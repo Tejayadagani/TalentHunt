@@ -33,45 +33,6 @@ function persistScouts(scouts: SavedScout[]) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(scouts));
 }
 
-// ── Loading State ─────────────────────────────────────────
-function LoadingState({ message }: { message: string }) {
-  const [elapsed, setElapsed] = useState(0);
-
-  useEffect(() => {
-    const t = setInterval(() => setElapsed(s => s + 1), 1000);
-    return () => clearInterval(t);
-  }, []);
-
-  const remaining = Math.max(0, 45 - elapsed);
-  const mins = Math.floor(remaining / 60);
-  const secs = remaining % 60;
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="bg-[#1A1A1A]/60 backdrop-blur-xl border border-[#333] rounded-xl p-10 shadow-lg flex flex-col items-center justify-center min-h-[480px] text-center"
-    >
-      <div className="spinner-gold mb-8" />
-      <h2 className="text-[22px] font-bold text-[#4A9D5F] mb-2">Scouting your candidates…</h2>
-      <p className="text-[14px] text-[#A0A0A0] max-w-sm mx-auto mb-10 leading-relaxed">
-        This typically takes ~45 seconds as we run parallel screening conversations with the top matches.
-      </p>
-
-      <div className="w-full max-w-xs mx-auto mb-8 text-center">
-        <div className="inline-flex items-center gap-3 text-[14px] bg-[#1A3A22]/50 text-[#4A9D5F] px-4 py-2 rounded-full border border-[#2D7D3E]/30">
-          <div className="w-4 h-4 rounded-full border-2 border-[#D4AF37] border-t-transparent animate-spin shrink-0" />
-          <span className="font-semibold">{message || "Initializing..."}</span>
-        </div>
-      </div>
-
-      <p className="text-[13px] italic text-[#777]">
-        Estimated time: ~{mins > 0 ? `${mins}m ` : ""}{secs}s remaining
-      </p>
-    </motion.div>
-  );
-}
-
 // ── Main Page ─────────────────────────────────────────────
 export default function ScoutPage() {
   const [isLoading, setIsLoading] = useState(false);
