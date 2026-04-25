@@ -15,6 +15,8 @@ services:
         sync: false        # e.g., https://talent-radar-frontend.vercel.app
       - key: PYTHONPATH
         value: .
+      - key: PYTHON_VERSION
+        value: 3.11.10
       - key: CHROMA_PERSIST_DIR
         value: /opt/render/project/src/chroma_data
     autoDeploy: true
