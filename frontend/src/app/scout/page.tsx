@@ -122,7 +122,7 @@ export default function ScoutPage() {
                   currentResults.weights = event.weights;
                   setTotalCandidates(event.total);
                   setResults({ ...currentResults });
-                  setIsLoading(false);
+                  // Pipeline continues running, do not set isLoading(false)
                 } else if (event.type === "candidate") {
                   currentResults.shortlist = [...currentResults.shortlist, event.data]
                     .sort((a, b) => (b.combined_score || 0) - (a.combined_score || 0))
@@ -133,8 +133,10 @@ export default function ScoutPage() {
                 } else if (event.type === "error") {
                   setError(event.message);
                   done = true;
+                  setIsLoading(false);
                 } else if (event.type === "done") {
                   done = true;
+                  setIsLoading(false);
                 }
               } catch (e) {
                 console.error("Failed to parse SSE JSON:", e, part);
@@ -266,15 +268,17 @@ export default function ScoutPage() {
           </AnimatePresence>
         </div>
 
-        {/* Right: Results */}
+        {/* Right: Results / Pipeline */}
         <div className={`transition-all duration-500 ease-out ${results || isLoading ? "lg:col-span-8" : "hidden"}`}>
-          {isLoading && !results && (
-            <AgentPipeline
-              activeAgent={activeAgent}
-              completedCount={completedCount}
-              totalCandidates={totalCandidates}
-              message={loadingMessage}
-            />
+          {isLoading && (
+            <div className="mb-6">
+              <AgentPipeline
+                activeAgent={activeAgent}
+                completedCount={completedCount}
+                totalCandidates={totalCandidates}
+                message={loadingMessage}
+              />
+            </div>
           )}
 
           {results && (
@@ -315,7 +319,7 @@ export default function ScoutPage() {
                 onReRank={(newShortlist, newWeight) => setResults({ ...results, shortlist: newShortlist, weights: { match: newWeight, interest: 1 - newWeight } })}
               />
 
-              <ShortlistTable candidates={results.shortlist || []} />
+              <ShortlistTable candidates={results.shortlist || []} isLoading={isLoading} />
             </motion.div>
           )}
         </div>
