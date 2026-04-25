@@ -37,7 +37,6 @@ from app.models import (
     Weights,
 )
 from app.pipeline import run_pipeline, rerank
-from app.llm_client import PROVIDER
 
 log = logging.getLogger(__name__)
 logging.basicConfig(
@@ -80,7 +79,7 @@ async def lifespan(app: FastAPI):
     except Exception as exc:
         log.error(f"Startup pre-warm failed: {exc}")
 
-    log.info(f"LLM provider: {PROVIDER.upper()}")
+    log.info("LLM Engine: Per-Agent Multi-Model Routing active")
     log.info("TalentRadar API ready.")
     log.info("=" * 60)
 
@@ -156,7 +155,7 @@ async def health_check():
     return HealthResponse(
         status="ok",
         chromadb=db_status,
-        llm_provider=PROVIDER,
+        llm_provider="Multi-Model (Per-Agent)",
         candidates_indexed=count,
     )
 
