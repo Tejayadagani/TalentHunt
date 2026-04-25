@@ -119,7 +119,7 @@ _AGENT_STATES = {}
 # the system prompt into the user message to avoid 400 INVALID_ARGUMENT errors.
 _NO_SYSTEM_ROLE_MODELS = {"google/gemma-3-27b-it:free", "google/gemma-3-12b-it:free"}
 
-MAX_RETRIES    = 6    # must be >= number of fallback tiers (Groq70B+Groq8B+3xOpenRouter)
+MAX_RETRIES    = 15    # Must be > total models across all tiers to allow full rotation + retries
 BASE_BACKOFF   = 1
 RATE_LIMIT_EXTRA_WAIT = 3
 
@@ -209,7 +209,7 @@ async def call_llm(system_prompt: str, user_prompt: str, agent_id: int = 0) -> s
                     log.error(f"[Agent {agent_id}] Models exhausted and hit unrecoverable error ({exc}). Failing fast.")
                     break
 
-            wait = BASE_BACKOFF * (2 ** attempt)
+            wait = min(BASE_BACKOFF * (2 ** attempt), 15)
 
             if is_rate_limit:
                 wait += RATE_LIMIT_EXTRA_WAIT
