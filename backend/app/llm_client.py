@@ -47,7 +47,13 @@ GROQ_MODELS       = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]
 GROQ_MODEL_IDX    = 0
 GROQ_BASE_URL     = "https://api.groq.com/openai/v1"
 
-OPENROUTER_MODEL  = os.getenv("OPENROUTER_MODEL", "meta-llama/llama-3.3-70b-instruct:free")
+# OpenRouter free-tier model rotation — if one upstream is throttled, try the next
+OPENROUTER_MODELS = [
+    os.getenv("OPENROUTER_MODEL", "qwen/qwen3-8b:free"),      # Qwen — very generous free tier
+    "microsoft/phi-4-reasoning:free",                          # MS Phi-4 — separate upstream
+    "mistralai/mistral-7b-instruct:free",                      # Mistral — different provider
+]
+OPENROUTER_MODEL_IDX = 0
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 
 MAX_RETRIES    = 3
@@ -86,7 +92,7 @@ def _get_openrouter_client():
         )
     return _openrouter_client
 
-log.info(f"LLM Engine: 3-Tier Multi-Model Fallback active (70B -> 8B -> OpenRouter)")
+log.info("LLM Engine: 4-Tier Fallback — Groq70B → Groq8B → OpenRouter(3 models)")
 
 
 # ── Public: main entry point ──────────────────────────────────────────────────
@@ -97,7 +103,7 @@ async def call_llm(system_prompt: str, user_prompt: str) -> str:
     """
     last_exc: Exception | None = None
     import asyncio
-    global PROVIDER, GROQ_MODEL_IDX
+    global PROVIDER, GROQ_MODEL_IDX, OPENROUTER_MODEL_IDX
 
     for attempt in range(MAX_RETRIES):
         try:
@@ -120,8 +126,15 @@ async def call_llm(system_prompt: str, user_prompt: str) -> str:
                 
                 # 2. Groq 8b -> OpenRouter
                 if PROVIDER == "groq" and GROQ_MODEL_IDX == 1:
-                    log.warning("Groq 8B limit hit. Switching to OpenRouter (Safety Net).")
+                    log.warning("Groq 8B limit hit. Switching to OpenRouter.")
                     PROVIDER = "openrouter"
+                    continue
+
+                # 3. Rotate through OpenRouter models
+                if PROVIDER == "openrouter" and OPENROUTER_MODEL_IDX < len(OPENROUTER_MODELS) - 1:
+                    OPENROUTER_MODEL_IDX += 1
+                    next_model = OPENROUTER_MODELS[OPENROUTER_MODEL_IDX]
+                    log.warning(f"OpenRouter rate limit. Rotating to next model: {next_model}")
                     continue
 
             wait = BASE_BACKOFF * (2 ** attempt)
@@ -169,10 +182,14 @@ def parse_json_response(text: str) -> dict:
 
 # ── Private: OpenRouter ───────────────────────────────────────────────────────
 async def _call_openrouter(system_prompt: str, user_prompt: str) -> str:
-    """Call OpenRouter via OpenAI-compatible API."""
+    """Call OpenRouter with the current model in the rotation list."""
+    import asyncio
     client = _get_openrouter_client()
+    model  = OPENROUTER_MODELS[OPENROUTER_MODEL_IDX]
+    # Small sleep to avoid hammering free-tier upstream concurrently
+    await asyncio.sleep(0.5)
     response = await client.chat.completions.create(
-        model=OPENROUTER_MODEL,
+        model=model,
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user",   "content": user_prompt},
