@@ -3,7 +3,7 @@ llm_client.py — Unified LLM wrapper for TalentRadar.
 
 Supports two providers, selected via the LLM_PROVIDER env var:
   - "gemini"  (default) → Google Gemini 1.5 Flash, free tier
-  - "grok"              → xAI Grok-3-mini via OpenAI-compatible API
+  - "groq"              → Groq API (Llama 3) via OpenAI-compatible API
 
 Public API
 ----------
@@ -35,20 +35,20 @@ log = logging.getLogger(__name__)
 # ── Configuration ─────────────────────────────────────────────────────────────
 PROVIDER       = os.getenv("LLM_PROVIDER", "gemini").lower()
 GEMINI_MODEL   = "gemini-2.0-flash"
-GROK_MODEL     = "grok-3-mini"
-GROK_BASE_URL  = "https://api.x.ai/v1"
+GROQ_MODEL     = "llama3-8b-8192"
+GROQ_BASE_URL  = "https://api.groq.com/openai/v1"
 
 MAX_RETRIES    = 3
 BASE_BACKOFF   = 1      # seconds — doubles each retry: 1 → 2 → 4
 RATE_LIMIT_EXTRA_WAIT = 5   # extra seconds on top of backoff for 429s
 
 # Validate provider at import time so failures are caught early
-if PROVIDER not in ("gemini", "grok"):
+if PROVIDER not in ("gemini", "groq"):
     raise ValueError(
-        f"Invalid LLM_PROVIDER='{PROVIDER}'. Must be 'gemini' or 'grok'."
+        f"Invalid LLM_PROVIDER='{PROVIDER}'. Must be 'gemini' or 'groq'."
     )
 
-log.info(f"Provider: {PROVIDER.upper()}  |  model: {GEMINI_MODEL if PROVIDER == 'gemini' else GROK_MODEL}")
+log.info(f"Provider: {PROVIDER.upper()}  |  model: {GEMINI_MODEL if PROVIDER == 'gemini' else GROQ_MODEL}")
 
 
 # ── Public: main entry point ──────────────────────────────────────────────────
@@ -69,7 +69,7 @@ def call_llm(system_prompt: str, user_prompt: str) -> str:
             if PROVIDER == "gemini":
                 return _call_gemini(system_prompt, user_prompt)
             else:
-                return _call_grok(system_prompt, user_prompt)
+                return _call_groq(system_prompt, user_prompt)
 
         except Exception as exc:
             last_exc = exc
@@ -138,21 +138,21 @@ def _call_gemini(system_prompt: str, user_prompt: str) -> str:
     return response.text.strip()
 
 
-# ── Private: Grok ─────────────────────────────────────────────────────────────
-def _call_grok(system_prompt: str, user_prompt: str) -> str:
-    """Call xAI Grok via the OpenAI-compatible API."""
+# ── Private: Groq ─────────────────────────────────────────────────────────────
+def _call_groq(system_prompt: str, user_prompt: str) -> str:
+    """Call Groq via the OpenAI-compatible API."""
     from openai import OpenAI
 
-    api_key = os.environ.get("GROK_API_KEY")
+    api_key = os.environ.get("GROQ_API_KEY")
     if not api_key:
         raise EnvironmentError(
-            "GROK_API_KEY is not set. Add it to your .env file."
+            "GROQ_API_KEY is not set. Add it to your .env file."
         )
 
-    client = OpenAI(api_key=api_key, base_url=GROK_BASE_URL)
+    client = OpenAI(api_key=api_key, base_url=GROQ_BASE_URL)
 
     response = client.chat.completions.create(
-        model=GROK_MODEL,
+        model=GROQ_MODEL,
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user",   "content": user_prompt},
@@ -166,7 +166,7 @@ def _is_rate_limit_error(exc: Exception) -> bool:
     """
     Return True if the exception looks like a rate-limit / quota error.
     Covers Gemini (google.api_core.exceptions.ResourceExhausted),
-    OpenAI / Grok (openai.RateLimitError), and generic HTTP 429 strings.
+    OpenAI / Groq (openai.RateLimitError), and generic HTTP 429 strings.
     """
     exc_str = str(exc).lower()
     rate_limit_keywords = (
