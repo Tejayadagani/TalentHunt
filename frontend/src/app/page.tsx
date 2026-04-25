@@ -149,7 +149,7 @@ export default function Home() {
               onClick={() => { setResults(null); setError(null); setIsSaved(false); }}
               className="text-[14px] font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
-              New Scout
+              Start New Search
             </button>
             <button
               onClick={() => setShowSaved(true)}
