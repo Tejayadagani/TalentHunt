@@ -10,6 +10,8 @@ build/
 
 # Environment
 .env
+.env.local
+.env.*.local
 
 # ChromaDB — generated, do not commit
 backend/chroma_data/

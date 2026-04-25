@@ -29,7 +29,8 @@ export default function Home() {
     // Health check on load
     const checkHealth = async () => {
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+        if (!apiUrl) throw new Error("NEXT_PUBLIC_API_URL is not defined");
         const res = await fetch(`${apiUrl}/api/health`, { method: "GET" });
         if (res.ok) {
           setIsBackendConnected(true);
@@ -48,7 +49,8 @@ export default function Home() {
     setError(null);
     setResults(null);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+      if (!apiUrl) throw new Error("NEXT_PUBLIC_API_URL is not defined. Please check your .env file.");
       const res = await fetch(`${apiUrl}/api/scout`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
