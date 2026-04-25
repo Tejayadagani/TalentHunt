@@ -194,11 +194,6 @@ export default function Home() {
                     {results.total_candidates_evaluated} candidates evaluated, {results.shortlist?.length || 0} ranked
                   </p>
                 </div>
-                {results.weights && (
-                  <div className="text-[13px] text-muted-foreground bg-secondary px-3 py-1.5 rounded-md border border-border">
-                    Current Weights: Match {Math.round(results.weights.match * 100)}% / Interest {Math.round(results.weights.interest * 100)}%
-                  </div>
-                )}
               </div>
 
               <ScoreSliders 
