@@ -87,6 +87,7 @@ async def find_candidates(parsed_jd: dict, top_k: int = 10) -> list[dict]:
 
     # ── Step 5: LLM match reason (one sentence per candidate) ────────────────
     import asyncio
+    jd_sum = jd_summary(parsed_jd)
     for i, candidate in enumerate(top_candidates):
         log.info(
             f"[Agent 2] Getting match reason for candidate "
