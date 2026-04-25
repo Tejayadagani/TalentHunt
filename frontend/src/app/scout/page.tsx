@@ -126,7 +126,7 @@ export default function ScoutPage() {
       let done = false;
       let buffer = "";
 
-      let currentResults: ScoutResponseData = {
+      const currentResults: ScoutResponseData = {
         job_title: null,
         total_candidates_evaluated: 0,
         shortlist: [],
