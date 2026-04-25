@@ -194,11 +194,6 @@ export default function LandingPage() {
         <FloatingCard name="Priya Nair" role="Sr. SWE · Razorpay" score={87} delay={1.5} x="72%" y="18%" />
         <FloatingCard name="Vikram Rao" role="Staff Engineer" score={83} delay={3} x="75%" y="62%" />
 
-        {/* Badge */}
-        <div className="relative z-10 inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-white text-[13px] font-medium mb-8">
-          <span className="w-2 h-2 rounded-full bg-[#D4AF37] animate-pulse" />
-          Built for Catalyst 2026 · AI Recruitment Track
-        </div>
 
         {/* Headline */}
         <div className="relative z-10 text-center max-w-3xl mx-auto">
