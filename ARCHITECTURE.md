@@ -5,58 +5,60 @@ This document provides a high-level overview of the TalentRadar system architect
 ## High-Level Architecture Diagram
 
 ```mermaid
-%%{init: { 'sequence': { 'actorMargin': 30, 'width': 200, 'height': 50, 'messageMargin': 40 } } }%%
-sequenceDiagram
-    autonumber
-    actor User
-    participant UI as Next.js Frontend
-    participant API as FastAPI Backend
-    participant Agents as Multi-Agent Pipeline
-    participant DB as ChromaDB
-    participant LLM as Groq / Gemini API
+flowchart TD
+    %% Define Theme Colors for perfect Dark/Light Mode Contrast
+    classDef user fill:#2D7D3E,stroke:#1F5A2B,stroke-width:2px,color:#fff
+    classDef frontend fill:#1A1A1A,stroke:#4A4A4A,stroke-width:2px,color:#fff
+    classDef backend fill:#111827,stroke:#374151,stroke-width:2px,color:#fff
+    classDef agent fill:#D4AF37,stroke:#A68312,stroke-width:2px,color:#000
+    classDef db fill:#0A0A0A,stroke:#D4AF37,stroke-width:2px,color:#fff
+    classDef external fill:#1F5A2B,stroke:#2D7D3E,stroke-width:2px,color:#fff
 
-    User->>UI: Pastes Raw Job Description
-    UI->>API: POST /api/scout/stream
-    
-    API->>Agents: Trigger Async Pipeline
-    
-    %% Step 1
-    Note over Agents,LLM: Step 1: Parse & Structure JD
-    Agents->>LLM: Agent 1 extracts skills & seniority
-    LLM-->>Agents: Returns Structured JSON
-    API-->>UI: (SSE Chunk) "Parsing job description..."
-    
-    %% Step 2
-    Note over Agents,DB: Step 2: Semantic Scouting
-    Agents->>DB: Agent 2 embeds JD & queries Vector DB
-    DB-->>Agents: Top 5 Candidate Matches
-    API-->>UI: (SSE Chunk) "Searching talent pool..."
-    
-    %% Step 3
-    Note over Agents,LLM: Step 3: Parallel Interview Simulation
-    par Candidate 1 (Asyncio Semaphore)
-        loop 6 Conversation Turns
-            Agents->>LLM: Agent 3 (Recruiter) asks question
-            LLM-->>Agents: 
-            Agents->>LLM: Agent 4 (Candidate) answers
-            LLM-->>Agents: 
-        end
-        Agents->>LLM: Agent 5 (Scorer) evaluates transcript
-        LLM-->>Agents: JSON Interest Score & Explanation
-        Note right of LLM: If Groq hits 429 Rate Limit, auto-fallback to Gemini.
-        API-->>UI: (SSE Chunk) {Candidate 1 Data}
-        UI->>UI: Live Re-sort & Update Dashboard
-    and Candidates 2-5 (Concurrent)
-        Agents->>LLM: Agents 3 & 4 converse
-        LLM-->>Agents: 
-        Agents->>LLM: Agent 5 scores transcript
-        LLM-->>Agents: JSON Interest Score
-        API-->>UI: (SSE Chunk) {Candidate N Data}
-        UI->>UI: Live Re-sort & Update Dashboard
+    User((User)):::user
+
+    subgraph Client [Frontend Layer - Next.js]
+        Input[Raw Job Description Input]:::frontend
+        Dashboard[Live Ranking Dashboard]:::frontend
     end
 
-    API-->>UI: (SSE Chunk) {Status: Done}
-    UI-->>User: Display Final Ranked Shortlist
+    subgraph Server [Backend Layer - FastAPI]
+        Endpoint[POST /api/scout/stream]:::backend
+        SSE[SSE Stream Generator]:::backend
+    end
+
+    subgraph Pipeline [Multi-Agent Pipeline]
+        A1[Agent 1: Parse & Structure JD]:::agent
+        A2[Agent 2: Embed & Semantic Match]:::agent
+        A3[Agents 3 & 4: Simulate Interview]:::agent
+        A5[Agent 5: Evaluate & Score]:::agent
+    end
+
+    subgraph Data [Data & AI Services]
+        Chroma[(ChromaDB)]:::db
+        Groq[Groq API: Llama 3]:::external
+        Gemini[Gemini API: Auto-Fallback]:::external
+    end
+
+    %% Step-by-Step Flow
+    User -->|1. Pastes Text| Input
+    Input -->|2. Submits| Endpoint
+    Endpoint -->|3. Triggers| A1
+
+    A1 <-->|JSON Structuring| Groq
+    A1 -->|Structured JD| A2
+
+    A2 <-->|Top 5 Query| Chroma
+    A2 -->|Candidates| A3
+
+    A3 <-->|Parallel 6-Turn Chat| Groq
+    A3 -->|Transcripts| A5
+
+    A5 <-->|Interest Scoring| Groq
+    A5 -.->|If 429 Rate Limit| Gemini
+    
+    A5 -->|Yield JSON Chunk| SSE
+    SSE -->|Server-Sent Events| Dashboard
+    Dashboard -->|Live Re-sorts| User
 ```
 
 ## System Components
