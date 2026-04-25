@@ -166,7 +166,7 @@ export default function Home() {
               onClick={() => setShowSettings(true)}
               className="text-[14px] font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
-              Settings
+              How It Works
             </button>
           </nav>
 
