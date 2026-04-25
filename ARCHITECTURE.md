@@ -5,6 +5,7 @@ This document provides a high-level overview of the TalentRadar system architect
 ## High-Level Architecture Diagram
 
 ```mermaid
+%%{init: { 'sequence': { 'actorMargin': 30, 'width': 200, 'height': 50, 'messageMargin': 40 } } }%%
 sequenceDiagram
     autonumber
     actor User
