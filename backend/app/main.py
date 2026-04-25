@@ -67,7 +67,13 @@ async def lifespan(app: FastAPI):
         log.info(f"ChromaDB ready — {count} candidates indexed.")
 
         if count == 0:
-            log.warning("ChromaDB is empty! Ensure the build step embedded the candidates.")
+            if os.getenv("RENDER"):
+                log.warning("ChromaDB is empty on Render! Ensure the build step embedded candidates.")
+            else:
+                log.info("Local dev: ChromaDB is empty. Auto-seeding candidates …")
+                from scripts.embed_candidates import main as seed_db
+                seed_db()
+                log.info(f"Seeding complete. New count: {collection_count()}")
     except Exception as exc:
         log.error(f"Startup pre-warm failed: {exc}")
 
