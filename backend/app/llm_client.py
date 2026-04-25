@@ -87,12 +87,11 @@ async def call_llm(system_prompt: str, user_prompt: str) -> str:
     """
     last_exc: Exception | None = None
     import asyncio
-    
-    current_provider = PROVIDER
+    global PROVIDER
 
     for attempt in range(MAX_RETRIES):
         try:
-            if current_provider == "gemini":
+            if PROVIDER == "gemini":
                 return await _call_gemini(system_prompt, user_prompt)
             else:
                 return await _call_groq(system_prompt, user_prompt)
@@ -101,10 +100,10 @@ async def call_llm(system_prompt: str, user_prompt: str) -> str:
             last_exc = exc
             is_rate_limit = _is_rate_limit_error(exc)
             
-            # AUTOMATIC FALLBACK: Groq -> Gemini
-            if is_rate_limit and current_provider == "groq":
-                log.warning("Groq rate limit hit! Automatically falling back to Gemini for this request.")
-                current_provider = "gemini"
+            # AUTOMATIC FALLBACK: Groq -> Gemini (Global Switch)
+            if is_rate_limit and PROVIDER == "groq":
+                log.warning("Groq rate limit hit! Permanently switching backend to Gemini for all subsequent requests.")
+                PROVIDER = "gemini"
                 continue  # Instantly retry this attempt using Gemini
 
             wait = BASE_BACKOFF * (2 ** attempt)
