@@ -6,7 +6,7 @@ Match Score for each, and asks the LLM for a one-sentence match reason.
 
 Public API
 ----------
-  find_candidates(parsed_jd, top_k=10) -> list[dict]
+  async def find_candidates(parsed_jd, top_k=10) -> list[dict]
   compute_match_score(jd, candidate, semantic_score) -> dict   (also exported for pipeline)
 
 Each returned candidate dict contains every field from the original profile
@@ -40,7 +40,7 @@ _CHROMA_FETCH = 15
 
 
 # ── Public: main entry point ──────────────────────────────────────────────────
-def find_candidates(parsed_jd: dict, top_k: int = 10) -> list[dict]:
+async def find_candidates(parsed_jd: dict, top_k: int = 10) -> list[dict]:
     """
     Find and score the top-K matching candidates for a parsed job description.
 
@@ -86,15 +86,15 @@ def find_candidates(parsed_jd: dict, top_k: int = 10) -> list[dict]:
     )
 
     # ── Step 5: LLM match reason (one sentence per candidate) ────────────────
-    jd_sum = jd_summary(parsed_jd)
+    import asyncio
     for i, candidate in enumerate(top_candidates):
         log.info(
             f"[Agent 2] Getting match reason for candidate "
             f"{i + 1}/{len(top_candidates)}: {candidate['name']}"
         )
-        candidate["match_reason"] = _get_match_reason(jd_sum, candidate)
+        candidate["match_reason"] = await _get_match_reason(jd_sum, candidate)
         if i < len(top_candidates) - 1:
-            time.sleep(_LLM_INTER_CALL_SLEEP)   # rate-limit guard
+            await asyncio.sleep(_LLM_INTER_CALL_SLEEP)   # rate-limit guard
 
     log.info("[Agent 2] Talent scouting complete.")
     return top_candidates
@@ -190,7 +190,7 @@ _MATCH_REASON_SYSTEM = (
     "Return only the sentence — no labels, no JSON, no bullet points."
 )
 
-def _get_match_reason(jd_sum: str, candidate: dict) -> str:
+async def _get_match_reason(jd_sum: str, candidate: dict) -> str:
     """Call the LLM for a one-sentence match/mismatch reason."""
     cand_summary = (
         f"{candidate['name']}: {candidate['current_title']} at {candidate['current_company']}. "
@@ -206,7 +206,7 @@ def _get_match_reason(jd_sum: str, candidate: dict) -> str:
     )
 
     try:
-        reason = call_llm(_MATCH_REASON_SYSTEM, user_prompt)
+        reason = await call_llm(_MATCH_REASON_SYSTEM, user_prompt)
         # Trim to a single sentence if the LLM goes over
         sentences = reason.replace("\n", " ").split(".")
         first = sentences[0].strip()

@@ -42,19 +42,37 @@ MAX_RETRIES    = 3
 BASE_BACKOFF   = 1      # seconds — doubles each retry: 1 → 2 → 4
 RATE_LIMIT_EXTRA_WAIT = 5   # extra seconds on top of backoff for 429s
 
-# Validate provider at import time so failures are caught early
-if PROVIDER not in ("gemini", "groq"):
-    raise ValueError(
-        f"Invalid LLM_PROVIDER='{PROVIDER}'. Must be 'gemini' or 'groq'."
-    )
+# Global clients to avoid re-instantiation overhead
+_genai_configured = False
+_groq_client = None
+
+def _get_groq_client():
+    global _groq_client
+    if _groq_client is None:
+        from openai import AsyncOpenAI
+        api_key = os.environ.get("GROQ_API_KEY")
+        if not api_key:
+            raise EnvironmentError("GROQ_API_KEY is not set. Add it to your .env file.")
+        _groq_client = AsyncOpenAI(api_key=api_key, base_url=GROQ_BASE_URL)
+    return _groq_client
+
+def _configure_gemini():
+    global _genai_configured
+    if not _genai_configured:
+        import google.generativeai as genai
+        api_key = os.environ.get("GEMINI_API_KEY")
+        if not api_key:
+            raise EnvironmentError("GEMINI_API_KEY is not set. Add it to your .env file.")
+        genai.configure(api_key=api_key)
+        _genai_configured = True
 
 log.info(f"Provider: {PROVIDER.upper()}  |  model: {GEMINI_MODEL if PROVIDER == 'gemini' else GROQ_MODEL}")
 
 
 # ── Public: main entry point ──────────────────────────────────────────────────
-def call_llm(system_prompt: str, user_prompt: str) -> str:
+async def call_llm(system_prompt: str, user_prompt: str) -> str:
     """
-    Call the configured LLM with the given prompts.
+    Call the configured LLM with the given prompts (Asynchronous).
 
     Retries up to MAX_RETRIES times with exponential backoff.
     Rate-limit errors trigger an additional RATE_LIMIT_EXTRA_WAIT-second pause.
@@ -63,13 +81,14 @@ def call_llm(system_prompt: str, user_prompt: str) -> str:
     Raises the last exception if all retries are exhausted.
     """
     last_exc: Exception | None = None
+    import asyncio
 
     for attempt in range(MAX_RETRIES):
         try:
             if PROVIDER == "gemini":
-                return _call_gemini(system_prompt, user_prompt)
+                return await _call_gemini(system_prompt, user_prompt)
             else:
-                return _call_groq(system_prompt, user_prompt)
+                return await _call_groq(system_prompt, user_prompt)
 
         except Exception as exc:
             last_exc = exc
@@ -89,7 +108,7 @@ def call_llm(system_prompt: str, user_prompt: str) -> str:
                 )
 
             if attempt < MAX_RETRIES - 1:
-                time.sleep(wait)
+                await asyncio.sleep(wait)
 
     log.error(f"All {MAX_RETRIES} LLM attempts failed. Last error: {last_exc}")
     raise last_exc  # type: ignore[misc]
@@ -117,46 +136,33 @@ def parse_json_response(text: str) -> dict:
 
 
 # ── Private: Gemini ───────────────────────────────────────────────────────────
-def _call_gemini(system_prompt: str, user_prompt: str) -> str:
+async def _call_gemini(system_prompt: str, user_prompt: str) -> str:
     """Call Google Gemini 1.5 Flash."""
     import google.generativeai as genai
-
-    api_key = os.environ.get("GEMINI_API_KEY")
-    if not api_key:
-        raise EnvironmentError(
-            "GEMINI_API_KEY is not set. Add it to your .env file."
-        )
-
-    genai.configure(api_key=api_key)
+    _configure_gemini()
 
     model = genai.GenerativeModel(
         model_name=GEMINI_MODEL,
         system_instruction=system_prompt,
     )
 
-    response = model.generate_content(user_prompt)
+    response = await model.generate_content_async(user_prompt)
     return response.text.strip()
 
 
 # ── Private: Groq ─────────────────────────────────────────────────────────────
-def _call_groq(system_prompt: str, user_prompt: str) -> str:
-    """Call Groq via the OpenAI-compatible API."""
-    from openai import OpenAI
+async def _call_groq(system_prompt: str, user_prompt: str) -> str:
+    """Call Groq via the OpenAI-compatible API (Asynchronous)."""
+    client = _get_groq_client()
 
-    api_key = os.environ.get("GROQ_API_KEY")
-    if not api_key:
-        raise EnvironmentError(
-            "GROQ_API_KEY is not set. Add it to your .env file."
-        )
-
-    client = OpenAI(api_key=api_key, base_url=GROQ_BASE_URL)
-
-    response = client.chat.completions.create(
+    response = await client.chat.completions.create(
         model=GROQ_MODEL,
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user",   "content": user_prompt},
         ],
+        max_tokens=2048,  # Increased to prevent truncation of JSON/explanations
+        temperature=0.1,  # Lower temperature for more stable JSON
     )
     return response.choices[0].message.content.strip()
 

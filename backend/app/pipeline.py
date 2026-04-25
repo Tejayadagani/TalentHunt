@@ -25,6 +25,7 @@ Privacy
   'interest_level' is stripped from all output dicts before returning.
 """
 
+import asyncio
 import logging
 import time
 from typing import Optional
@@ -36,10 +37,10 @@ from app.agents.scorer           import score_conversation
 
 log = logging.getLogger(__name__)
 
-# ── Rate-limit guard between candidates ───────────────────────────────────────
-# Conversation sim already sleeps 2s/turn internally.
-# This additional pause separates back-to-back candidate pipelines.
-INTER_CANDIDATE_SLEEP = 3   # seconds
+# ── Rate-limit guard ──────────────────────────────────────────────────────────
+# Parallel execution semaphore to stay under LLM TPM/RPM limits.
+_CONCURRENCY_LIMIT = 2   # Evaluate 2 candidates at a time
+_SEMAPHORE = asyncio.Semaphore(_CONCURRENCY_LIMIT)
 
 # Fields from the candidate profile that must never appear in the API response
 _PRIVATE_FIELDS = {"interest_level"}
@@ -53,80 +54,65 @@ def compute_combined_score(
     interest_score: float,
     match_weight: float = 0.6,
 ) -> float:
-    """
-    Combine Match Score and Interest Score into a single ranking number.
-
-    Combined Score = (match_score × match_weight)
-                   + (interest_score × (1 − match_weight))
-
-    Default weights: Match 60% / Interest 40% (recruiter-adjustable via sliders).
-
-    Args:
-        match_score:    0–100, from Agent 2 (talent_scout).
-        interest_score: 0–100, from Agent 5 (scorer).
-        match_weight:   0.0–1.0, defaults to 0.6 per spec.
-
-    Returns:
-        Float rounded to 1 decimal place.
-    """
     match_weight    = max(0.0, min(1.0, match_weight))  # clamp to [0, 1]
     interest_weight = 1.0 - match_weight
     return round(match_score * match_weight + interest_score * interest_weight, 1)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Main pipeline
+# Parallel Evaluation Helper
 # ─────────────────────────────────────────────────────────────────────────────
-def run_pipeline(
+async def evaluate_candidate(
+    candidate: dict,
+    parsed_jd: dict,
+    conversation_turns: int,
+    match_weight: float,
+) -> dict:
+    """
+    Evaluate a single candidate end-to-end (simulation + scoring).
+    Uses a semaphore to manage LLM concurrency.
+    """
+    name = candidate.get("name", "Unknown")
+    
+    async with _SEMAPHORE:
+        log.info(f"[Pipeline] Processing {name} (parallel slot acquired) …")
+        
+        # Agents 3 + 4: Conversation simulation
+        transcript = await simulate_conversation(
+            parsed_jd, candidate, turns=conversation_turns
+        )
+
+        # Agent 5: Score the transcript
+        score_result = await score_conversation(transcript, parsed_jd, candidate)
+
+        # Combine scores
+        combined = compute_combined_score(
+            match_score    = candidate["match_score"],
+            interest_score = score_result["interest_score"],
+            match_weight   = match_weight,
+        )
+
+        return {
+            **_public_candidate(candidate),
+            "interest_score":          score_result["interest_score"],
+            "interest_breakdown":      score_result["breakdown"],
+            "combined_score":          combined,
+            "explanation":             score_result["explanation"],
+            "conversation_transcript": transcript,
+        }
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Main pipeline (Async)
+# ─────────────────────────────────────────────────────────────────────────────
+async def run_pipeline(
     jd_text: str,
     top_k: int = 5,
     match_weight: float = 0.6,
     conversation_turns: int = 6,
 ) -> dict:
     """
-    Run the full TalentRadar pipeline for a given job description.
-
-    Args:
-        jd_text:           Raw job description text (min 50 chars).
-        top_k:             Number of candidates to evaluate end-to-end (default 5).
-        match_weight:      Weight for Match Score in combined ranking (default 0.6).
-        conversation_turns: Number of recruiter↔candidate turns (default 6).
-
-    Returns:
-        {
-          "job_title":                  str,
-          "parsed_jd":                  dict,
-          "total_candidates_evaluated": int,
-          "shortlist": [
-            {
-              "rank":                   int,
-              "candidate_id":           str,
-              "name":                   str,
-              "current_title":          str,
-              "current_company":        str,
-              "seniority":              str,
-              "years_of_experience":    int,
-              "location":               str,
-              "remote_ok":              bool,
-              "skills":                 list[str],
-              "match_score":            float,
-              "match_breakdown":        dict,
-              "match_reason":           str,
-              "interest_score":         int,
-              "interest_breakdown":     dict,
-              "combined_score":         float,
-              "explanation":            str,
-              "conversation_transcript": list[dict]
-            },
-            ...
-          ],
-          "weights": { "match": float, "interest": float },
-          "errors":  list[str]    # per-candidate errors, empty if all succeeded
-        }
-
-    Raises:
-        ValueError: if jd_text is too short.
-        Exception:  if Agent 1 (JD parsing) fails — pipeline cannot continue.
+    Run the full TalentRadar pipeline asynchronously and in parallel.
     """
     pipeline_start = time.time()
     errors: list[str] = []
@@ -134,74 +120,57 @@ def run_pipeline(
     # ── Step 1: Parse the JD (Agent 1) ───────────────────────────────────────
     log.info("=" * 60)
     log.info("[Pipeline] Step 1/3 — Parsing job description …")
-    parsed_jd = parse_jd(jd_text)   # raises ValueError if JD is too short
-    log.info(
-        f"[Pipeline] JD parsed: title='{parsed_jd.get('title')}' "
-        f"seniority={parsed_jd.get('seniority')} "
-        f"required_skills={parsed_jd.get('required_skills')}"
-    )
+    parsed_jd = await parse_jd(jd_text)
+    log.info(f"[Pipeline] JD parsed: '{parsed_jd.get('title')}'")
 
     # ── Step 2: Find candidates (Agent 2) ─────────────────────────────────────
     log.info(f"[Pipeline] Step 2/3 — Scouting top {top_k} candidates …")
-    candidates = find_candidates(parsed_jd, top_k=top_k)
+    candidates = await find_candidates(parsed_jd, top_k=top_k)
 
     if not candidates:
-        log.warning("[Pipeline] No candidates found. Returning empty shortlist.")
+        log.warning("[Pipeline] No candidates found.")
         return _empty_result(parsed_jd, match_weight)
 
-    log.info(f"[Pipeline] {len(candidates)} candidates retrieved from ChromaDB.")
+    # ── Step 3: Parallel evaluation ──────────────────────────────────────────
+    log.info(f"[Pipeline] Step 3/3 — Evaluating {len(candidates)} candidates in parallel …")
+    
+    tasks = [
+        evaluate_candidate(c, parsed_jd, conversation_turns, match_weight)
+        for c in candidates
+    ]
+    
+    # We use return_exceptions=True so one failure doesn't kill the batch
+    raw_results = await asyncio.gather(*tasks, return_exceptions=True)
+    
+    results = []
+    for idx, res in enumerate(raw_results):
+        if isinstance(res, Exception):
+            name = candidates[idx].get("name", f"Candidate {idx+1}")
+            log.error(f"[Pipeline] Error processing {name}: {res}")
+            errors.append(f"{name}: {res}")
+        else:
+            results.append(res)
 
-    # ── Steps 3+4+5: Per-candidate conversation + scoring ────────────────────
-    log.info(f"[Pipeline] Step 3/3 — Running conversation + scoring for each candidate …")
-    results: list[dict] = []
+    # ── Sort and Rank ────────────────────────────────────────────────────────
+    results.sort(key=lambda x: x["combined_score"], reverse=True)
+    for rank, result in enumerate(results, start=1):
+        result["rank"] = rank
 
-    for idx, candidate in enumerate(candidates, start=1):
-        name = candidate.get("name", f"Candidate {idx}")
-        log.info(f"[Pipeline] ── Candidate {idx}/{len(candidates)}: {name} ──")
+    elapsed = round(time.time() - pipeline_start, 1)
+    log.info(f"[Pipeline] Complete — {len(results)} scored in {elapsed}s. Errors: {len(errors)}")
+    log.info("=" * 60)
 
-        try:
-            # Agent 3 + 4: Conversation simulation
-            log.info(f"[Pipeline] Simulating conversation for {name} …")
-            transcript = simulate_conversation(
-                parsed_jd, candidate, turns=conversation_turns
-            )
-
-            # Agent 5: Score the transcript
-            log.info(f"[Pipeline] Scoring conversation for {name} …")
-            score_result = score_conversation(transcript, parsed_jd, candidate)
-
-            # Combine scores
-            combined = compute_combined_score(
-                match_score    = candidate["match_score"],
-                interest_score = score_result["interest_score"],
-                match_weight   = match_weight,
-            )
-
-            # Build result dict — strip private fields
-            result = {
-                **_public_candidate(candidate),
-                "interest_score":          score_result["interest_score"],
-                "interest_breakdown":      score_result["breakdown"],
-                "combined_score":          combined,
-                "explanation":             score_result["explanation"],
-                "conversation_transcript": transcript,
-            }
-            results.append(result)
-
-            log.info(
-                f"[Pipeline] {name} → match={candidate['match_score']} "
-                f"interest={score_result['interest_score']} combined={combined}"
-            )
-
-        except Exception as exc:
-            # Don't let one candidate failure abort the whole pipeline
-            log.error(f"[Pipeline] Error processing {name}: {exc}", exc_info=True)
-            errors.append(f"{name}: {exc}")
-
-        # Rate-limit guard between candidates (skip after last one)
-        if idx < len(candidates):
-            log.info(f"[Pipeline] Sleeping {INTER_CANDIDATE_SLEEP}s before next candidate …")
-            time.sleep(INTER_CANDIDATE_SLEEP)
+    return {
+        "job_title":                  parsed_jd.get("title"),
+        "parsed_jd":                  parsed_jd,
+        "total_candidates_evaluated": len(candidates),
+        "shortlist":                  results,
+        "weights": {
+            "match":    round(match_weight, 2),
+            "interest": round(1.0 - match_weight, 2),
+        },
+        "errors": errors,
+    }
 
     # ── Sort by combined score and assign ranks ────────────────────────────────
     results.sort(key=lambda x: x["combined_score"], reverse=True)

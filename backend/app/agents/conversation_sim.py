@@ -8,7 +8,7 @@ these through conversation, just like a real recruiter would.
 
 Public API
 ----------
-  simulate_conversation(parsed_jd, candidate, turns=6) -> list[dict]
+  async def simulate_conversation(parsed_jd, candidate, turns=6) -> list[dict]
 
 Returns a transcript:
   [
@@ -39,7 +39,7 @@ _INTER_TURN_SLEEP = 2   # seconds between each full turn (recruiter + candidate)
 # ─────────────────────────────────────────────────────────────────────────────
 # Public function
 # ─────────────────────────────────────────────────────────────────────────────
-def simulate_conversation(
+async def simulate_conversation(
     parsed_jd: dict,
     candidate: dict,
     turns: int = 6,
@@ -70,24 +70,25 @@ def simulate_conversation(
 
     history: list[dict] = []
 
+    import asyncio
     for turn in range(1, turns + 1):
         is_last_turn = (turn == turns)
 
         # ── Agent 3: Recruiter speaks ────────────────────────────────────────
         log.info(f"[Agent 3] Turn {turn}/{turns} — recruiter generating message …")
-        recruiter_msg = _call_recruiter(parsed_jd, history, turn, turns, is_last_turn)
+        recruiter_msg = await _call_recruiter(parsed_jd, history, turn, turns, is_last_turn)
         history.append({"role": "recruiter", "turn": turn, "message": recruiter_msg})
 
         # ── Agent 4: Candidate responds ───────────────────────────────────────
         log.info(f"[Agent 4] Turn {turn}/{turns} — candidate generating response …")
-        candidate_msg = _call_candidate(candidate, history, turn, turns, is_last_turn)
+        candidate_msg = await _call_candidate(candidate, history, turn, turns, is_last_turn)
         history.append({"role": "candidate", "turn": turn, "message": candidate_msg})
 
         log.info(f"[Agent 3+4] Turn {turn} complete.")
 
         # Rate-limit guard — skip sleep after last turn
         if not is_last_turn:
-            time.sleep(_INTER_TURN_SLEEP)
+            await asyncio.sleep(_INTER_TURN_SLEEP)
 
     log.info(f"[Agent 3+4] Simulation complete — {len(history)} messages total.")
     return history
@@ -127,7 +128,7 @@ Rules:
 - Respond ONLY with your next message — no labels, no JSON."""
 
 
-def _call_recruiter(
+async def _call_recruiter(
     parsed_jd: dict,
     history: list[dict],
     turn: int,
@@ -160,7 +161,7 @@ def _call_recruiter(
         user_prompt = f"Conversation so far:\n{dialogue}\n\n{instruction}"
 
     try:
-        return call_llm(system, user_prompt).strip()
+        return (await call_llm(system, user_prompt)).strip()
     except Exception as exc:
         log.error(f"[Agent 3] LLM call failed on turn {turn}: {exc}")
         return "Thank you for your time. We'll be in touch soon."
@@ -236,7 +237,7 @@ Strict rules:
 - Respond ONLY with your next message — no labels, no JSON."""
 
 
-def _call_candidate(
+async def _call_candidate(
     candidate: dict,
     history: list[dict],
     turn: int,
@@ -262,7 +263,7 @@ def _call_candidate(
     user_prompt = f"Conversation so far:\n{dialogue}\n\n{instruction}"
 
     try:
-        return call_llm(system, user_prompt).strip()
+        return (await call_llm(system, user_prompt)).strip()
     except Exception as exc:
         log.error(f"[Agent 4] LLM call failed on turn {turn}: {exc}")
         return "Sorry, I seem to have lost the connection. Could we continue?"

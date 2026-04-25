@@ -7,7 +7,7 @@ not from their private profile data.
 
 Public API
 ----------
-  score_conversation(transcript, parsed_jd, candidate) -> dict
+  async def score_conversation(transcript, parsed_jd, candidate) -> dict
 
 Output schema
 -------------
@@ -113,7 +113,7 @@ Return ONLY valid JSON in this exact format — no markdown, no code fences, no 
 # ─────────────────────────────────────────────────────────────────────────────
 # Public function
 # ─────────────────────────────────────────────────────────────────────────────
-def score_conversation(
+async def score_conversation(
     transcript: list[dict],
     parsed_jd: dict,
     candidate: dict,
@@ -156,7 +156,7 @@ def score_conversation(
     )
 
     # ── Call LLM ─────────────────────────────────────────────────────────────
-    raw_response = call_llm(system_prompt, user_prompt)
+    raw_response = await call_llm(system_prompt, user_prompt)
     log.info(f"[Agent 5] Raw response received — parsing JSON …")
 
     # ── Parse and validate ────────────────────────────────────────────────────

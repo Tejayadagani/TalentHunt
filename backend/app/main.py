@@ -184,28 +184,19 @@ async def scout_candidates(request: ScoutRequest):
     log.info(f"JD preview: {request.jd_text[:120].strip()} …")
 
     try:
-        # run_pipeline is synchronous/blocking — run in a thread pool
-        # so we don't block the event loop during the long LLM calls.
-        loop = asyncio.get_event_loop()
-        result = await loop.run_in_executor(
-            None,
-            lambda: run_pipeline(
-                jd_text            = request.jd_text,
-                top_k              = request.top_k,
-                match_weight       = request.match_weight,
-                conversation_turns = request.conversation_turns,
-            ),
+        # run_pipeline is now async and parallelized.
+        result = await run_pipeline(
+            jd_text            = request.jd_text,
+            top_k              = request.top_k,
+            match_weight       = request.match_weight,
+            conversation_turns = request.conversation_turns,
         )
         return result
 
     except ValueError as exc:
-        # JD too short or other validation error
         raise HTTPException(status_code=422, detail=str(exc))
-
     except RuntimeError as exc:
-        # ChromaDB empty (embed_candidates.py not run)
         raise HTTPException(status_code=503, detail=str(exc))
-
     except Exception as exc:
         log.error(f"Pipeline error: {exc}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(exc))

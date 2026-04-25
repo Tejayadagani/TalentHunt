@@ -26,6 +26,8 @@ print("[vector_store] Embedding model ready.")
 # ── ChromaDB client ────────────────────────────────────────────────────────────
 def _get_client() -> chromadb.PersistentClient:
     """Return a persistent ChromaDB client pointed at CHROMA_PERSIST_DIR."""
+    # Explicitly disable telemetry
+    os.environ["ANONYMIZED_TELEMETRY"] = "False"
     return chromadb.PersistentClient(
         path=CHROMA_PERSIST_DIR,
         settings=Settings(anonymized_telemetry=False),

@@ -6,7 +6,7 @@ downstream agents consume.
 
 Public API
 ----------
-  parse_jd(jd_text: str) -> dict
+  async def parse_jd(jd_text: str) -> dict
 
 Output schema
 -------------
@@ -71,7 +71,7 @@ Rules:
 
 
 # ── Public function ───────────────────────────────────────────────────────────
-def parse_jd(jd_text: str) -> dict:
+async def parse_jd(jd_text: str) -> dict:
     """
     Parse a raw job description string into a structured dict.
 
@@ -89,7 +89,7 @@ def parse_jd(jd_text: str) -> dict:
 
     log.info("[Agent 1] Parsing job description …")
 
-    raw_response = call_llm(
+    raw_response = await call_llm(
         system_prompt=_SYSTEM_PROMPT,
         user_prompt=f"Extract the structured data from this job description:\n\n{jd_text}",
     )
