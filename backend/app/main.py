@@ -62,7 +62,7 @@ async def lifespan(app: FastAPI):
 
     try:
         # Pre-warm embedding model (downloads ~80 MB on first run, then cached)
-        from app.vector_store import _embedding_model, collection_count
+        from app.vector_store import _embedding_fn, collection_count
         count = collection_count()
         log.info(f"ChromaDB ready — {count} candidates indexed.")
 
