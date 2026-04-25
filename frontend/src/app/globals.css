@@ -6,33 +6,52 @@
 
 @layer base {
   :root {
+    /* Brand palette */
+    --green-deccan:  #2D7D3E;
+    --green-dark:    #1F5A2B;
+    --green-light:   #4A9D5F;
+    --green-pale:    #E8F5E9;
+    --gold:          #D4AF37;
+    --gold-dark:     #B8941F;
+    --black:         #1A1A1A;
+    --white:         #FFFFFF;
+    --gray-light:    #F5F5F5;
+    --gray-mid:      #E0E0E0;
+    --gray-dark:     #4A4A4A;
+
+    /* Semantic tokens */
     --background: #FFFFFF;
     --foreground: #1A1A1A;
     --card: #FFFFFF;
     --card-foreground: #1A1A1A;
     --popover: #FFFFFF;
     --popover-foreground: #1A1A1A;
-    
-    --primary: #2D7D3E;          /* Deccan Green */
+
+    --primary: #2D7D3E;
     --primary-foreground: #FFFFFF;
-    
-    --secondary: #F5F5F5;        /* Light Gray */
-    --secondary-foreground: #2D7D3E; /* Deccan Green */
-    
-    --muted: #F5F5F5;            /* Light Gray */
-    --muted-foreground: #4A4A4A; /* Dark Gray */
-    
-    --accent: #D4AF37;           /* Gold */
+
+    --secondary: #F5F5F5;
+    --secondary-foreground: #2D7D3E;
+
+    --muted: #F5F5F5;
+    --muted-foreground: #4A4A4A;
+
+    --accent: #D4AF37;
     --accent-foreground: #1A1A1A;
-    
+
     --destructive: #D32F2F;
     --destructive-foreground: #FFFFFF;
-    
+
     --border: #E0E0E0;
     --input: #E0E0E0;
     --ring: #2D7D3E;
-    
+
     --radius: 0.5rem;
+
+    /* Shadows */
+    --shadow-card: 0 2px 8px rgba(0,0,0,0.06);
+    --shadow-hover: 0 8px 24px rgba(0,0,0,0.12);
+    --shadow-gold: 0 4px 16px rgba(212,175,55,0.25);
   }
 
   .dark {
@@ -42,22 +61,22 @@
     --card-foreground: #FFFFFF;
     --popover: #1A1A1A;
     --popover-foreground: #FFFFFF;
-    
+
     --primary: #2D7D3E;
     --primary-foreground: #FFFFFF;
-    
+
     --secondary: #2C2C2C;
-    --secondary-foreground: #2D7D3E;
-    
+    --secondary-foreground: #4A9D5F;
+
     --muted: #2C2C2C;
     --muted-foreground: #A0A0A0;
-    
+
     --accent: #D4AF37;
     --accent-foreground: #1A1A1A;
-    
+
     --destructive: #D32F2F;
     --destructive-foreground: #FFFFFF;
-    
+
     --border: #333333;
     --input: #333333;
     --ring: #2D7D3E;
@@ -67,30 +86,47 @@
 @layer base {
   * {
     border-color: var(--border);
+    box-sizing: border-box;
   }
   body {
     background-color: var(--background);
     color: var(--foreground);
     font-family: var(--font-sans), sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
   }
   h1, h2, h3, h4, h5, h6 {
     color: var(--foreground);
-    font-weight: 600;
+    font-weight: 700;
+    line-height: 1.25;
   }
 }
 
-/* Custom scrollbar for transcript */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+/* ── Scrollbar ── */
+.custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--muted-foreground); }
+
+/* ── Gold spinner animation ── */
+@keyframes gold-spin {
+  to { transform: rotate(360deg); }
 }
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
+.spinner-gold {
+  width: 48px;
+  height: 48px;
+  border: 4px solid rgba(212,175,55,0.2);
+  border-top-color: #D4AF37;
+  border-radius: 50%;
+  animation: gold-spin 2s linear infinite;
 }
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 10px;
+
+/* ── Smooth transitions ── */
+a, button { transition: all 0.3s ease; }
+
+/* ── Step animation ── */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
 }
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: var(--muted-foreground);
-}
+.pulse-dot { animation: pulse-dot 1.4s ease-in-out infinite; }

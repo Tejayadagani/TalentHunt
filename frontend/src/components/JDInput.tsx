@@ -1,10 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Settings2 } from "lucide-react";
-import { Textarea } from "@/components/ui/textarea";
-import { Slider } from "@/components/ui/slider";
 
 export interface ScoutFormData {
   jd_text: string;
@@ -22,149 +18,115 @@ export function JDInput({ onSubmit, isLoading }: JDInputProps) {
   const [jdText, setJdText] = useState("");
   const [topK, setTopK] = useState(5);
   const [matchWeight, setMatchWeight] = useState(0.6);
-  const [turns, setTurns] = useState(6);
+  const [turns, setTurns] = useState(4);
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (jdText.length < 50) return;
-    
-    onSubmit({
-      jd_text: jdText,
-      top_k: topK,
-      match_weight: matchWeight,
-      conversation_turns: turns,
-    });
+  const charCount = jdText.length;
+  const isReady = charCount >= 50 && !isLoading;
+
+  const readiness =
+    charCount === 0 ? ""
+    : charCount < 50 ? `${charCount} characters · Add more detail`
+    : charCount < 300 ? `${charCount} characters · Good to go`
+    : `${charCount} characters · Ready to scout ✓`;
+
+  const handleSubmit = () => {
+    if (!isReady) return;
+    onSubmit({ jd_text: jdText, top_k: topK, match_weight: matchWeight, conversation_turns: turns });
   };
 
-  const isSubmitDisabled = jdText.length < 50 || isLoading;
-
   return (
-    <div className="bg-card text-card-foreground border border-border rounded-lg p-5 shadow-sm">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <label htmlFor="jd" className="block text-[14px] font-semibold text-[#1A1A1A] dark:text-white">
-            Job description (paste raw text)
-          </label>
-          <Textarea
-            id="jd"
-            placeholder="Senior Backend Engineer, 5+ years Python, PostgreSQL, Docker required. Bangalore office, hybrid..."
-            className="min-h-[200px] p-3 text-[14px] font-mono bg-white dark:bg-[#121212] border-[#E0E0E0] dark:border-[#333333] placeholder:text-[#4A4A4A] placeholder:italic focus-visible:ring-0 focus-visible:border-[#D4AF37] focus-visible:shadow-[0_0_0_3px_rgba(45,125,62,0.1)] transition-shadow resize-y"
-            value={jdText}
-            onChange={(e) => setJdText(e.target.value)}
-            disabled={isLoading}
-          />
-          <div className="flex justify-between text-[13px] text-muted-foreground uppercase tracking-wide font-medium">
-            <span>{jdText.length} characters</span>
-            {jdText.length > 0 && jdText.length < 50 && (
-              <span className="text-destructive normal-case tracking-normal">Minimum 50 characters required</span>
-            )}
-          </div>
-        </div>
+    <div className="bg-white border border-[#E0E0E0] rounded-xl shadow-sm overflow-hidden">
+      <div className="p-5">
+        <label className="block text-[13px] font-bold text-[#1A1A1A] uppercase tracking-wide mb-3">
+          Job description
+        </label>
+        <textarea
+          value={jdText}
+          onChange={e => setJdText(e.target.value)}
+          disabled={isLoading}
+          rows={10}
+          placeholder={`Senior Backend Engineer, 5+ years Python, PostgreSQL, Docker required. Bangalore office, hybrid...\n\nPaste your full job description here — the more detail you provide, the better the matches.`}
+          className="w-full resize-none text-[14px] text-[#1A1A1A] placeholder-[#A0A0A0] leading-relaxed outline-none rounded-lg p-4 border-2 border-[#E0E0E0] focus:border-[#2D7D3E] transition-colors bg-white disabled:opacity-60"
+          style={{ background: "rgba(45,125,62,0.01)" }}
+        />
+        {charCount > 0 && (
+          <p className={`text-[12px] mt-2 font-medium ${charCount < 50 ? "text-[#D4AF37]" : "text-[#2D7D3E]"}`}>
+            {readiness}
+          </p>
+        )}
+      </div>
 
-        <div>
-          <button
-            type="button"
-            className="flex items-center text-[14px] font-medium text-primary hover:underline bg-transparent border-none p-0 cursor-pointer"
-            onClick={() => setShowAdvanced(!showAdvanced)}
-          >
-            <Settings2 className="w-4 h-4 mr-2" />
-            {showAdvanced ? "Hide Advanced Settings" : "Show Advanced Settings"}
-          </button>
-        </div>
+      {/* Advanced settings */}
+      <div className="border-t border-[#E0E0E0]">
+        <button
+          onClick={() => setShowAdvanced(!showAdvanced)}
+          className="w-full flex items-center justify-between px-5 py-3 text-[13px] font-semibold text-[#4A4A4A] hover:text-[#2D7D3E] hover:bg-[#F5F5F5] transition-all"
+        >
+          <span>Advanced settings (optional)</span>
+          <span className={`transition-transform duration-200 ${showAdvanced ? "rotate-180" : ""}`}>▼</span>
+        </button>
 
-        <AnimatePresence>
-          {showAdvanced && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="overflow-hidden"
-            >
-              <div className="p-4 rounded-md bg-secondary border border-border space-y-6 my-2">
-                
-                {/* Top K */}
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <label className="text-[13px] font-medium text-muted-foreground uppercase tracking-wide">Candidates to Evaluate</label>
-                    <span className="text-[14px] font-semibold text-foreground">{topK}</span>
-                  </div>
-                  <Slider
-                    disabled={isLoading}
-                    value={[topK]}
-                    min={1}
-                    max={15}
-                    step={1}
-                    onValueChange={(vals) => setTopK(typeof vals === "number" ? vals : vals[0])}
-                    className="[&_[role=slider]]:bg-primary [&_[role=slider]]:border-primary"
-                  />
-                </div>
-
-                {/* Match Weight */}
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <label className="text-[13px] font-medium text-muted-foreground uppercase tracking-wide">Match Score Weight</label>
-                    <span className="text-[14px] font-semibold text-foreground">{Math.round(matchWeight * 100)}% Match</span>
-                  </div>
-                  <Slider
-                    disabled={isLoading}
-                    value={[matchWeight]}
-                    min={0}
-                    max={1}
-                    step={0.1}
-                    onValueChange={(vals) => setMatchWeight(typeof vals === "number" ? vals : vals[0])}
-                    className="[&_[role=slider]]:bg-primary [&_[role=slider]]:border-primary"
-                  />
-                  <div className="flex justify-between text-[13px] text-muted-foreground">
-                    <span>0%</span>
-                    <span>100%</span>
-                  </div>
-                </div>
-
-                {/* Conversation Turns */}
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <label className="text-[13px] font-medium text-muted-foreground uppercase tracking-wide">Simulation Turns</label>
-                    <span className="text-[14px] font-semibold text-foreground">{turns}</span>
-                  </div>
-                  <Slider
-                    disabled={isLoading}
-                    value={[turns]}
-                    min={2}
-                    max={10}
-                    step={1}
-                    onValueChange={(vals) => setTurns(typeof vals === "number" ? vals : vals[0])}
-                    className="[&_[role=slider]]:bg-primary [&_[role=slider]]:border-primary"
-                  />
-                </div>
+        {showAdvanced && (
+          <div className="px-5 pb-5 space-y-4 border-t border-[#E0E0E0] pt-4">
+            {/* Top K */}
+            <div>
+              <div className="flex justify-between text-[13px] font-medium text-[#1A1A1A] mb-2">
+                <span>Candidates to evaluate</span>
+                <span className="text-[#2D7D3E] font-bold">{topK}</span>
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              <input type="range" min={3} max={15} value={topK} onChange={e => setTopK(Number(e.target.value))}
+                className="w-full h-2 rounded-full appearance-none cursor-pointer bg-[#E0E0E0]"
+                style={{ accentColor: "#2D7D3E" }}
+              />
+              <div className="flex justify-between text-[11px] text-[#A0A0A0] mt-1"><span>3</span><span>15</span></div>
+            </div>
 
-        <motion.button
-          whileTap={isSubmitDisabled ? {} : { scale: 0.98 }}
-          type="submit"
-          disabled={isSubmitDisabled}
-          className={`w-full h-[44px] rounded-[6px] text-white text-[14px] font-semibold flex items-center justify-center transition-colors ${
-            isSubmitDisabled
-              ? "bg-[#E0E0E0] text-[#A0A0A0] cursor-not-allowed dark:bg-[#333333] dark:text-[#777777]"
-              : "bg-[#2D7D3E] hover:bg-[#1F5A2B] shadow-[0_2px_4px_rgba(0,0,0,0.1)] active:shadow-inner"
+            {/* Match weight */}
+            <div>
+              <div className="flex justify-between text-[13px] font-medium text-[#1A1A1A] mb-2">
+                <span>Match weight</span>
+                <span className="text-[#2D7D3E] font-bold">{Math.round(matchWeight * 100)}% match / {Math.round((1 - matchWeight) * 100)}% interest</span>
+              </div>
+              <input type="range" min={0} max={100} value={Math.round(matchWeight * 100)} onChange={e => setMatchWeight(Number(e.target.value) / 100)}
+                className="w-full h-2 rounded-full appearance-none cursor-pointer"
+                style={{ accentColor: "#2D7D3E" }}
+              />
+            </div>
+
+            {/* Turns */}
+            <div>
+              <div className="flex justify-between text-[13px] font-medium text-[#1A1A1A] mb-2">
+                <span>Conversation turns per candidate</span>
+                <span className="text-[#2D7D3E] font-bold">{turns}</span>
+              </div>
+              <input type="range" min={2} max={6} value={turns} onChange={e => setTurns(Number(e.target.value))}
+                className="w-full h-2 rounded-full appearance-none cursor-pointer"
+                style={{ accentColor: "#2D7D3E" }}
+              />
+              <div className="flex justify-between text-[11px] text-[#A0A0A0] mt-1"><span>Faster</span><span>More thorough</span></div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Scout button */}
+      <div className="px-5 pb-5 pt-4">
+        <button
+          onClick={handleSubmit}
+          disabled={!isReady}
+          className={`w-full h-[48px] rounded-lg text-[15px] font-bold transition-all active:scale-[0.98] ${
+            isReady
+              ? "bg-[#2D7D3E] hover:bg-[#1F5A2B] text-white shadow-sm hover:shadow-md"
+              : "bg-[#E0E0E0] text-[#A0A0A0] cursor-not-allowed"
           }`}
         >
-          {isLoading ? (
-            <span className="flex items-center gap-2">
-              <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              Scouting candidates...
-            </span>
-          ) : (
-            "Scout Candidates"
-          )}
-        </motion.button>
-      </form>
+          {isLoading ? "Scouting…" : "Scout candidates →"}
+        </button>
+        {!isLoading && charCount < 50 && charCount > 0 && (
+          <p className="text-[12px] text-center text-[#A0A0A0] mt-2">Add at least 50 characters to continue</p>
+        )}
+      </div>
     </div>
   );
 }

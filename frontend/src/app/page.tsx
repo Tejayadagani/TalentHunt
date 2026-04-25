@@ -1,308 +1,262 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { JDInput, ScoutFormData } from "@/components/JDInput";
-import { ShortlistTable } from "@/components/ShortlistTable";
-import { CandidateResult } from "@/components/CandidateCard";
-import { ScoreSliders } from "@/components/ScoreSliders";
-import { SavedResultsModal, SavedScout } from "@/components/SavedResultsModal";
-import { SettingsModal } from "@/components/SettingsModal";
-import { AlertCircle, CheckCircle2, Search, Bookmark, BookmarkCheck } from "lucide-react";
+import Link from "next/link";
+import { Search, ArrowRight, CheckCircle2, ChevronRight } from "lucide-react";
 
-interface ScoutResponseData {
-  job_title: string | null;
-  total_candidates_evaluated: number;
-  shortlist: CandidateResult[];
-  weights?: {
-    match: number;
-    interest: number;
-  };
-  [key: string]: unknown;
-}
+const STEPS = [
+  {
+    n: "01",
+    title: "Paste your job description",
+    desc: "Drop in raw text — any length, any format. Our parser extracts skills, seniority, location, budget, and domain automatically.",
+  },
+  {
+    n: "02",
+    title: "We scout and screen",
+    desc: "TalentRadar searches the talent pool by semantic similarity, then simulates a real screening conversation with each top match.",
+  },
+  {
+    n: "03",
+    title: "Review your shortlist",
+    desc: "Get a ranked list with Match Score, Interest Score, and the full conversation transcript behind every decision. No black box.",
+  },
+];
 
-const STORAGE_KEY = "talentradar_saved_scouts";
+const WHY = [
+  {
+    title: "Skill match + genuine interest",
+    desc: "Most tools just match keywords. TalentRadar also measures whether candidates will actually accept the offer — before you pick up the phone.",
+  },
+  {
+    title: "Fully transparent scoring",
+    desc: "Every score is backed by a real simulated conversation you can read. You know exactly why Rank #1 is Rank #1.",
+  },
+  {
+    title: "Ready to move fast",
+    desc: "Top candidates ranked with salary expectations, notice period, and location — everything you need to make the call today.",
+  },
+];
 
-function loadSavedScouts(): SavedScout[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-}
+const SAMPLE = {
+  name: "Priya Nair",
+  title: "Senior Software Engineer",
+  company: "Razorpay",
+  years: 5,
+  location: "Bangalore",
+  match: 88,
+  interest: 86,
+  combined: 87,
+  explanation:
+    "Priya demonstrated high enthusiasm and asked thoughtful questions about team structure and tech stack. Her fintech background maps directly to the role. Salary expectation ₹28L is within budget. Available in 45 days.",
+};
 
-function persistScouts(scouts: SavedScout[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(scouts));
-}
-
-export default function Home() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [results, setResults] = useState<ScoutResponseData | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [isBackendConnected, setIsBackendConnected] = useState<boolean | null>(null);
-  const [savedScouts, setSavedScouts] = useState<SavedScout[]>([]);
-  const [showSaved, setShowSaved] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
-
-  useEffect(() => {
-    setSavedScouts(loadSavedScouts());
-  }, []);
-
-  useEffect(() => {
-    const checkHealth = async () => {
-      try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-        if (!apiUrl) throw new Error("NEXT_PUBLIC_API_URL is not defined");
-        const res = await fetch(`${apiUrl}/api/health`, { method: "GET" });
-        setIsBackendConnected(res.ok);
-      } catch {
-        setIsBackendConnected(false);
-      }
-    };
-    checkHealth();
-  }, []);
-
-  const handleScout = async (data: ScoutFormData) => {
-    setIsLoading(true);
-    setError(null);
-    setResults(null);
-    setIsSaved(false);
-    try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-      if (!apiUrl) throw new Error("NEXT_PUBLIC_API_URL is not defined. Please check your .env file.");
-      const res = await fetch(`${apiUrl}/api/scout`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.detail || "Failed to fetch candidates");
-      }
-
-      const json = await res.json();
-      setResults(json);
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message || "An unexpected error occurred. Is the backend running?");
-      } else {
-        setError("An unexpected error occurred. Is the backend running?");
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSaveResult = () => {
-    if (!results) return;
-    const scout: SavedScout = {
-      id: `scout_${Date.now()}`,
-      timestamp: Date.now(),
-      job_title: results.job_title || "Untitled Role",
-      results,
-    };
-    const updated = [scout, ...savedScouts];
-    setSavedScouts(updated);
-    persistScouts(updated);
-    setIsSaved(true);
-  };
-
-  const handleDeleteScout = (id: string) => {
-    const updated = savedScouts.filter((s) => s.id !== id);
-    setSavedScouts(updated);
-    persistScouts(updated);
-  };
-
-  const handleLoadScout = (loadedResults: Record<string, unknown>) => {
-    setResults(loadedResults as ScoutResponseData);
-    setShowSaved(false);
-    setIsSaved(true);
-  };
-
+export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
-      {/* Modals */}
-      <SavedResultsModal
-        isOpen={showSaved}
-        onClose={() => setShowSaved(false)}
-        savedScouts={savedScouts}
-        onLoad={handleLoadScout}
-        onDelete={handleDeleteScout}
-      />
-      <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />
+    <div className="min-h-screen bg-[#FFFFFF] text-[#1A1A1A] font-sans">
 
-      {/* Top Bar */}
-      <header className="h-[60px] border-b border-border bg-white dark:bg-[#1A1A1A] px-6 flex items-center justify-between shrink-0">
+      {/* ── NAV ── */}
+      <header className="sticky top-0 z-40 bg-white border-b border-[#E0E0E0] px-6 h-16 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded bg-primary flex items-center justify-center">
+          <div className="w-8 h-8 rounded-md bg-[#2D7D3E] flex items-center justify-center">
             <Search className="w-4 h-4 text-white" />
           </div>
-          <span className="text-[18px] font-semibold tracking-tight text-foreground">TalentRadar</span>
+          <span className="text-[20px] font-bold text-[#1A1A1A]">TalentRadar</span>
         </div>
-
-        <div className="flex items-center gap-6">
-          <nav className="hidden md:flex items-center gap-4">
-            <button
-              onClick={() => { setResults(null); setError(null); setIsSaved(false); }}
-              className="text-[14px] font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Start New Search
-            </button>
-            <button
-              onClick={() => setShowSaved(true)}
-              className="text-[14px] font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5"
-            >
-              Saved Results
-              {savedScouts.length > 0 && (
-                <span className="text-[11px] bg-primary text-white rounded-full px-1.5 py-0.5 font-bold leading-none">
-                  {savedScouts.length}
-                </span>
-              )}
-            </button>
-            <button
-              onClick={() => setShowSettings(true)}
-              className="text-[14px] font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              How It Works
-            </button>
-          </nav>
-
-          <div className="flex items-center gap-2 text-[13px] font-medium bg-secondary px-3 py-1.5 rounded-full border border-border">
-            {isBackendConnected === true ? (
-              <>
-                <span className="w-2 h-2 rounded-full bg-primary" />
-                <span className="text-foreground">Connected</span>
-              </>
-            ) : isBackendConnected === false ? (
-              <>
-                <span className="w-2 h-2 rounded-full bg-destructive" />
-                <span className="text-foreground">Offline</span>
-              </>
-            ) : (
-              <>
-                <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-                <span className="text-foreground">Checking...</span>
-              </>
-            )}
-          </div>
-        </div>
+        <nav className="hidden md:flex items-center gap-6">
+          <a href="#how-it-works" className="text-[14px] text-[#4A4A4A] hover:text-[#2D7D3E] transition-colors">How it works</a>
+          <a href="#why" className="text-[14px] text-[#4A4A4A] hover:text-[#2D7D3E] transition-colors">Why TalentRadar</a>
+        </nav>
+        <Link
+          href="/scout"
+          className="bg-[#2D7D3E] hover:bg-[#1F5A2B] text-white text-[14px] font-semibold px-5 py-2.5 rounded-md transition-colors"
+        >
+          Get started
+        </Link>
       </header>
 
-      {/* Main Content */}
-      <main className="flex-1 max-w-[1200px] w-full mx-auto p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      {/* ── HERO ── */}
+      <section
+        className="relative px-6 py-24 md:py-36"
+        style={{ background: "linear-gradient(135deg, #2D7D3E 0%, #1F5A2B 100%)" }}
+      >
+        <div className="max-w-3xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-white text-[13px] font-medium mb-8">
+            <span className="w-2 h-2 rounded-full bg-[#D4AF37]" />
+            Built for Catalyst 2026 — AI Recruitment Track
+          </div>
+          <h1 className="text-[48px] md:text-[56px] font-bold text-white leading-[1.15] mb-6">
+            Find your next hire in minutes,<br className="hidden md:block" /> not days.
+          </h1>
+          <p className="text-[18px] text-[#E8E8E8] leading-relaxed max-w-2xl mx-auto mb-10">
+            Stop wasting time sifting through resumes. TalentRadar scouts candidates based on skills <em>and</em> genuine interest — then gives you a ranked shortlist with transparent scoring you can trust.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              href="/scout"
+              className="flex items-center gap-2 bg-[#D4AF37] hover:bg-[#B8941F] text-[#1A1A1A] font-bold text-[16px] px-8 py-4 rounded-md shadow-lg transition-all hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
+            >
+              Start scouting
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+            <a
+              href="#how-it-works"
+              className="text-white/80 hover:text-white text-[15px] font-medium underline underline-offset-4 transition-colors"
+            >
+              See how it works ↓
+            </a>
+          </div>
+        </div>
+        {/* Decorative bottom fade */}
+        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-b from-transparent to-white pointer-events-none" />
+      </section>
 
-        {/* Left Column: Input Form */}
-        <div className={`transition-all duration-500 ease-out ${results || isLoading ? 'lg:col-span-4' : 'lg:col-span-8 lg:col-start-3'}`}>
-          {!results && !isLoading && (
-            <div className="mb-8 space-y-2">
-              <h1 className="text-[28px] font-semibold text-foreground">Scout Candidates</h1>
-              <p className="text-[14px] text-muted-foreground">
-                Paste a job description below. Our AI will analyze the requirements, search the talent pool, and simulate screening conversations to find the best fit.
-              </p>
+      {/* ── HOW IT WORKS ── */}
+      <section id="how-it-works" className="px-6 py-20 max-w-5xl mx-auto">
+        <div className="text-center mb-12">
+          <h2 className="text-[32px] font-bold text-[#1A1A1A] mb-3">How it works</h2>
+          <p className="text-[16px] text-[#4A4A4A]">Three steps from job description to ranked shortlist.</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {STEPS.map((step, i) => (
+            <div
+              key={i}
+              className="bg-white border border-[#E0E0E0] rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow"
+              style={{ borderLeft: "4px solid #2D7D3E" }}
+            >
+              <div className="text-[28px] font-bold text-[#2D7D3E] mb-3">{step.n}</div>
+              <h3 className="text-[16px] font-bold text-[#1A1A1A] mb-2">{step.title}</h3>
+              <p className="text-[14px] text-[#4A4A4A] leading-relaxed">{step.desc}</p>
+              {i < 2 && (
+                <div className="hidden md:block absolute -right-4 top-1/2 -translate-y-1/2 z-10">
+                  <ChevronRight className="w-6 h-6 text-[#2D7D3E]" />
+                </div>
+              )}
             </div>
-          )}
-
-          <JDInput onSubmit={handleScout} isLoading={isLoading} />
-
-          <AnimatePresence>
-            {error && (
-              <motion.div
-                initial={{ opacity: 0, height: 0, y: -10 }}
-                animate={{ opacity: 1, height: "auto", y: 0 }}
-                exit={{ opacity: 0, height: 0 }}
-                className="mt-6 p-4 rounded-md bg-[rgba(211,47,47,0.1)] border-l-4 border-destructive text-foreground text-[14px] flex items-start gap-3"
-              >
-                <AlertCircle className="w-5 h-5 text-destructive shrink-0" />
-                <span><strong>Error:</strong> {error}</span>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          ))}
         </div>
+      </section>
 
-        {/* Right Column: Results or Loading */}
-        <div className={`transition-all duration-500 ease-out ${results || isLoading ? 'lg:col-span-8' : 'hidden'}`}>
-          {isLoading && !results && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="bg-card border border-border rounded-lg p-8 shadow-sm flex flex-col items-center justify-center min-h-[400px] text-center"
-            >
-              <div className="w-12 h-12 mb-6 relative">
-                <div className="absolute inset-0 border-4 border-secondary rounded-full"></div>
-                <div className="absolute inset-0 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
-              </div>
-              <h2 className="text-[20px] font-semibold text-foreground mb-2">Scouting candidates...</h2>
-              <p className="text-[14px] text-muted-foreground max-w-sm mx-auto mb-8">
-                This process takes about 2-3 minutes as we conduct deep conversational screening with top matches.
-              </p>
-
-              <div className="w-full max-w-sm text-left space-y-3">
-                <div className="flex items-center gap-3 text-[14px]">
-                  <CheckCircle2 className="w-5 h-5 text-primary" />
-                  <span className="text-foreground">Parsing job description</span>
+      {/* ── WHY TALENTREADER ── */}
+      <section
+        id="why"
+        className="px-6 py-16"
+        style={{ background: "#F5F5F5" }}
+      >
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="text-[32px] font-bold text-[#1A1A1A] mb-3">Why TalentRadar?</h2>
+            <p className="text-[16px] text-[#4A4A4A]">Built to solve the real problems in technical hiring.</p>
+          </div>
+          <div
+            className="bg-white rounded-xl overflow-hidden"
+            style={{ border: "1px solid #E0E0E0", borderTop: "4px solid #D4AF37", borderBottom: "4px solid #D4AF37" }}
+          >
+            {WHY.map((item, i) => (
+              <div key={i} className={`flex items-start gap-4 p-6 ${i < WHY.length - 1 ? "border-b border-[#E0E0E0]" : ""}`}>
+                <div className="w-8 h-8 rounded-full bg-[#2D7D3E] flex items-center justify-center shrink-0 mt-0.5">
+                  <CheckCircle2 className="w-4 h-4 text-white" />
                 </div>
-                <div className="flex items-center gap-3 text-[14px]">
-                  <CheckCircle2 className="w-5 h-5 text-primary" />
-                  <span className="text-foreground">Searching candidate pool</span>
-                </div>
-                <div className="flex items-center gap-3 text-[14px]">
-                  <div className="w-5 h-5 border-2 border-accent border-t-transparent rounded-full animate-spin" />
-                  <span className="text-foreground font-medium">Running conversations & scoring...</span>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {results && (
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="space-y-6"
-            >
-              <div className="mb-6 border-b border-border pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
-                  <h1 className="text-[28px] font-semibold text-foreground">
-                    Results for {results.job_title || "the role"}
-                  </h1>
-                  <p className="text-[14px] text-muted-foreground mt-1">
-                    {results.total_candidates_evaluated} candidates evaluated, {results.shortlist?.length || 0} ranked
-                  </p>
+                  <p className="text-[13px] font-bold text-[#2D7D3E] uppercase tracking-wide mb-1">{item.title}</p>
+                  <p className="text-[14px] text-[#4A4A4A] leading-[1.7]">{item.desc}</p>
                 </div>
-                {/* Save Button */}
-                <button
-                  onClick={handleSaveResult}
-                  disabled={isSaved}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold border transition-all ${
-                    isSaved
-                      ? "bg-primary/10 text-primary border-primary/30 cursor-default"
-                      : "border-border text-muted-foreground hover:text-foreground hover:border-primary hover:bg-primary/5"
-                  }`}
-                >
-                  {isSaved ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
-                  {isSaved ? "Saved" : "Save Result"}
-                </button>
               </div>
-
-              <ScoreSliders
-                initialMatchWeight={results.weights?.match ?? 0.6}
-                shortlist={results.shortlist || []}
-                onReRank={(newShortlist, newWeight) => {
-                  setResults({
-                    ...results,
-                    shortlist: newShortlist,
-                    weights: { match: newWeight, interest: 1 - newWeight },
-                  });
-                }}
-              />
-
-              <ShortlistTable candidates={results.shortlist || []} />
-            </motion.div>
-          )}
+            ))}
+          </div>
         </div>
-      </main>
+      </section>
+
+      {/* ── SAMPLE OUTPUT ── */}
+      <section className="px-6 py-20 max-w-4xl mx-auto">
+        <div className="text-center mb-10">
+          <h2 className="text-[32px] font-bold text-[#1A1A1A] mb-3">What the output looks like</h2>
+          <p className="text-[16px] text-[#4A4A4A]">Real data, transparent reasoning, ready to act on.</p>
+        </div>
+        <div className="rounded-xl overflow-hidden" style={{ background: "#1A1A1A" }}>
+          <div className="p-6 border-b border-[#333333]">
+            <div className="flex items-center gap-3 mb-1">
+              <span className="bg-[#2D7D3E] text-white text-[12px] font-bold px-2.5 py-1 rounded">Rank #1</span>
+              <h3 className="text-[18px] font-bold text-white">{SAMPLE.name}</h3>
+            </div>
+            <p className="text-[13px] text-[#A0A0A0]">
+              {SAMPLE.title} at {SAMPLE.company} · {SAMPLE.years} yrs · {SAMPLE.location}
+            </p>
+          </div>
+          <div className="p-6 border-b border-[#333333]">
+            <div className="flex gap-3 flex-wrap">
+              <div className="bg-[#2D7D3E] px-4 py-2 rounded-lg text-center">
+                <p className="text-[11px] text-white/70 uppercase tracking-wide font-bold">Match</p>
+                <p className="text-[24px] font-bold text-white">{SAMPLE.match}</p>
+              </div>
+              <div className="bg-[#2D7D3E] px-4 py-2 rounded-lg text-center">
+                <p className="text-[11px] text-white/70 uppercase tracking-wide font-bold">Interest</p>
+                <p className="text-[24px] font-bold text-white">{SAMPLE.interest}</p>
+              </div>
+              <div className="px-4 py-2 rounded-lg text-center" style={{ background: "#D4AF37" }}>
+                <p className="text-[11px] text-[#1A1A1A]/70 uppercase tracking-wide font-bold">Combined</p>
+                <p className="text-[24px] font-bold text-[#1A1A1A]">{SAMPLE.combined}</p>
+              </div>
+            </div>
+          </div>
+          <div className="p-6 border-b border-[#333333]">
+            <p
+              className="text-[14px] text-[#A0A0A0] italic leading-relaxed pl-4"
+              style={{ borderLeft: "2px solid #D4AF37" }}
+            >
+              &ldquo;{SAMPLE.explanation}&rdquo;
+            </p>
+          </div>
+          <div className="p-6">
+            <Link
+              href="/scout"
+              className="inline-flex items-center gap-2 border-2 border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#1A1A1A] font-semibold text-[14px] px-5 py-2.5 rounded-md transition-all"
+            >
+              See full results like this
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FINAL CTA ── */}
+      <section
+        className="px-6 py-20 text-center"
+        style={{ background: "linear-gradient(180deg, #2D7D3E 0%, #1F5A2B 100%)" }}
+      >
+        <h2 className="text-[36px] font-bold text-white mb-4">Ready to find your next hire?</h2>
+        <p className="text-[16px] text-[#E8E8E8] mb-8 max-w-xl mx-auto">
+          Paste a job description and get a fully evaluated, ranked shortlist in under 3 minutes.
+        </p>
+        <Link
+          href="/scout"
+          className="inline-flex items-center gap-2 bg-[#D4AF37] hover:bg-[#B8941F] text-[#1A1A1A] font-bold text-[16px] px-10 py-4 rounded-md shadow-lg transition-all hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
+        >
+          Start scouting now
+          <ArrowRight className="w-5 h-5" />
+        </Link>
+      </section>
+
+      {/* ── FOOTER ── */}
+      <footer className="bg-[#1A1A1A] px-6 py-8">
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded bg-[#2D7D3E] flex items-center justify-center">
+              <Search className="w-3 h-3 text-white" />
+            </div>
+            <span className="text-white font-bold text-[15px]">TalentRadar</span>
+          </div>
+          <p className="text-[13px] text-[#4A4A4A]">
+            Built for Catalyst by Deccan AI · Powered by Groq Llama 3.3 & ChromaDB
+          </p>
+          <a
+            href="https://github.com/Charan512/TalentHunt"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[13px] text-[#4A4A4A] hover:text-white transition-colors"
+          >
+            GitHub →
+          </a>
+        </div>
+      </footer>
     </div>
   );
 }
