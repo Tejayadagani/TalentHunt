@@ -67,10 +67,7 @@ async def lifespan(app: FastAPI):
         log.info(f"ChromaDB ready — {count} candidates indexed.")
 
         if count == 0:
-            log.info("ChromaDB is empty. Seeding candidates from candidates.json …")
-            from scripts.embed_candidates import main as seed_db
-            seed_db()
-            log.info(f"Seeding complete. New count: {collection_count()}")
+            log.warning("ChromaDB is empty! Ensure the build step embedded the candidates.")
     except Exception as exc:
         log.error(f"Startup pre-warm failed: {exc}")
 
@@ -172,7 +169,7 @@ async def scout_candidates(request: ScoutRequest):
     5. **Pipeline** — Combine scores, sort, rank.
 
     ⚠️ This endpoint makes ~14 LLM calls per candidate (6-turn conversation).
-    With `top_k=5` expect ~2–5 minutes on Gemini free tier.
+    With `top_k=5` expect ~2-5 minutes.
     """
     import asyncio
 
