@@ -47,7 +47,7 @@ GROQ_MODELS       = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]
 GROQ_MODEL_IDX    = 0
 GROQ_BASE_URL     = "https://api.groq.com/openai/v1"
 
-OPENROUTER_MODEL  = os.getenv("OPENROUTER_MODEL", "google/gemini-2.0-flash-lite:free")
+OPENROUTER_MODEL  = os.getenv("OPENROUTER_MODEL", "meta-llama/llama-3.1-8b-instruct:free")
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 
 MAX_RETRIES    = 3
@@ -202,8 +202,7 @@ async def _call_groq(system_prompt: str, user_prompt: str, model: str) -> str:
 def _is_rate_limit_error(exc: Exception) -> bool:
     """
     Return True if the exception looks like a rate-limit / quota error.
-    Covers Gemini (google.api_core.exceptions.ResourceExhausted),
-    OpenAI / Groq (openai.RateLimitError), and generic HTTP 429 strings.
+    Covers OpenAI / Groq / OpenRouter (openai.RateLimitError), and generic HTTP 429 strings.
     """
     exc_str = str(exc).lower()
     rate_limit_keywords = (
