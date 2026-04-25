@@ -35,7 +35,7 @@ log = logging.getLogger(__name__)
 # ── Configuration ─────────────────────────────────────────────────────────────
 PROVIDER       = os.getenv("LLM_PROVIDER", "gemini").lower()
 GEMINI_MODEL   = "gemini-2.0-flash"
-GROQ_MODEL     = "llama3-8b-8192"
+GROQ_MODEL     = "llama-3.3-70b-versatile"
 GROQ_BASE_URL  = "https://api.groq.com/openai/v1"
 
 MAX_RETRIES    = 3
