@@ -65,7 +65,7 @@ def _get_groq_client():
         api_key = os.environ.get("GROQ_API_KEY")
         if not api_key:
             raise EnvironmentError("GROQ_API_KEY is not set. Add it to your .env file.")
-        _groq_client = AsyncOpenAI(api_key=api_key, base_url=GROQ_BASE_URL)
+        _groq_client = AsyncOpenAI(api_key=api_key, base_url=GROQ_BASE_URL, max_retries=0)
     return _groq_client
 
 def _get_openrouter_client():
@@ -81,7 +81,8 @@ def _get_openrouter_client():
             default_headers={
                 "HTTP-Referer": "https://talenthunt.vercel.app",
                 "X-Title": "TalentRadar"
-            }
+            },
+            max_retries=0
         )
     return _openrouter_client
 
