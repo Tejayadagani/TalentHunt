@@ -56,9 +56,9 @@ OPENROUTER_MODELS = [
 OPENROUTER_MODEL_IDX = 0
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 
-MAX_RETRIES    = 3
+MAX_RETRIES    = 6    # must be >= number of fallback tiers (Groq70B+Groq8B+3xOpenRouter)
 BASE_BACKOFF   = 1
-RATE_LIMIT_EXTRA_WAIT = 5
+RATE_LIMIT_EXTRA_WAIT = 3
 
 # Global clients
 _groq_client = None
