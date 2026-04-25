@@ -32,6 +32,13 @@ logging.basicConfig(
 )
 log = logging.getLogger(__name__)
 
+class TelemetryFilter(logging.Filter):
+    """Filter out noisy ChromaDB telemetry errors."""
+    def filter(self, record):
+        return "Failed to send telemetry event" not in record.getMessage()
+
+# Attach filter to root logger
+logging.getLogger().addFilter(TelemetryFilter())
 # ── Configuration ─────────────────────────────────────────────────────────────
 PROVIDER       = os.getenv("LLM_PROVIDER", "gemini").lower()
 GEMINI_MODEL   = "gemini-flash-latest"
