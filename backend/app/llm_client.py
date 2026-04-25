@@ -41,9 +41,10 @@ class TelemetryFilter(logging.Filter):
 for handler in logging.root.handlers:
     handler.addFilter(TelemetryFilter())
 # ── Configuration ─────────────────────────────────────────────────────────────
-PROVIDER       = os.getenv("LLM_PROVIDER", "gemini").lower()
-GEMINI_MODEL   = "gemini-flash-latest"
-GROQ_MODEL     = "llama-3.3-70b-versatile"
+PROVIDER       = os.getenv("LLM_PROVIDER", "groq").lower()
+GEMINI_MODEL   = "gemini-2.5-flash"
+GROQ_MODELS    = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]
+GROQ_MODEL_IDX = 0
 GROQ_BASE_URL  = "https://api.groq.com/openai/v1"
 
 MAX_RETRIES    = 3
@@ -74,7 +75,7 @@ def _configure_gemini():
         genai.configure(api_key=api_key)
         _genai_configured = True
 
-log.info(f"Provider: {PROVIDER.upper()}  |  model: {GEMINI_MODEL if PROVIDER == 'gemini' else GROQ_MODEL}")
+log.info(f"Initial Provider: {PROVIDER.upper()} | Primary Model: {GROQ_MODELS[0] if PROVIDER == 'groq' else GEMINI_MODEL}")
 
 
 # ── Public: main entry point ──────────────────────────────────────────────────
@@ -88,24 +89,34 @@ async def call_llm(system_prompt: str, user_prompt: str) -> str:
     """
     last_exc: Exception | None = None
     import asyncio
-    global PROVIDER
+    global PROVIDER, GROQ_MODEL_IDX
 
     for attempt in range(MAX_RETRIES):
         try:
             if PROVIDER == "gemini":
                 return await _call_gemini(system_prompt, user_prompt)
             else:
-                return await _call_groq(system_prompt, user_prompt)
+                # Try current Groq model
+                model_name = GROQ_MODELS[GROQ_MODEL_IDX]
+                return await _call_groq(system_prompt, user_prompt, model=model_name)
 
         except Exception as exc:
             last_exc = exc
             is_rate_limit = _is_rate_limit_error(exc)
             
-            # AUTOMATIC FALLBACK: Groq -> Gemini (Global Switch)
-            if is_rate_limit and PROVIDER == "groq":
-                log.warning("Groq rate limit hit! Permanently switching backend to Gemini for all subsequent requests.")
-                PROVIDER = "gemini"
-                continue  # Instantly retry this attempt using Gemini
+            # TIERED FALLBACK LOGIC
+            if is_rate_limit:
+                # 1. Groq 70b -> Groq 8b
+                if PROVIDER == "groq" and GROQ_MODEL_IDX == 0:
+                    log.warning("Groq 70b limit hit. Falling back to Groq 8b (higher limits).")
+                    GROQ_MODEL_IDX = 1
+                    continue
+                
+                # 2. Groq 8b -> Gemini
+                if PROVIDER == "groq" and GROQ_MODEL_IDX == 1:
+                    log.warning("Groq 8b limit hit. Falling back to Gemini 2.5 Flash.")
+                    PROVIDER = "gemini"
+                    continue
 
             wait = BASE_BACKOFF * (2 ** attempt)
 
@@ -166,12 +177,12 @@ async def _call_gemini(system_prompt: str, user_prompt: str) -> str:
 
 
 # ── Private: Groq ─────────────────────────────────────────────────────────────
-async def _call_groq(system_prompt: str, user_prompt: str) -> str:
+async def _call_groq(system_prompt: str, user_prompt: str, model: str) -> str:
     """Call Groq via the OpenAI-compatible API (Asynchronous)."""
     client = _get_groq_client()
 
     response = await client.chat.completions.create(
-        model=GROQ_MODEL,
+        model=model,
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user",   "content": user_prompt},
