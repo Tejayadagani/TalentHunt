@@ -34,7 +34,7 @@ log = logging.getLogger(__name__)
 
 # ── Configuration ─────────────────────────────────────────────────────────────
 PROVIDER       = os.getenv("LLM_PROVIDER", "gemini").lower()
-GEMINI_MODEL   = "gemini-1.5-flash"
+GEMINI_MODEL   = "gemini-2.0-flash"
 GROK_MODEL     = "grok-3-mini"
 GROK_BASE_URL  = "https://api.x.ai/v1"
 
