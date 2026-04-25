@@ -203,11 +203,14 @@ async def call_llm(system_prompt: str, user_prompt: str, agent_id: int = 0) -> s
                     next_model = config["openrouter"][state["openrouter_idx"]]
                     log.warning(f"[Agent {agent_id}] OpenRouter error ({exc.__class__.__name__}). Rotating to: {next_model}")
                     continue
-                # All OpenRouter models exhausted
-                # If it's a 404/400 (unrecoverable), waiting won't help. Break and fail fast.
-                if is_unavailable:
-                    log.error(f"[Agent {agent_id}] Models exhausted and hit unrecoverable error ({exc}). Failing fast.")
-                    break
+                else:
+                    # All OpenRouter models exhausted — loop back to Groq!
+                    # We do NOT 'continue' here, so that it hits the backoff sleep below
+                    # before trying Groq again. This prevents rapid infinite looping.
+                    log.warning(f"[Agent {agent_id}] All models exhausted. Looping back to Groq.")
+                    state["provider"] = "groq"
+                    state["groq_idx"] = 0
+                    state["openrouter_idx"] = 0
 
             wait = min(BASE_BACKOFF * (2 ** attempt), 15)
 
