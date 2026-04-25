@@ -12,7 +12,7 @@ pip install -r requirements.txt
 
 # 3. Configure environment variables
 cp .env.example .env
-# Edit .env and add your GEMINI_API_KEY (or GROK_API_KEY)
+# Edit .env and add your OPENROUTER_API_KEY (and GROQ_API_KEY)
 
 # 4. Embed candidates (run once, after Step 1.2 + 1.3 are complete)
 python scripts/embed_candidates.py

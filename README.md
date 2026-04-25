@@ -40,7 +40,7 @@ flowchart TD
     subgraph Data [Data & AI Services]
         Chroma[(ChromaDB)]:::db
         Groq[Groq API: Llama 3]:::external
-        Gemini[Gemini API: Auto-Fallback]:::external
+        OpenRouter[OpenRouter: Safety Net]:::external
     end
 
     %% Step-by-Step Flow
@@ -58,7 +58,7 @@ flowchart TD
     A3 -->|Transcripts| A5
 
     A5 <-->|Interest Scoring| Groq
-    A5 -.->|If 429 Rate Limit| Gemini
+    A5 -.->|If 429 Rate Limit| OpenRouter
     
     A5 -->|Yield JSON Chunk| SSE
     SSE -->|Server-Sent Events| Dashboard
@@ -81,7 +81,7 @@ TalentRadar utilizes a **5-Agent Pipeline** to evaluate candidates with extreme 
 ## ✨ Key Features
 
 - **Live SSE Streaming**: Candidates appear and re-sort themselves on your dashboard in real-time as their "interviews" finish.
-- **LLM Auto-Fallback**: If the primary engine (Groq) hits a rate limit, the system automatically hot-swaps to Google Gemini 1.5 Flash to ensure zero downtime.
+- **LLM Auto-Fallback**: If the primary engine (Groq) hits a rate limit, the system automatically hot-swaps to OpenRouter's free tier to ensure zero downtime.
 - **JSON Healing**: Advanced error handling that automatically repairs truncated LLM responses to prevent pipeline crashes.
 - **Premium UI**: A high-contrast, glassmorphic dark-mode dashboard built with Framer Motion and Tailwind CSS.
 
@@ -92,7 +92,7 @@ TalentRadar utilizes a **5-Agent Pipeline** to evaluate candidates with extreme 
 - **Backend**: Python 3.12, FastAPI, Asyncio
 - **Vector DB**: ChromaDB (all-MiniLM-L6-v2)
 - **Frontend**: Next.js 14, Tailwind CSS, Lucide React
-- **LLM Engines**: Groq (Llama-3.3-70b) + Google Gemini (Fallback)
+- **LLM Engines**: Groq (Llama-3.3-70b + 3.1-8b) + OpenRouter (Fallback)
 
 ---
 
@@ -103,7 +103,7 @@ TalentRadar utilizes a **5-Agent Pipeline** to evaluate candidates with extreme 
 cd backend
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env   # Add your API keys (GROQ_API_KEY, GEMINI_API_KEY)
+cp .env.example .env   # Add your API keys (GROQ_API_KEY, OPENROUTER_API_KEY)
 
 # Seed the database
 python scripts/embed_candidates.py

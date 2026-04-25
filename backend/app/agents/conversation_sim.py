@@ -31,7 +31,7 @@ from app.llm_client import call_llm
 log = logging.getLogger(__name__)
 
 # ── Rate-limit guard ─────────────────────────────────────────────────────────
-# Gemini free tier: 15 req/min. Each turn = 2 LLM calls.
+# Groq tier 1: 30 RPM. Each turn = 2 LLM calls.
 # 6 turns × 2 calls = 12 calls per candidate. Sleep between turns.
 _INTER_TURN_SLEEP = 2   # seconds between each full turn (recruiter + candidate)
 

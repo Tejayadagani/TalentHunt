@@ -15,7 +15,7 @@ Public API
 
 Rate limiting
 -------------
-  Gemini free tier: 15 req/min, 1500 req/day.
+  Groq Tier 1 limit: 100k tokens/day.
   Per candidate: ~1 (match reason) + 12 (conversation) + 1 (scoring) = ~14 LLM calls.
   Pipeline sleeps INTER_CANDIDATE_SLEEP seconds between candidates.
   With top_k=5 and 14 calls/candidate: ~70 calls total — within daily limit.
