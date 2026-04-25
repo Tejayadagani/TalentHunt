@@ -6,7 +6,9 @@ import { JDInput, ScoutFormData } from "@/components/JDInput";
 import { ShortlistTable } from "@/components/ShortlistTable";
 import { CandidateResult } from "@/components/CandidateCard";
 import { ScoreSliders } from "@/components/ScoreSliders";
-import { AlertCircle, CheckCircle2, Search } from "lucide-react";
+import { SavedResultsModal, SavedScout } from "@/components/SavedResultsModal";
+import { SettingsModal } from "@/components/SettingsModal";
+import { AlertCircle, CheckCircle2, Search, Bookmark, BookmarkCheck } from "lucide-react";
 
 interface ScoutResponseData {
   job_title: string | null;
@@ -19,24 +21,42 @@ interface ScoutResponseData {
   [key: string]: unknown;
 }
 
+const STORAGE_KEY = "talentradar_saved_scouts";
+
+function loadSavedScouts(): SavedScout[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function persistScouts(scouts: SavedScout[]) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(scouts));
+}
+
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<ScoutResponseData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isBackendConnected, setIsBackendConnected] = useState<boolean | null>(null);
+  const [savedScouts, setSavedScouts] = useState<SavedScout[]>([]);
+  const [showSaved, setShowSaved] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
 
   useEffect(() => {
-    // Health check on load
+    setSavedScouts(loadSavedScouts());
+  }, []);
+
+  useEffect(() => {
     const checkHealth = async () => {
       try {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL;
         if (!apiUrl) throw new Error("NEXT_PUBLIC_API_URL is not defined");
         const res = await fetch(`${apiUrl}/api/health`, { method: "GET" });
-        if (res.ok) {
-          setIsBackendConnected(true);
-        } else {
-          setIsBackendConnected(false);
-        }
+        setIsBackendConnected(res.ok);
       } catch {
         setIsBackendConnected(false);
       }
@@ -48,6 +68,7 @@ export default function Home() {
     setIsLoading(true);
     setError(null);
     setResults(null);
+    setIsSaved(false);
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL;
       if (!apiUrl) throw new Error("NEXT_PUBLIC_API_URL is not defined. Please check your .env file.");
@@ -75,8 +96,44 @@ export default function Home() {
     }
   };
 
+  const handleSaveResult = () => {
+    if (!results) return;
+    const scout: SavedScout = {
+      id: `scout_${Date.now()}`,
+      timestamp: Date.now(),
+      job_title: results.job_title || "Untitled Role",
+      results,
+    };
+    const updated = [scout, ...savedScouts];
+    setSavedScouts(updated);
+    persistScouts(updated);
+    setIsSaved(true);
+  };
+
+  const handleDeleteScout = (id: string) => {
+    const updated = savedScouts.filter((s) => s.id !== id);
+    setSavedScouts(updated);
+    persistScouts(updated);
+  };
+
+  const handleLoadScout = (loadedResults: ScoutResponseData) => {
+    setResults(loadedResults);
+    setShowSaved(false);
+    setIsSaved(true);
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
+      {/* Modals */}
+      <SavedResultsModal
+        isOpen={showSaved}
+        onClose={() => setShowSaved(false)}
+        savedScouts={savedScouts}
+        onLoad={handleLoadScout}
+        onDelete={handleDeleteScout}
+      />
+      <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />
+
       {/* Top Bar */}
       <header className="h-[60px] border-b border-border bg-white dark:bg-[#1A1A1A] px-6 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2">
@@ -85,14 +142,34 @@ export default function Home() {
           </div>
           <span className="text-[18px] font-semibold tracking-tight text-foreground">TalentRadar</span>
         </div>
-        
+
         <div className="flex items-center gap-6">
           <nav className="hidden md:flex items-center gap-4">
-            <button className="text-[14px] font-medium text-muted-foreground hover:text-foreground transition-colors">New Scout</button>
-            <button className="text-[14px] font-medium text-muted-foreground hover:text-foreground transition-colors">Saved Results</button>
-            <button className="text-[14px] font-medium text-muted-foreground hover:text-foreground transition-colors">Settings</button>
+            <button
+              onClick={() => { setResults(null); setError(null); setIsSaved(false); }}
+              className="text-[14px] font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              New Scout
+            </button>
+            <button
+              onClick={() => setShowSaved(true)}
+              className="text-[14px] font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5"
+            >
+              Saved Results
+              {savedScouts.length > 0 && (
+                <span className="text-[11px] bg-primary text-white rounded-full px-1.5 py-0.5 font-bold leading-none">
+                  {savedScouts.length}
+                </span>
+              )}
+            </button>
+            <button
+              onClick={() => setShowSettings(true)}
+              className="text-[14px] font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Settings
+            </button>
           </nav>
-          
+
           <div className="flex items-center gap-2 text-[13px] font-medium bg-secondary px-3 py-1.5 rounded-full border border-border">
             {isBackendConnected === true ? (
               <>
@@ -116,7 +193,7 @@ export default function Home() {
 
       {/* Main Content */}
       <main className="flex-1 max-w-[1200px] w-full mx-auto p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        
+
         {/* Left Column: Input Form */}
         <div className={`transition-all duration-500 ease-out ${results || isLoading ? 'lg:col-span-4' : 'lg:col-span-8 lg:col-start-3'}`}>
           {!results && !isLoading && (
@@ -127,12 +204,12 @@ export default function Home() {
               </p>
             </div>
           )}
-          
+
           <JDInput onSubmit={handleScout} isLoading={isLoading} />
-          
+
           <AnimatePresence>
             {error && (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, height: 0, y: -10 }}
                 animate={{ opacity: 1, height: "auto", y: 0 }}
                 exit={{ opacity: 0, height: 0 }}
@@ -145,10 +222,10 @@ export default function Home() {
           </AnimatePresence>
         </div>
 
-        {/* Right Column: Results or Empty State */}
+        {/* Right Column: Results or Loading */}
         <div className={`transition-all duration-500 ease-out ${results || isLoading ? 'lg:col-span-8' : 'hidden'}`}>
           {isLoading && !results && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="bg-card border border-border rounded-lg p-8 shadow-sm flex flex-col items-center justify-center min-h-[400px] text-center"
@@ -161,7 +238,7 @@ export default function Home() {
               <p className="text-[14px] text-muted-foreground max-w-sm mx-auto mb-8">
                 This process takes about 2-3 minutes as we conduct deep conversational screening with top matches.
               </p>
-              
+
               <div className="w-full max-w-sm text-left space-y-3">
                 <div className="flex items-center gap-3 text-[14px]">
                   <CheckCircle2 className="w-5 h-5 text-primary" />
@@ -180,7 +257,7 @@ export default function Home() {
           )}
 
           {results && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               className="space-y-6"
@@ -194,20 +271,33 @@ export default function Home() {
                     {results.total_candidates_evaluated} candidates evaluated, {results.shortlist?.length || 0} ranked
                   </p>
                 </div>
+                {/* Save Button */}
+                <button
+                  onClick={handleSaveResult}
+                  disabled={isSaved}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold border transition-all ${
+                    isSaved
+                      ? "bg-primary/10 text-primary border-primary/30 cursor-default"
+                      : "border-border text-muted-foreground hover:text-foreground hover:border-primary hover:bg-primary/5"
+                  }`}
+                >
+                  {isSaved ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
+                  {isSaved ? "Saved" : "Save Result"}
+                </button>
               </div>
 
-              <ScoreSliders 
+              <ScoreSliders
                 initialMatchWeight={results.weights?.match ?? 0.6}
                 shortlist={results.shortlist || []}
                 onReRank={(newShortlist, newWeight) => {
                   setResults({
                     ...results,
                     shortlist: newShortlist,
-                    weights: { match: newWeight, interest: 1 - newWeight }
+                    weights: { match: newWeight, interest: 1 - newWeight },
                   });
                 }}
               />
-              
+
               <ShortlistTable candidates={results.shortlist || []} />
             </motion.div>
           )}
