@@ -1,9 +1,10 @@
 """
 llm_client.py — Unified LLM wrapper for TalentRadar.
 
-Supports two providers, selected via the LLM_PROVIDER env var:
-  - "gemini"  (default) → Google Gemini 1.5 Flash, free tier
-  - "groq"              → Groq API (Llama 3) via OpenAI-compatible API
+Supports three-tier fallback:
+  - Groq 70B (Primary)
+  - Groq 8B (Secondary - high limits)
+  - OpenRouter (Safety Net - generous free models)
 
 Public API
 ----------
@@ -41,19 +42,21 @@ class TelemetryFilter(logging.Filter):
 for handler in logging.root.handlers:
     handler.addFilter(TelemetryFilter())
 # ── Configuration ─────────────────────────────────────────────────────────────
-PROVIDER       = os.getenv("LLM_PROVIDER", "groq").lower()
-GEMINI_MODEL   = "gemini-2.5-flash"
-GROQ_MODELS    = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]
-GROQ_MODEL_IDX = 0
-GROQ_BASE_URL  = "https://api.groq.com/openai/v1"
+PROVIDER          = "groq"
+GROQ_MODELS       = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]
+GROQ_MODEL_IDX    = 0
+GROQ_BASE_URL     = "https://api.groq.com/openai/v1"
+
+OPENROUTER_MODEL  = os.getenv("OPENROUTER_MODEL", "google/gemini-2.0-flash-lite:free")
+OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 
 MAX_RETRIES    = 3
-BASE_BACKOFF   = 1      # seconds — doubles each retry: 1 → 2 → 4
-RATE_LIMIT_EXTRA_WAIT = 5   # extra seconds on top of backoff for 429s
+BASE_BACKOFF   = 1
+RATE_LIMIT_EXTRA_WAIT = 5
 
-# Global clients to avoid re-instantiation overhead
-_genai_configured = False
+# Global clients
 _groq_client = None
+_openrouter_client = None
 
 def _get_groq_client():
     global _groq_client
@@ -65,27 +68,31 @@ def _get_groq_client():
         _groq_client = AsyncOpenAI(api_key=api_key, base_url=GROQ_BASE_URL)
     return _groq_client
 
-def _configure_gemini():
-    global _genai_configured
-    if not _genai_configured:
-        import google.generativeai as genai
-        api_key = os.environ.get("GEMINI_API_KEY")
+def _get_openrouter_client():
+    global _openrouter_client
+    if _openrouter_client is None:
+        from openai import AsyncOpenAI
+        api_key = os.environ.get("OPENROUTER_API_KEY")
         if not api_key:
-            raise EnvironmentError("GEMINI_API_KEY is not set. Add it to your .env file.")
-        genai.configure(api_key=api_key)
-        _genai_configured = True
+            raise EnvironmentError("OPENROUTER_API_KEY is not set. Add it to your .env file.")
+        _openrouter_client = AsyncOpenAI(
+            api_key=api_key, 
+            base_url=OPENROUTER_BASE_URL,
+            default_headers={
+                "HTTP-Referer": "https://talenthunt.vercel.app",
+                "X-Title": "TalentRadar"
+            }
+        )
+    return _openrouter_client
 
-log.info(f"Initial Provider: {PROVIDER.upper()} | Primary Model: {GROQ_MODELS[0] if PROVIDER == 'groq' else GEMINI_MODEL}")
+log.info(f"LLM Engine: 3-Tier Multi-Model Fallback active (70B -> 8B -> OpenRouter)")
 
 
 # ── Public: main entry point ──────────────────────────────────────────────────
 async def call_llm(system_prompt: str, user_prompt: str) -> str:
     """
-    Call the configured LLM with the given prompts (Asynchronous).
-
-    Retries up to MAX_RETRIES times with exponential backoff.
-    If using Groq and a rate limit is hit, it will automatically fall back
-    to Gemini to prevent failure.
+    Call the configured LLM with tiered fallback logic.
+    70B -> 8B -> OpenRouter.
     """
     last_exc: Exception | None = None
     import asyncio
@@ -93,10 +100,9 @@ async def call_llm(system_prompt: str, user_prompt: str) -> str:
 
     for attempt in range(MAX_RETRIES):
         try:
-            if PROVIDER == "gemini":
-                return await _call_gemini(system_prompt, user_prompt)
+            if PROVIDER == "openrouter":
+                return await _call_openrouter(system_prompt, user_prompt)
             else:
-                # Try current Groq model
                 model_name = GROQ_MODELS[GROQ_MODEL_IDX]
                 return await _call_groq(system_prompt, user_prompt, model=model_name)
 
@@ -104,18 +110,17 @@ async def call_llm(system_prompt: str, user_prompt: str) -> str:
             last_exc = exc
             is_rate_limit = _is_rate_limit_error(exc)
             
-            # TIERED FALLBACK LOGIC
             if is_rate_limit:
                 # 1. Groq 70b -> Groq 8b
                 if PROVIDER == "groq" and GROQ_MODEL_IDX == 0:
-                    log.warning("Groq 70b limit hit. Falling back to Groq 8b (higher limits).")
+                    log.warning("Groq 70B limit hit. Switching to Groq 8B.")
                     GROQ_MODEL_IDX = 1
                     continue
                 
-                # 2. Groq 8b -> Gemini
+                # 2. Groq 8b -> OpenRouter
                 if PROVIDER == "groq" and GROQ_MODEL_IDX == 1:
-                    log.warning("Groq 8b limit hit. Falling back to Gemini 2.5 Flash.")
-                    PROVIDER = "gemini"
+                    log.warning("Groq 8B limit hit. Switching to OpenRouter (Safety Net).")
+                    PROVIDER = "openrouter"
                     continue
 
             wait = BASE_BACKOFF * (2 ** attempt)
@@ -161,19 +166,19 @@ def parse_json_response(text: str) -> dict:
     return json.loads(cleaned)
 
 
-# ── Private: Gemini ───────────────────────────────────────────────────────────
-async def _call_gemini(system_prompt: str, user_prompt: str) -> str:
-    """Call Google Gemini 1.5 Flash."""
-    import google.generativeai as genai
-    _configure_gemini()
-
-    model = genai.GenerativeModel(
-        model_name=GEMINI_MODEL,
-        system_instruction=system_prompt,
+# ── Private: OpenRouter ───────────────────────────────────────────────────────
+async def _call_openrouter(system_prompt: str, user_prompt: str) -> str:
+    """Call OpenRouter via OpenAI-compatible API."""
+    client = _get_openrouter_client()
+    response = await client.chat.completions.create(
+        model=OPENROUTER_MODEL,
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user",   "content": user_prompt},
+        ],
+        temperature=0.3,
     )
-
-    response = await model.generate_content_async(user_prompt)
-    return response.text.strip()
+    return response.choices[0].message.content.strip()
 
 
 # ── Private: Groq ─────────────────────────────────────────────────────────────
