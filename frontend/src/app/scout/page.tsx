@@ -33,7 +33,7 @@ function persistScouts(scouts: SavedScout[]) {
 }
 
 // ── Loading State ─────────────────────────────────────────
-function LoadingState() {
+function LoadingState({ message }: { message: string }) {
   const [elapsed, setElapsed] = useState(0);
 
   useEffect(() => {
@@ -41,7 +41,7 @@ function LoadingState() {
     return () => clearInterval(t);
   }, []);
 
-  const remaining = Math.max(0, 150 - elapsed);
+  const remaining = Math.max(0, 45 - elapsed);
   const mins = Math.floor(remaining / 60);
   const secs = remaining % 60;
 
@@ -54,33 +54,14 @@ function LoadingState() {
       <div className="spinner-gold mb-8" />
       <h2 className="text-[22px] font-bold text-[#4A9D5F] mb-2">Scouting your candidates…</h2>
       <p className="text-[14px] text-[#A0A0A0] max-w-sm mx-auto mb-10 leading-relaxed">
-        This typically takes 2–3 minutes as we conduct thoughtful screening conversations with each top match.
+        This typically takes ~45 seconds as we run parallel screening conversations with the top matches.
       </p>
 
-      <div className="w-full max-w-xs text-left space-y-4 mb-8">
-        {[
-          { label: "Parsing your job description", done: true },
-          { label: "Searching our talent pool", done: true },
-          { label: "Running conversations & scoring", done: false, active: true },
-          { label: "Generating explanations", done: false, active: false },
-        ].map((step, i) => (
-          <div key={i} className="flex items-center gap-3 text-[14px]">
-            {step.done ? (
-              <div className="w-6 h-6 rounded-full bg-[#2D7D3E] flex items-center justify-center shrink-0">
-                <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 12 12">
-                  <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </div>
-            ) : step.active ? (
-              <div className="w-6 h-6 rounded-full border-2 border-[#D4AF37] border-t-transparent animate-spin shrink-0" />
-            ) : (
-              <div className="w-6 h-6 rounded-full border-2 border-[#4A4A4A] shrink-0" />
-            )}
-            <span className={step.active ? "font-semibold text-white" : step.done ? "text-[#4A9D5F]" : "text-[#777]"}>
-              {step.label}
-            </span>
-          </div>
-        ))}
+      <div className="w-full max-w-xs mx-auto mb-8 text-center">
+        <div className="inline-flex items-center gap-3 text-[14px] bg-[#1A3A22]/50 text-[#4A9D5F] px-4 py-2 rounded-full border border-[#2D7D3E]/30">
+          <div className="w-4 h-4 rounded-full border-2 border-[#D4AF37] border-t-transparent animate-spin shrink-0" />
+          <span className="font-semibold">{message || "Initializing..."}</span>
+        </div>
       </div>
 
       <p className="text-[13px] italic text-[#777]">
@@ -93,6 +74,7 @@ function LoadingState() {
 // ── Main Page ─────────────────────────────────────────────
 export default function ScoutPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState("");
   const [results, setResults] = useState<ScoutResponseData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isBackendConnected, setIsBackendConnected] = useState<boolean | null>(null);
@@ -120,19 +102,75 @@ export default function ScoutPage() {
     setError(null);
     setResults(null);
     setIsSaved(false);
+    setLoadingMessage("Connecting to server...");
+    
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL;
       if (!apiUrl) throw new Error("NEXT_PUBLIC_API_URL is not defined.");
-      const res = await fetch(`${apiUrl}/api/scout`, {
+      
+      const res = await fetch(`${apiUrl}/api/scout/stream`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
+
       if (!res.ok) {
         const e = await res.json();
-        throw new Error(e.detail || "Failed to fetch candidates");
+        throw new Error(e.detail || "Failed to start streaming");
       }
-      setResults(await res.json());
+
+      if (!res.body) throw new Error("ReadableStream not supported in this browser.");
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder("utf-8");
+      let done = false;
+      let buffer = "";
+
+      let currentResults: ScoutResponseData = {
+        job_title: null,
+        total_candidates_evaluated: 0,
+        shortlist: [],
+      };
+
+      while (!done) {
+        const { value, done: readerDone } = await reader.read();
+        done = readerDone;
+        if (value) {
+          buffer += decoder.decode(value, { stream: true });
+          const parts = buffer.split("\n\n");
+          buffer = parts.pop() || "";
+
+          for (const part of parts) {
+            if (part.startsWith("data: ")) {
+              try {
+                const event = JSON.parse(part.substring(6));
+                
+                if (event.type === "info") {
+                  setLoadingMessage(event.message);
+                } else if (event.type === "start") {
+                  currentResults.job_title = event.job_title;
+                  currentResults.total_candidates_evaluated = event.total;
+                  currentResults.weights = event.weights;
+                  setResults({ ...currentResults });
+                  setIsLoading(false); // Hide loading state once we have start info
+                } else if (event.type === "candidate") {
+                  currentResults.shortlist = [...currentResults.shortlist, event.data]
+                    .sort((a, b) => (b.combined_score || 0) - (a.combined_score || 0))
+                    .map((c, i) => ({ ...c, rank: i + 1 }));
+                  setResults({ ...currentResults });
+                } else if (event.type === "error") {
+                  setError(event.message);
+                  done = true;
+                } else if (event.type === "done") {
+                  done = true;
+                }
+              } catch (e) {
+                console.error("Failed to parse SSE JSON:", e, part);
+              }
+            }
+          }
+        }
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An unexpected error occurred.");
     } finally {
@@ -258,7 +296,7 @@ export default function ScoutPage() {
 
         {/* Right: Results */}
         <div className={`transition-all duration-500 ease-out ${results || isLoading ? "lg:col-span-8" : "hidden"}`}>
-          {isLoading && !results && <LoadingState />}
+          {isLoading && !results && <LoadingState message={loadingMessage} />}
 
           {results && (
             <motion.div initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} className="space-y-5">

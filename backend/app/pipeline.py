@@ -172,31 +172,71 @@ async def run_pipeline(
         "errors": errors,
     }
 
-    # ── Sort by combined score and assign ranks ────────────────────────────────
-    results.sort(key=lambda x: x["combined_score"], reverse=True)
-    for rank, result in enumerate(results, start=1):
-        result["rank"] = rank
 
-    elapsed = round(time.time() - pipeline_start, 1)
-    log.info(
-        f"[Pipeline] Complete — {len(results)}/{len(candidates)} candidates scored "
-        f"in {elapsed}s.  Errors: {len(errors)}"
-    )
-    log.info("=" * 60)
+# ─────────────────────────────────────────────────────────────────────────────
+# Streaming pipeline (Async Generator)
+# ─────────────────────────────────────────────────────────────────────────────
+async def run_pipeline_stream(
+    jd_text: str,
+    top_k: int = 5,
+    match_weight: float = 0.6,
+    conversation_turns: int = 6,
+):
+    """
+    Async generator that yields JSON serializable dicts representing pipeline events.
+    Yields:
+      {"type": "info", "message": "..."}
+      {"type": "start", "job_title": "...", "total": int, "weights": {...}}
+      {"type": "candidate", "data": dict}
+      {"type": "error", "message": "..."}
+      {"type": "done"}
+    """
+    yield {"type": "info", "message": "Parsing job description..."}
+    try:
+        parsed_jd = await parse_jd(jd_text)
+    except Exception as e:
+        yield {"type": "error", "message": f"Failed to parse JD: {e}"}
+        return
 
-    return {
-        "job_title":                  parsed_jd.get("title"),
-        "parsed_jd":                  parsed_jd,
-        "total_candidates_evaluated": len(candidates),
-        "shortlist":                  results,
+    yield {"type": "info", "message": f"Parsed JD for '{parsed_jd.get('title')}'. Searching pool..."}
+
+    try:
+        candidates = await find_candidates(parsed_jd, top_k=top_k)
+    except Exception as e:
+        yield {"type": "error", "message": f"Failed to find candidates: {e}"}
+        return
+
+    if not candidates:
+        yield {"type": "error", "message": "No candidates found matching the criteria."}
+        return
+
+    yield {
+        "type": "start",
+        "job_title": parsed_jd.get("title"),
+        "total": len(candidates),
         "weights": {
-            "match":    round(match_weight, 2),
+            "match": round(match_weight, 2),
             "interest": round(1.0 - match_weight, 2),
-        },
-        "errors": errors,
+        }
     }
 
+    yield {"type": "info", "message": f"Simulating interviews for {len(candidates)} candidates..."}
 
+    # Parallel evaluation
+    tasks = [
+        asyncio.create_task(evaluate_candidate(c, parsed_jd, conversation_turns, match_weight))
+        for c in candidates
+    ]
+
+    for future in asyncio.as_completed(tasks):
+        try:
+            res = await future
+            yield {"type": "candidate", "data": res}
+        except Exception as e:
+            log.error(f"[Pipeline Stream] Task error: {e}")
+            yield {"type": "error", "message": f"A candidate evaluation failed: {e}"}
+
+    yield {"type": "done"}
 # ─────────────────────────────────────────────────────────────────────────────
 # Private helpers
 # ─────────────────────────────────────────────────────────────────────────────

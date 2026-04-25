@@ -203,6 +203,38 @@ async def scout_candidates(request: ScoutRequest):
 
 
 @app.post(
+    "/api/scout/stream",
+    summary="Stream scout and rank candidates",
+    tags=["Pipeline"],
+)
+async def scout_candidates_stream(request: ScoutRequest):
+    """
+    Server-Sent Events (SSE) endpoint for the TalentRadar pipeline.
+    Yields real-time events as candidates are processed.
+    """
+    import json
+    from fastapi.responses import StreamingResponse
+    from app.pipeline import run_pipeline_stream
+
+    log.info(f"POST /api/scout/stream — top_k={request.top_k}")
+
+    async def event_generator():
+        try:
+            async for event in run_pipeline_stream(
+                jd_text            = request.jd_text,
+                top_k              = request.top_k,
+                match_weight       = request.match_weight,
+                conversation_turns = request.conversation_turns,
+            ):
+                yield f"data: {json.dumps(event)}\n\n"
+        except Exception as exc:
+            log.error(f"Stream error: {exc}", exc_info=True)
+            yield f"data: {json.dumps({'type': 'error', 'message': str(exc)})}\n\n"
+
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
+
+
+@app.post(
     "/api/rerank",
     response_model=RerankResponse,
     summary="Re-rank an existing shortlist with new weights",

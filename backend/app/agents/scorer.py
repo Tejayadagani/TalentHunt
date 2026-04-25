@@ -165,8 +165,23 @@ async def score_conversation(
         result = _validate_and_fix(parsed, candidate_name)
     except Exception as exc:
         log.error(f"[Agent 5] JSON parse error for {candidate_name}: {exc}")
-        log.error(f"[Agent 5] Raw response was: {raw_response[:500]}")
-        result = _zero_score(f"Scoring failed due to a parsing error: {exc}")
+        
+        # HEAL: If it looks like truncation, try to close the JSON manually
+        if "Expecting" in str(exc) or "Unterminated" in str(exc):
+            log.warning("[Agent 5] Attempting to heal truncated JSON …")
+            try:
+                # Add closing quote if missing, then closing braces
+                healed = raw_response.strip()
+                if not healed.endswith('"}'):
+                    if not healed.endswith('"'): healed += '"'
+                    if not healed.endswith('}'): healed += '}'
+                    if not healed.endswith('}'): healed += '}'
+                parsed = parse_json_response(healed)
+                result = _validate_and_fix(parsed, candidate_name)
+            except Exception:
+                result = _zero_score(f"Scoring failed due to a critical truncation error: {exc}")
+        else:
+            result = _zero_score(f"Scoring failed due to a parsing error: {exc}")
 
     log.info(
         f"[Agent 5] Scored {candidate_name}: "
