@@ -68,7 +68,10 @@ async def lifespan(app: FastAPI):
 
         if count == 0:
             if os.getenv("RENDER"):
-                log.warning("ChromaDB is empty on Render! Ensure the build step embedded candidates.")
+                log.warning("ChromaDB empty on Render! Launching background seeder to avoid port timeout...")
+                import threading
+                from scripts.embed_candidates import main as seed_db
+                threading.Thread(target=seed_db, daemon=True).start()
             else:
                 log.info("Local dev: ChromaDB is empty. Auto-seeding candidates …")
                 from scripts.embed_candidates import main as seed_db
