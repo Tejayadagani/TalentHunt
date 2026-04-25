@@ -30,7 +30,7 @@ const SAVED_KEY = "talentradar_saved_candidates";
 
 function ScoreBar({ value, color }: { value: number; color: string }) {
   return (
-    <div className="h-2 w-full rounded-full overflow-hidden" style={{ background: "#E0E0E0" }}>
+    <div className="h-2 w-full rounded-full overflow-hidden" style={{ background: "#333" }}>
       <div className="h-full rounded-full transition-all duration-500" style={{ width: `${value}%`, background: color }} />
     </div>
   );
@@ -81,8 +81,8 @@ Best regards`
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden"
-      style={{ border: "1px solid #E0E0E0", borderTop: "3px solid #D4AF37" }}
+      className="bg-[#1A1A1A]/60 backdrop-blur-xl rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 overflow-hidden"
+      style={{ border: "1px solid #333", borderTop: "3px solid #D4AF37" }}
       whileHover={{ y: -2 }}
     >
       {/* ── Header ── */}
@@ -91,26 +91,26 @@ Best regards`
           #{candidate.rank}
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="text-[17px] font-bold text-[#1A1A1A] leading-tight">{candidate.name}</h3>
-          <p className="text-[13px] text-[#4A4A4A] mt-0.5">
+          <h3 className="text-[17px] font-bold text-white leading-tight">{candidate.name}</h3>
+          <p className="text-[13px] text-[#A0A0A0] mt-0.5">
             {candidate.current_title} · {candidate.current_company} · {candidate.years_of_experience} yrs · {candidate.location}
-            {candidate.remote_ok && <span className="ml-1.5 text-[#2D7D3E] font-medium">(Remote ok)</span>}
+            {candidate.remote_ok && <span className="ml-1.5 text-[#4A9D5F] font-medium">(Remote ok)</span>}
           </p>
         </div>
       </div>
 
       {/* ── Scores ── */}
-      <div className="grid grid-cols-3 gap-4 px-5 py-4 border-t border-b border-[#F5F5F5]">
+      <div className="grid grid-cols-3 gap-4 px-5 py-4 border-t border-b border-[#333]">
         {/* Match */}
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-wide text-[#1A1A1A] mb-1">Match score</p>
-          <p className="text-[28px] font-bold text-[#2D7D3E] leading-none mb-2">{Math.round(candidate.match_score)}</p>
-          <ScoreBar value={candidate.match_score} color="#2D7D3E" />
+          <p className="text-[11px] font-bold uppercase tracking-wide text-white mb-1">Match score</p>
+          <p className="text-[28px] font-bold text-[#4A9D5F] leading-none mb-2">{Math.round(candidate.match_score)}</p>
+          <ScoreBar value={candidate.match_score} color="#4A9D5F" />
         </div>
         {/* Interest */}
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-wide text-[#1A1A1A] mb-1">Interest score</p>
-          <p className="text-[28px] font-bold text-[#2D7D3E] leading-none mb-2">{Math.round(candidate.interest_score)}</p>
+          <p className="text-[11px] font-bold uppercase tracking-wide text-white mb-1">Interest score</p>
+          <p className="text-[28px] font-bold text-[#4A9D5F] leading-none mb-2">{Math.round(candidate.interest_score)}</p>
           <ScoreBar value={candidate.interest_score} color="#4A9D5F" />
         </div>
         {/* Combined */}
@@ -124,16 +124,16 @@ Best regards`
       {/* ── Skills ── */}
       <div className="px-5 py-4 flex flex-wrap gap-2">
         {candidate.skills.slice(0, 8).map(skill => (
-          <span key={skill} className="flex items-center gap-1 text-[12px] px-3 py-1 rounded-md font-medium" style={{ background: "rgba(45,125,62,0.1)", color: "#1A1A1A" }}>
-            {skill} <Check className="w-3 h-3 text-[#2D7D3E]" />
+          <span key={skill} className="flex items-center gap-1 text-[12px] px-3 py-1 rounded-md font-medium" style={{ background: "rgba(45,125,62,0.2)", color: "#4A9D5F" }}>
+            {skill} <Check className="w-3 h-3 text-[#4A9D5F]" />
           </span>
         ))}
         {candidate.skills.length > 8 && (
-          <span className="text-[12px] text-[#4A4A4A] self-center">+{candidate.skills.length - 8} more</span>
+          <span className="text-[12px] text-[#A0A0A0] self-center">+{candidate.skills.length - 8} more</span>
         )}
         {candidate.missing_skills && candidate.missing_skills.length > 0 && (
           candidate.missing_skills.map(skill => (
-            <span key={skill} className="text-[12px] px-3 py-1 rounded-md text-[#A0A0A0] line-through" style={{ background: "#F5F5F5" }}>
+            <span key={skill} className="text-[12px] px-3 py-1 rounded-md text-[#777] line-through" style={{ background: "#333" }}>
               {skill}
             </span>
           ))
@@ -143,23 +143,23 @@ Best regards`
       {/* ── Explanation ── */}
       <div className="px-5 pb-4">
         <p
-          className="text-[13px] text-[#4A4A4A] italic leading-relaxed pl-4 line-clamp-3"
+          className="text-[13px] text-[#A0A0A0] italic leading-relaxed pl-4 line-clamp-3"
           style={{ borderLeft: "2px solid #D4AF37" }}
         >
           &ldquo;{candidate.explanation}&rdquo;
         </p>
         {candidate.match_reason && (
-          <p className="text-[12px] text-[#4A4A4A] mt-2 truncate">
-            <strong className="text-[#1A1A1A]">Match reasoning:</strong> {candidate.match_reason}
+          <p className="text-[12px] text-[#A0A0A0] mt-2 truncate">
+            <strong className="text-white">Match reasoning:</strong> {candidate.match_reason}
           </p>
         )}
       </div>
 
       {/* ── Actions ── */}
-      <div className="flex flex-wrap items-center gap-2 px-5 py-4 border-t border-[#F5F5F5] bg-[#FAFAFA]">
+      <div className="flex flex-wrap items-center gap-2 px-5 py-4 border-t border-[#333] bg-[#0A0A0A]/50">
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="h-10 px-5 rounded-lg border-2 border-[#2D7D3E] text-[#2D7D3E] hover:bg-[#E8F5E9] font-semibold text-[13px] transition-all active:scale-[0.97]"
+          className="h-10 px-5 rounded-lg border-2 border-[#4A9D5F] text-[#4A9D5F] hover:bg-[#1A3A22]/50 font-semibold text-[13px] transition-all active:scale-[0.97]"
         >
           {isExpanded ? "Hide conversation" : "View conversation"}
         </button>
@@ -177,7 +177,7 @@ Best regards`
         <button
           onClick={toggleSaveForLater}
           className={`h-10 px-4 rounded-lg text-[13px] font-medium flex items-center gap-1.5 transition-all ${
-            savedLater ? "text-[#2D7D3E] bg-[#E8F5E9]" : "text-[#4A4A4A] hover:text-[#2D7D3E] hover:bg-[#F5F5F5]"
+            savedLater ? "text-[#4A9D5F] bg-[#1A3A22]/50" : "text-[#A0A0A0] hover:text-white hover:bg-[#333]"
           }`}
         >
           {savedLater ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}

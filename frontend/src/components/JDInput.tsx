@@ -36,9 +36,9 @@ export function JDInput({ onSubmit, isLoading }: JDInputProps) {
   };
 
   return (
-    <div className="bg-white border border-[#E0E0E0] rounded-xl shadow-sm overflow-hidden">
+    <div className="bg-[#1A1A1A]/60 backdrop-blur-xl border border-[#333] rounded-xl shadow-lg overflow-hidden">
       <div className="p-5">
-        <label className="block text-[13px] font-bold text-[#1A1A1A] uppercase tracking-wide mb-3">
+        <label className="block text-[13px] font-bold text-white uppercase tracking-wide mb-3">
           Job description
         </label>
         <textarea
@@ -47,8 +47,8 @@ export function JDInput({ onSubmit, isLoading }: JDInputProps) {
           disabled={isLoading}
           rows={10}
           placeholder={`Senior Backend Engineer, 5+ years Python, PostgreSQL, Docker required. Bangalore office, hybrid...\n\nPaste your full job description here — the more detail you provide, the better the matches.`}
-          className="w-full resize-none text-[14px] text-[#1A1A1A] placeholder-[#A0A0A0] leading-relaxed outline-none rounded-lg p-4 border-2 border-[#E0E0E0] focus:border-[#2D7D3E] transition-colors bg-white disabled:opacity-60"
-          style={{ background: "rgba(45,125,62,0.01)" }}
+          className="w-full resize-none text-[14px] text-white placeholder-[#777] leading-relaxed outline-none rounded-lg p-4 border-2 border-[#333] focus:border-[#4A9D5F] transition-colors bg-[#0A0A0A]/50 disabled:opacity-60"
+          style={{ background: "rgba(10,10,10,0.5)" }}
         />
         {charCount > 0 && (
           <p className={`text-[12px] mt-2 font-medium ${charCount < 50 ? "text-[#D4AF37]" : "text-[#2D7D3E]"}`}>
@@ -58,25 +58,25 @@ export function JDInput({ onSubmit, isLoading }: JDInputProps) {
       </div>
 
       {/* Advanced settings */}
-      <div className="border-t border-[#E0E0E0]">
+      <div className="border-t border-[#333]">
         <button
           onClick={() => setShowAdvanced(!showAdvanced)}
-          className="w-full flex items-center justify-between px-5 py-3 text-[13px] font-semibold text-[#4A4A4A] hover:text-[#2D7D3E] hover:bg-[#F5F5F5] transition-all"
+          className="w-full flex items-center justify-between px-5 py-3 text-[13px] font-semibold text-[#A0A0A0] hover:text-white hover:bg-[#1F5A2B]/20 transition-all"
         >
           <span>Advanced settings (optional)</span>
           <span className={`transition-transform duration-200 ${showAdvanced ? "rotate-180" : ""}`}>▼</span>
         </button>
 
         {showAdvanced && (
-          <div className="px-5 pb-5 space-y-4 border-t border-[#E0E0E0] pt-4">
+          <div className="px-5 pb-5 space-y-4 border-t border-[#333] pt-4">
             {/* Top K */}
             <div>
-              <div className="flex justify-between text-[13px] font-medium text-[#1A1A1A] mb-2">
+              <div className="flex justify-between text-[13px] font-medium text-white mb-2">
                 <span>Candidates to evaluate</span>
-                <span className="text-[#2D7D3E] font-bold">{topK}</span>
+                <span className="text-[#4A9D5F] font-bold">{topK}</span>
               </div>
               <input type="range" min={3} max={15} value={topK} onChange={e => setTopK(Number(e.target.value))}
-                className="w-full h-2 rounded-full appearance-none cursor-pointer bg-[#E0E0E0]"
+                className="w-full h-2 rounded-full appearance-none cursor-pointer bg-[#333]"
                 style={{ accentColor: "#2D7D3E" }}
               />
               <div className="flex justify-between text-[11px] text-[#A0A0A0] mt-1"><span>3</span><span>15</span></div>
@@ -84,9 +84,9 @@ export function JDInput({ onSubmit, isLoading }: JDInputProps) {
 
             {/* Match weight */}
             <div>
-              <div className="flex justify-between text-[13px] font-medium text-[#1A1A1A] mb-2">
+              <div className="flex justify-between text-[13px] font-medium text-white mb-2">
                 <span>Match weight</span>
-                <span className="text-[#2D7D3E] font-bold">{Math.round(matchWeight * 100)}% match / {Math.round((1 - matchWeight) * 100)}% interest</span>
+                <span className="text-[#4A9D5F] font-bold">{Math.round(matchWeight * 100)}% match / {Math.round((1 - matchWeight) * 100)}% interest</span>
               </div>
               <input type="range" min={0} max={100} value={Math.round(matchWeight * 100)} onChange={e => setMatchWeight(Number(e.target.value) / 100)}
                 className="w-full h-2 rounded-full appearance-none cursor-pointer"
@@ -96,9 +96,9 @@ export function JDInput({ onSubmit, isLoading }: JDInputProps) {
 
             {/* Turns */}
             <div>
-              <div className="flex justify-between text-[13px] font-medium text-[#1A1A1A] mb-2">
+              <div className="flex justify-between text-[13px] font-medium text-white mb-2">
                 <span>Conversation turns per candidate</span>
-                <span className="text-[#2D7D3E] font-bold">{turns}</span>
+                <span className="text-[#4A9D5F] font-bold">{turns}</span>
               </div>
               <input type="range" min={2} max={6} value={turns} onChange={e => setTurns(Number(e.target.value))}
                 className="w-full h-2 rounded-full appearance-none cursor-pointer"
@@ -118,7 +118,7 @@ export function JDInput({ onSubmit, isLoading }: JDInputProps) {
           className={`w-full h-[48px] rounded-lg text-[15px] font-bold transition-all active:scale-[0.98] ${
             isReady
               ? "bg-[#2D7D3E] hover:bg-[#1F5A2B] text-white shadow-sm hover:shadow-md"
-              : "bg-[#E0E0E0] text-[#A0A0A0] cursor-not-allowed"
+              : "bg-[#333] text-[#777] cursor-not-allowed"
           }`}
         >
           {isLoading ? "Scouting…" : "Scout candidates →"}

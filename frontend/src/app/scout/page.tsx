@@ -10,6 +10,7 @@ import { SavedResultsModal, SavedScout } from "@/components/SavedResultsModal";
 import { SettingsModal } from "@/components/SettingsModal";
 import { AlertCircle, Search, Bookmark, BookmarkCheck, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import ShapeGrid from "@/components/ShapeGrid";
 
 interface ScoutResponseData {
   job_title: string | null;
@@ -48,11 +49,11 @@ function LoadingState() {
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white border border-[#E0E0E0] rounded-xl p-10 shadow-sm flex flex-col items-center justify-center min-h-[480px] text-center"
+      className="bg-[#1A1A1A]/60 backdrop-blur-xl border border-[#333] rounded-xl p-10 shadow-lg flex flex-col items-center justify-center min-h-[480px] text-center"
     >
       <div className="spinner-gold mb-8" />
-      <h2 className="text-[22px] font-bold text-[#2D7D3E] mb-2">Scouting your candidates…</h2>
-      <p className="text-[14px] text-[#4A4A4A] max-w-sm mx-auto mb-10 leading-relaxed">
+      <h2 className="text-[22px] font-bold text-[#4A9D5F] mb-2">Scouting your candidates…</h2>
+      <p className="text-[14px] text-[#A0A0A0] max-w-sm mx-auto mb-10 leading-relaxed">
         This typically takes 2–3 minutes as we conduct thoughtful screening conversations with each top match.
       </p>
 
@@ -73,16 +74,16 @@ function LoadingState() {
             ) : step.active ? (
               <div className="w-6 h-6 rounded-full border-2 border-[#D4AF37] border-t-transparent animate-spin shrink-0" />
             ) : (
-              <div className="w-6 h-6 rounded-full border-2 border-[#E0E0E0] shrink-0" />
+              <div className="w-6 h-6 rounded-full border-2 border-[#4A4A4A] shrink-0" />
             )}
-            <span className={step.active ? "font-semibold text-[#1A1A1A]" : step.done ? "text-[#2D7D3E]" : "text-[#4A4A4A]"}>
+            <span className={step.active ? "font-semibold text-white" : step.done ? "text-[#4A9D5F]" : "text-[#777]"}>
               {step.label}
             </span>
           </div>
         ))}
       </div>
 
-      <p className="text-[13px] italic text-[#4A4A4A]">
+      <p className="text-[13px] italic text-[#777]">
         Estimated time: ~{mins > 0 ? `${mins}m ` : ""}{secs}s remaining
       </p>
     </motion.div>
@@ -166,35 +167,38 @@ export default function ScoutPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F5F5] text-[#1A1A1A] flex flex-col font-sans">
+    <div className="min-h-screen bg-[#0A0A0A] text-white flex flex-col font-sans relative overflow-hidden">
+      <ShapeGrid className="absolute inset-0 z-0 opacity-30" hoverTrailAmount={5} shape="hexagon" speed={0.5} squareSize={40} borderColor="#1F5A2B" hoverFillColor="#2D7D3E" />
+      
+      <div className="relative z-10 flex flex-col min-h-screen">
       {/* Modals */}
       <SavedResultsModal isOpen={showSaved} onClose={() => setShowSaved(false)} savedScouts={savedScouts} onLoad={handleLoadScout} onDelete={handleDeleteScout} />
       <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />
 
       {/* ── Header ── */}
-      <header className="h-16 bg-white border-b border-[#E0E0E0] px-6 flex items-center justify-between shrink-0 sticky top-0 z-30">
+      <header className="h-16 bg-[#0A0A0A]/80 backdrop-blur-xl border-b border-[#333] px-6 flex items-center justify-between shrink-0 sticky top-0 z-30">
         <div className="flex items-center gap-4">
-          <Link href="/" className="flex items-center gap-1 text-[13px] text-[#4A4A4A] hover:text-[#2D7D3E] transition-colors">
+          <Link href="/" className="flex items-center gap-1 text-[13px] text-[#A0A0A0] hover:text-[#4A9D5F] transition-colors">
             <ArrowLeft className="w-4 h-4" />
             Home
           </Link>
-          <div className="w-px h-5 bg-[#E0E0E0]" />
+          <div className="w-px h-5 bg-[#333]" />
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded bg-[#2D7D3E] flex items-center justify-center">
+            <div className="w-7 h-7 rounded bg-[#2D7D3E] flex items-center justify-center shadow-lg shadow-[#2D7D3E]/20">
               <Search className="w-3.5 h-3.5 text-white" />
             </div>
-            <span className="text-[17px] font-bold text-[#1A1A1A]">TalentRadar</span>
+            <span className="text-[17px] font-bold text-white">TalentRadar</span>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
           <nav className="hidden md:flex items-center gap-1">
             <button onClick={() => { setResults(null); setError(null); setIsSaved(false); }}
-              className="text-[13px] font-medium text-[#4A4A4A] hover:text-[#2D7D3E] hover:bg-[#E8F5E9] px-3 py-2 rounded-md transition-all">
+              className="text-[13px] font-medium text-[#A0A0A0] hover:text-white hover:bg-[#1A1A1A] px-3 py-2 rounded-md transition-all">
               Start new search
             </button>
             <button onClick={() => setShowSaved(true)}
-              className="flex items-center gap-1.5 text-[13px] font-medium text-[#4A4A4A] hover:text-[#2D7D3E] hover:bg-[#E8F5E9] px-3 py-2 rounded-md transition-all">
+              className="flex items-center gap-1.5 text-[13px] font-medium text-[#A0A0A0] hover:text-white hover:bg-[#1A1A1A] px-3 py-2 rounded-md transition-all">
               Saved results
               {savedScouts.length > 0 && (
                 <span className="text-[10px] bg-[#2D7D3E] text-white rounded-full w-4 h-4 flex items-center justify-center font-bold">
@@ -203,15 +207,15 @@ export default function ScoutPage() {
               )}
             </button>
             <button onClick={() => setShowSettings(true)}
-              className="text-[13px] font-medium text-[#4A4A4A] hover:text-[#2D7D3E] hover:bg-[#E8F5E9] px-3 py-2 rounded-md transition-all">
+              className="text-[13px] font-medium text-[#A0A0A0] hover:text-white hover:bg-[#1A1A1A] px-3 py-2 rounded-md transition-all">
               How it works
             </button>
           </nav>
 
           <div className={`flex items-center gap-1.5 text-[12px] font-semibold px-3 py-1.5 rounded-full border ${
-            isBackendConnected === true ? "bg-[#E8F5E9] border-[#2D7D3E]/20 text-[#2D7D3E]"
-            : isBackendConnected === false ? "bg-red-50 border-red-200 text-red-600"
-            : "bg-[#F5F5F5] border-[#E0E0E0] text-[#4A4A4A]"
+            isBackendConnected === true ? "bg-[#1A3A22]/50 border-[#2D7D3E]/30 text-[#4A9D5F]"
+            : isBackendConnected === false ? "bg-red-900/30 border-red-500/30 text-red-400"
+            : "bg-[#1A1A1A]/50 border-[#333] text-[#A0A0A0]"
           }`}>
             <span className={`w-1.5 h-1.5 rounded-full ${
               isBackendConnected === true ? "bg-[#2D7D3E]"
@@ -230,8 +234,8 @@ export default function ScoutPage() {
         <div className={`transition-all duration-500 ease-out ${results || isLoading ? "lg:col-span-4" : "lg:col-span-7 lg:col-start-3"}`}>
           {!results && !isLoading && (
             <div className="mb-6">
-              <h1 className="text-[26px] font-bold text-[#1A1A1A] mb-1">Scout candidates</h1>
-              <p className="text-[14px] text-[#4A4A4A] leading-relaxed">
+              <h1 className="text-[26px] font-bold text-white mb-1">Scout candidates</h1>
+              <p className="text-[14px] text-[#A0A0A0] leading-relaxed">
                 Paste a job description below. Our AI will analyse the requirements, search the talent pool, and simulate screening conversations to find the best match.
               </p>
             </div>
@@ -243,10 +247,10 @@ export default function ScoutPage() {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
-                className="mt-4 p-4 rounded-lg bg-red-50 border-l-4 border-red-500 text-[14px] flex items-start gap-3"
+                className="mt-4 p-4 rounded-lg bg-red-900/20 border-l-4 border-red-500 text-[14px] flex items-start gap-3 backdrop-blur-md"
               >
-                <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
-                <span className="text-[#1A1A1A]"><strong>Error:</strong> {error}</span>
+                <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+                <span className="text-white"><strong>Error:</strong> {error}</span>
               </motion.div>
             )}
           </AnimatePresence>
@@ -259,27 +263,27 @@ export default function ScoutPage() {
           {results && (
             <motion.div initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} className="space-y-5">
               {/* Results header */}
-              <div className="bg-white border border-[#E0E0E0] rounded-xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+              <div className="bg-[#1A1A1A]/60 backdrop-blur-xl border border-[#333] rounded-xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-lg">
                 <div>
-                  <h2 className="text-[22px] font-bold text-[#1A1A1A]">
+                  <h2 className="text-[22px] font-bold text-white">
                     Results for {results.job_title || "your role"}
                   </h2>
-                  <p className="text-[13px] text-[#4A4A4A] mt-0.5">
+                  <p className="text-[13px] text-[#A0A0A0] mt-0.5">
                     {results.total_candidates_evaluated} candidates evaluated · {results.shortlist?.length || 0} ranked
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
                   {/* Summary pill */}
-                  <div className="hidden md:block bg-[#E8F5E9] border-l-4 border-[#2D7D3E] px-4 py-2 rounded-r-md">
-                    <p className="text-[12px] font-semibold text-[#2D7D3E]">Ready to move forward?</p>
-                    <p className="text-[11px] text-[#4A4A4A]">Here are your top matches.</p>
+                  <div className="hidden md:block bg-[#1A3A22]/30 border-l-4 border-[#2D7D3E] px-4 py-2 rounded-r-md">
+                    <p className="text-[12px] font-semibold text-[#4A9D5F]">Ready to move forward?</p>
+                    <p className="text-[11px] text-[#A0A0A0]">Here are your top matches.</p>
                   </div>
                   <button
                     onClick={handleSaveResult}
                     disabled={isSaved}
                     className={`flex items-center gap-2 px-4 py-2 rounded-lg text-[13px] font-semibold border transition-all ${
-                      isSaved ? "bg-[#E8F5E9] text-[#2D7D3E] border-[#2D7D3E]/30 cursor-default"
-                        : "border-[#E0E0E0] text-[#4A4A4A] hover:text-[#2D7D3E] hover:border-[#2D7D3E] hover:bg-[#E8F5E9]"
+                      isSaved ? "bg-[#1A3A22]/50 text-[#4A9D5F] border-[#2D7D3E]/30 cursor-default"
+                        : "border-[#333] text-[#A0A0A0] hover:text-white hover:border-[#4A9D5F] hover:bg-[#1A3A22]/30"
                     }`}
                   >
                     {isSaved ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
@@ -299,6 +303,7 @@ export default function ScoutPage() {
           )}
         </div>
       </main>
+      </div>
     </div>
   );
 }

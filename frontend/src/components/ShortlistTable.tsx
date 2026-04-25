@@ -8,7 +8,7 @@ interface ShortlistTableProps {
 export function ShortlistTable({ candidates }: ShortlistTableProps) {
   if (!candidates || candidates.length === 0) {
     return (
-      <div className="text-center py-12 text-[#4A4A4A] border-2 border-dashed border-[#E0E0E0] rounded-xl bg-white">
+      <div className="text-center py-12 text-[#A0A0A0] border-2 border-dashed border-[#333] rounded-xl bg-[#1A1A1A]/60 backdrop-blur-xl">
         No candidates found. Try adjusting your job description or relaxing the requirements.
       </div>
     );

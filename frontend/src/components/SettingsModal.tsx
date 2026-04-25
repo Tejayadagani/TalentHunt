@@ -57,12 +57,12 @@ export function SettingsModal({
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-card w-full max-w-2xl rounded-xl shadow-xl overflow-hidden border border-border flex flex-col max-h-[90vh]"
+        className="bg-[#1A1A1A]/90 backdrop-blur-xl w-full max-w-2xl rounded-xl shadow-2xl overflow-hidden border border-[#333] flex flex-col max-h-[90vh]"
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-border shrink-0">
+        <div className="flex items-center justify-between p-5 border-b border-[#333]">
           <div>
-            <h2 className="text-xl font-semibold text-foreground flex items-center gap-2">
+            <h2 className="text-[18px] font-bold text-white flex items-center gap-2">
               <Zap className="w-5 h-5 text-primary" />
               Architecture Overview
             </h2>
@@ -70,8 +70,8 @@ export function SettingsModal({
               TalentRadar&apos;s 5-Agent AI Pipeline
             </p>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-secondary rounded-full">
-            <X className="w-5 h-5 text-muted-foreground" />
+          <button onClick={onClose} className="p-2 hover:bg-[#333] rounded-full transition-colors">
+            <X className="w-5 h-5 text-[#A0A0A0]" />
           </button>
         </div>
 
@@ -89,8 +89,8 @@ export function SettingsModal({
                     <Icon className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="font-semibold text-foreground text-sm">{agent.label}</p>
-                    <p className="text-muted-foreground text-sm mt-0.5">{agent.desc}</p>
+                    <h3 className="font-semibold text-white text-[13px]">{agent.label}</h3>
+                    <p className="text-[12px] text-[#A0A0A0] mt-0.5">{agent.desc}</p>
                   </div>
                 </div>
               );
@@ -98,15 +98,13 @@ export function SettingsModal({
           </div>
 
           {/* Tech Stack */}
-          <div>
-            <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-3">
-              Tech Stack
-            </h3>
-            <div className="grid grid-cols-2 gap-3">
+          <div className="bg-[#0A0A0A] border border-[#333] rounded-lg p-5">
+            <h3 className="text-[13px] font-bold text-white uppercase tracking-wider mb-4">Tech Stack</h3>
+            <div className="grid grid-cols-2 gap-4">
               {STACK.map((item) => (
-                <div key={item.label} className="p-3 bg-secondary rounded-lg border border-border">
-                  <p className="text-xs text-muted-foreground font-medium">{item.label}</p>
-                  <p className="text-sm font-semibold text-foreground mt-0.5">{item.value}</p>
+                <div key={item.label} className="flex flex-col gap-1">
+                  <span className="text-[11px] text-[#777] uppercase tracking-wide font-medium">{item.label}</span>
+                  <span className="text-[13px] font-medium text-white">{item.value}</span>
                 </div>
               ))}
             </div>

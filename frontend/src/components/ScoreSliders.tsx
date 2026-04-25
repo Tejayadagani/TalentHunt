@@ -26,20 +26,20 @@ export function ScoreSliders({ initialMatchWeight, shortlist, onReRank }: ScoreS
   };
 
   return (
-    <div className="bg-white border border-[#E0E0E0] rounded-xl p-5 shadow-sm">
-      <h3 className="text-[13px] font-bold text-[#1A1A1A] uppercase tracking-wide mb-4">
+    <div className="bg-[#1A1A1A]/60 backdrop-blur-xl border border-[#333] rounded-xl p-5 shadow-lg">
+      <h3 className="text-[13px] font-bold text-white uppercase tracking-wide mb-4">
         Adjust ranking weights (optional)
       </h3>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
         {/* Match weight */}
         <div>
-          <div className="flex justify-between text-[13px] font-medium text-[#1A1A1A] mb-2">
+          <div className="flex justify-between text-[13px] font-medium text-white mb-2">
             <span>Match score weight</span>
             <span className="font-bold text-[#2D7D3E]">{Math.round(matchWeight * 100)}%</span>
           </div>
           <div className="relative flex items-center h-5">
-            <div className="absolute w-full h-2 rounded-full" style={{ background: "#E0E0E0" }} />
+            <div className="absolute w-full h-2 rounded-full" style={{ background: "#333" }} />
             <div
               className="absolute h-2 rounded-full"
               style={{ width: `${matchWeight * 100}%`, background: "#2D7D3E" }}
@@ -56,12 +56,12 @@ export function ScoreSliders({ initialMatchWeight, shortlist, onReRank }: ScoreS
 
         {/* Interest weight */}
         <div>
-          <div className="flex justify-between text-[13px] font-medium text-[#1A1A1A] mb-2">
+          <div className="flex justify-between text-[13px] font-medium text-white mb-2">
             <span>Interest score weight</span>
             <span className="font-bold text-[#4A9D5F]">{Math.round((1 - matchWeight) * 100)}%</span>
           </div>
           <div className="relative flex items-center h-5">
-            <div className="absolute w-full h-2 rounded-full" style={{ background: "#E0E0E0" }} />
+            <div className="absolute w-full h-2 rounded-full" style={{ background: "#333" }} />
             <div
               className="absolute h-2 rounded-full"
               style={{ width: `${(1 - matchWeight) * 100}%`, background: "#4A9D5F" }}
@@ -81,8 +81,8 @@ export function ScoreSliders({ initialMatchWeight, shortlist, onReRank }: ScoreS
         onClick={applyReRank}
         className={`h-10 px-6 rounded-lg border-2 text-[13px] font-semibold transition-all active:scale-[0.97] ${
           reranked
-            ? "border-[#2D7D3E] bg-[#E8F5E9] text-[#2D7D3E]"
-            : "border-[#2D7D3E] text-[#2D7D3E] hover:bg-[#E8F5E9]"
+            ? "border-[#4A9D5F] bg-[#1A3A22]/50 text-[#4A9D5F]"
+            : "border-[#4A9D5F] text-[#4A9D5F] hover:bg-[#1A3A22]/50"
         }`}
       >
         {reranked ? <><Check className="w-4 h-4" /> Re-ranked!</> : "Re-rank candidates"}
