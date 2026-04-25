@@ -37,8 +37,9 @@ class TelemetryFilter(logging.Filter):
     def filter(self, record):
         return "Failed to send telemetry event" not in record.getMessage()
 
-# Attach filter to root logger
-logging.getLogger().addFilter(TelemetryFilter())
+# Attach filter to all root logger handlers to catch propagated logs
+for handler in logging.root.handlers:
+    handler.addFilter(TelemetryFilter())
 # ── Configuration ─────────────────────────────────────────────────────────────
 PROVIDER       = os.getenv("LLM_PROVIDER", "gemini").lower()
 GEMINI_MODEL   = "gemini-flash-latest"
