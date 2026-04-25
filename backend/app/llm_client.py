@@ -75,17 +75,17 @@ async def call_llm(system_prompt: str, user_prompt: str) -> str:
     Call the configured LLM with the given prompts (Asynchronous).
 
     Retries up to MAX_RETRIES times with exponential backoff.
-    Rate-limit errors trigger an additional RATE_LIMIT_EXTRA_WAIT-second pause.
-
-    Returns the raw text response (stripped of leading/trailing whitespace).
-    Raises the last exception if all retries are exhausted.
+    If using Groq and a rate limit is hit, it will automatically fall back
+    to Gemini to prevent failure.
     """
     last_exc: Exception | None = None
     import asyncio
+    
+    current_provider = PROVIDER
 
     for attempt in range(MAX_RETRIES):
         try:
-            if PROVIDER == "gemini":
+            if current_provider == "gemini":
                 return await _call_gemini(system_prompt, user_prompt)
             else:
                 return await _call_groq(system_prompt, user_prompt)
@@ -93,6 +93,13 @@ async def call_llm(system_prompt: str, user_prompt: str) -> str:
         except Exception as exc:
             last_exc = exc
             is_rate_limit = _is_rate_limit_error(exc)
+            
+            # AUTOMATIC FALLBACK: Groq -> Gemini
+            if is_rate_limit and current_provider == "groq":
+                log.warning("Groq rate limit hit! Automatically falling back to Gemini for this request.")
+                current_provider = "gemini"
+                continue  # Instantly retry this attempt using Gemini
+
             wait = BASE_BACKOFF * (2 ** attempt)
 
             if is_rate_limit:
@@ -112,6 +119,7 @@ async def call_llm(system_prompt: str, user_prompt: str) -> str:
 
     log.error(f"All {MAX_RETRIES} LLM attempts failed. Last error: {last_exc}")
     raise last_exc  # type: ignore[misc]
+
 
 
 # ── Public: JSON parsing helper ───────────────────────────────────────────────
