@@ -191,14 +191,14 @@ async def run_pipeline_stream(
       {"type": "error", "message": "..."}
       {"type": "done"}
     """
-    yield {"type": "info", "message": "Parsing job description..."}
+    yield {"type": "info", "message": "Parsing job description...", "agent": 1}
     try:
         parsed_jd = await parse_jd(jd_text)
     except Exception as e:
         yield {"type": "error", "message": f"Failed to parse JD: {e}"}
         return
 
-    yield {"type": "info", "message": f"Parsed JD for '{parsed_jd.get('title')}'. Searching pool..."}
+    yield {"type": "info", "message": f"Parsed JD for '{parsed_jd.get('title')}'. Searching pool...", "agent": 2}
 
     try:
         candidates = await find_candidates(parsed_jd, top_k=top_k)
@@ -220,7 +220,7 @@ async def run_pipeline_stream(
         }
     }
 
-    yield {"type": "info", "message": f"Simulating interviews for {len(candidates)} candidates..."}
+    yield {"type": "info", "message": f"Simulating interviews for {len(candidates)} candidates...", "agent": 3}
 
     # Parallel evaluation
     tasks = [

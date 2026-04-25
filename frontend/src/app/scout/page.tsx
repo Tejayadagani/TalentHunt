@@ -11,6 +11,7 @@ import { SettingsModal } from "@/components/SettingsModal";
 import { AlertCircle, Search, Bookmark, BookmarkCheck, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import ShapeGrid from "@/components/ShapeGrid";
+import { AgentPipeline } from "@/components/AgentPipeline";
 
 interface ScoutResponseData {
   job_title: string | null;
@@ -75,6 +76,9 @@ function LoadingState({ message }: { message: string }) {
 export default function ScoutPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("");
+  const [activeAgent, setActiveAgent] = useState(0);
+  const [completedCount, setCompletedCount] = useState(0);
+  const [totalCandidates, setTotalCandidates] = useState(0);
   const [results, setResults] = useState<ScoutResponseData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isBackendConnected, setIsBackendConnected] = useState<boolean | null>(null);
@@ -102,6 +106,9 @@ export default function ScoutPage() {
     setError(null);
     setResults(null);
     setIsSaved(false);
+    setActiveAgent(1);
+    setCompletedCount(0);
+    setTotalCandidates(0);
     setLoadingMessage("Connecting to server...");
     
     try {
@@ -147,16 +154,20 @@ export default function ScoutPage() {
                 
                 if (event.type === "info") {
                   setLoadingMessage(event.message);
+                  if (event.agent) setActiveAgent(event.agent);
                 } else if (event.type === "start") {
                   currentResults.job_title = event.job_title;
                   currentResults.total_candidates_evaluated = event.total;
                   currentResults.weights = event.weights;
+                  setTotalCandidates(event.total);
                   setResults({ ...currentResults });
-                  setIsLoading(false); // Hide loading state once we have start info
+                  setIsLoading(false);
                 } else if (event.type === "candidate") {
                   currentResults.shortlist = [...currentResults.shortlist, event.data]
                     .sort((a, b) => (b.combined_score || 0) - (a.combined_score || 0))
                     .map((c, i) => ({ ...c, rank: i + 1 }));
+                  setCompletedCount(prev => prev + 1);
+                  setActiveAgent(5);
                   setResults({ ...currentResults });
                 } else if (event.type === "error") {
                   setError(event.message);
@@ -296,7 +307,14 @@ export default function ScoutPage() {
 
         {/* Right: Results */}
         <div className={`transition-all duration-500 ease-out ${results || isLoading ? "lg:col-span-8" : "hidden"}`}>
-          {isLoading && !results && <LoadingState message={loadingMessage} />}
+          {isLoading && !results && (
+            <AgentPipeline
+              activeAgent={activeAgent}
+              completedCount={completedCount}
+              totalCandidates={totalCandidates}
+              message={loadingMessage}
+            />
+          )}
 
           {results && (
             <motion.div initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} className="space-y-5">
