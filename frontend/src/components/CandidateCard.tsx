@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ConversationViewer, ConversationMessage } from "./ConversationViewer";
 import { motion } from "framer-motion";
+import { BookmarkCheck, Bookmark } from "lucide-react";
 
 export interface CandidateResult {
   rank: number;
@@ -37,6 +38,53 @@ interface CandidateCardProps {
 
 export function CandidateCard({ candidate }: CandidateCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const SAVED_KEY = "talentradar_saved_candidates";
+
+  const isSavedForLater = (): boolean => {
+    try {
+      const raw = localStorage.getItem(SAVED_KEY);
+      const list: string[] = raw ? JSON.parse(raw) : [];
+      return list.includes(candidate.id);
+    } catch { return false; }
+  };
+
+  const [savedLater, setSavedLater] = useState(false);
+
+  useEffect(() => {
+    setSavedLater(isSavedForLater());
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [candidate.id]);
+
+  const toggleSaveForLater = () => {
+    try {
+      const raw = localStorage.getItem(SAVED_KEY);
+      const list: string[] = raw ? JSON.parse(raw) : [];
+      const updated = list.includes(candidate.id)
+        ? list.filter((id) => id !== candidate.id)
+        : [...list, candidate.id];
+      localStorage.setItem(SAVED_KEY, JSON.stringify(updated));
+      setSavedLater(!savedLater);
+    } catch { /* ignore */ }
+  };
+
+  const handleSendOffer = () => {
+    const email = candidate.email || "";
+    const subject = encodeURIComponent(
+      `Exciting Opportunity — ${candidate.current_title} Role`
+    );
+    const body = encodeURIComponent(
+`Hi ${candidate.name},
+
+I came across your profile and I'm impressed by your experience as a ${candidate.current_title} at ${candidate.current_company} with ${candidate.years_of_experience} years of expertise.
+
+We have an opening that we believe would be a great fit for your skills in ${candidate.skills.slice(0, 3).join(", ")}. We'd love to connect and discuss this opportunity with you.
+
+Would you be available for a quick call this week?
+
+Best regards`
+    );
+    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+  };
 
   const getScoreColor = (score: number) => {
     if (score <= 40) return "bg-destructive";
@@ -142,7 +190,7 @@ export function CandidateCard({ candidate }: CandidateCardProps) {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-3 mt-4 pt-4 border-t border-border">
+        <div className="flex items-center gap-3 mt-4 pt-4 border-t border-border flex-wrap">
           <button 
             onClick={() => setIsExpanded(!isExpanded)}
             className="border-2 border-primary bg-transparent text-primary hover:bg-[rgba(45,125,62,0.1)] font-semibold text-[14px] px-[22px] py-[10px] rounded-[6px] transition-all"
@@ -150,12 +198,26 @@ export function CandidateCard({ candidate }: CandidateCardProps) {
             {isExpanded ? "Hide Conversation" : "View Conversation"}
           </button>
           
-          <button className="bg-primary hover:bg-[#1F5A2B] text-white font-semibold text-[14px] px-[24px] py-[12px] rounded-[6px] shadow-sm transition-all active:scale-[0.98]">
+          <button
+            onClick={handleSendOffer}
+            disabled={!candidate.email}
+            title={candidate.email ? `Send offer to ${candidate.email}` : "No email available"}
+            className="bg-primary hover:bg-[#1F5A2B] disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold text-[14px] px-[24px] py-[12px] rounded-[6px] shadow-sm transition-all active:scale-[0.98]"
+          >
             Send Offer
           </button>
 
-          <button className="bg-transparent text-primary hover:underline font-medium text-[14px] px-3 py-2 transition-all">
-            Save for later
+          <button
+            onClick={toggleSaveForLater}
+            className={`flex items-center gap-1.5 bg-transparent font-medium text-[14px] px-3 py-2 transition-all ${
+              savedLater
+                ? "text-primary"
+                : "text-muted-foreground hover:text-primary"
+            }`}
+          >
+            {savedLater
+              ? <><BookmarkCheck className="w-4 h-4" /> Saved</>
+              : <><Bookmark className="w-4 h-4" /> Save for later</>}
           </button>
         </div>
 
