@@ -10,20 +10,21 @@ This document showcases standard workflows in the TalentRadar application, from 
 The user pastes a raw, unstructured job description into the frontend.
 
 **Input Text:**
-> **Job Title**: Senior Backend Engineer (Payments Infrastructure)
-> 
-> **About Us**:
-> We are a fast-growing Fintech startup based in Bangalore, building next-generation payment gateways and fraud-detection pipelines. We process millions of transactions daily, and our engineering team focuses heavily on high-throughput, low-latency architectures. 
-> 
-> **Role Overview**:
-> We are looking for a Senior Backend Engineer with at least 5 years of experience to join our core infrastructure team. You will be responsible for designing idempotent API patterns, migrating legacy systems to microservices, and scaling our databases to handle 50k+ RPS. 
-> 
-> **Required Skills**:
-> - Deep expertise in Python.
-> - Production experience with modern frameworks like FastAPI.
-> - Strong knowledge of relational databases, particularly PostgreSQL.
-> - Experience with containerisation (Docker) and orchestration (Kubernetes).
-> - Familiarity with cloud platforms (AWS or GCP).
+
+Job Title: Senior Backend Engineer (Payments Infrastructure)
+
+About Us:
+We are a fast-growing Fintech startup based in Bangalore, building next-generation payment gateways and fraud-detection pipelines. We process millions of transactions daily, and our engineering team focuses heavily on high-throughput, low-latency architectures. 
+
+Role Overview:
+We are looking for a Senior Backend Engineer with at least 5 years of experience to join our core infrastructure team. You will be responsible for designing idempotent API patterns, migrating legacy systems to microservices, and scaling our databases to handle 50k+ RPS. 
+
+Required Skills:
+Deep expertise in Python.
+Production experience with modern frameworks like FastAPI.
+Strong knowledge of relational databases, particularly PostgreSQL.
+Experience with containerisation (Docker) and orchestration (Kubernetes).
+Familiarity with cloud platforms (AWS or GCP).
 
 *[ Placeholder: Insert Screenshot of the Input Form here ]*
 
@@ -65,8 +66,9 @@ As each candidate finishes their simulated interview, they pop onto the screen. 
 
 ### 1. The Input
 **Input Text:**
-> **Role**: Lead Frontend Engineer
-> Looking for an expert UI developer to lead our migration to Next.js. Must have deep knowledge of React, Server Components, Tailwind CSS, and state management (Zustand/Redux). You will work closely with design to implement pixel-perfect glassmorphism interfaces and complex animations using Framer Motion. 4+ years of experience required.
+
+Role: Lead Frontend Engineer
+Looking for an expert UI developer to lead our migration to Next.js. Must have deep knowledge of React, Server Components, Tailwind CSS, and state management (Zustand/Redux). You will work closely with design to implement pixel-perfect glassmorphism interfaces and complex animations using Framer Motion. 4+ years of experience required.
 
 *[ Placeholder: Insert Screenshot of the Input Form here ]*
 
