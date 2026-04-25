@@ -28,7 +28,7 @@ export function JDInput({ onSubmit, isLoading }: JDInputProps) {
     charCount === 0 ? ""
     : charCount < 50 ? `${charCount} characters · Add more detail`
     : charCount < 300 ? `${charCount} characters · Good to go`
-    : `${charCount} characters · Ready to scout ✓`;
+    : `${charCount} characters · Ready to scout`;
 
   const handleSubmit = () => {
     if (!isReady) return;

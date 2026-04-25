@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { ArrowRight, CheckCircle2, FileText, Radar, ListOrdered, Trophy } from "lucide-react";
 
 // ── SVG Radar Logo ─────────────────────────────────────────
 function RadarLogo({ size = 32, color = "#2D7D3E" }: { size?: number; color?: string }) {
@@ -109,24 +109,24 @@ const STATS = [
 ];
 
 // ── Steps ─────────────────────────────────────────────────
-const STEPS = [
+const STEPS: { n: string; title: string; desc: string; Icon: React.ElementType }[] = [
   {
     n: "01",
     title: "Paste your job description",
     desc: "Drop in raw text — any format, any length. Our parser extracts skills, seniority, location, budget, and domain automatically.",
-    icon: "📋",
+    Icon: FileText,
   },
   {
     n: "02",
     title: "We scout and screen candidates",
     desc: "TalentRadar searches the talent pool by semantic similarity, then simulates a real screening conversation with each top match.",
-    icon: "🎯",
+    Icon: Radar,
   },
   {
     n: "03",
     title: "Review your ranked shortlist",
     desc: "Get a ranked list with Match Score, Interest Score, and the full conversation transcript behind every decision. No guessing.",
-    icon: "✨",
+    Icon: ListOrdered,
   },
 ];
 
@@ -257,10 +257,10 @@ export default function LandingPage() {
             <div key={i} className="relative flex flex-col items-center text-center px-6 pb-8">
               {/* Icon circle */}
               <div
-                className="w-20 h-20 rounded-2xl mb-5 flex items-center justify-center text-3xl shadow-md relative z-10"
+                className="w-20 h-20 rounded-2xl mb-5 flex items-center justify-center shadow-md relative z-10"
                 style={{ background: i === 1 ? "#2D7D3E" : "white", border: `2px solid ${i === 1 ? "#2D7D3E" : "#E0E0E0"}` }}
               >
-                {step.icon}
+                <step.Icon className="w-8 h-8" style={{ color: i === 1 ? "#fff" : "#2D7D3E" }} />
               </div>
               <div className="text-[12px] font-bold text-[#2D7D3E] uppercase tracking-widest mb-2">{step.n}</div>
               <h3 className="text-[17px] font-bold text-[#1A1A1A] mb-3 leading-snug">{step.title}</h3>
@@ -342,7 +342,7 @@ export default function LandingPage() {
               </div>
             </div>
             <div className="p-5">
-              <p className="text-[11px] font-bold text-[#D4AF37] uppercase tracking-wide mb-1">Combined ★</p>
+              <div className="flex items-center gap-1 mb-1"><p className="text-[11px] font-bold text-[#D4AF37] uppercase tracking-wide">Combined</p><Trophy className="w-3 h-3 text-[#D4AF37]" /></div>
               <p className="text-[36px] font-black text-[#D4AF37] leading-none">{SAMPLE.combined}</p>
               <div className="h-1.5 w-full rounded-full mt-2" style={{ background: "#2A2A2A" }}>
                 <div className="h-full rounded-full" style={{ width: `${SAMPLE.combined}%`, background: "#D4AF37" }} />
@@ -354,7 +354,7 @@ export default function LandingPage() {
           <div className="px-6 py-4 border-b border-[#2A2A2A] flex flex-wrap gap-2">
             {SAMPLE.skills.map(s => (
               <span key={s} className="text-[12px] px-3 py-1 rounded-md font-medium" style={{ background: "rgba(45,125,62,0.2)", color: "#4A9D5F" }}>
-                {s} ✓
+                <span className="flex items-center gap-1">{s} <CheckCircle2 className="w-3 h-3" /></span>
               </span>
             ))}
           </div>

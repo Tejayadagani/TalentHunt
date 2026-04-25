@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { CandidateResult } from "./CandidateCard";
+import { Check } from "lucide-react";
 
 interface ScoreSlidersProps {
   initialMatchWeight: number;
@@ -84,7 +85,7 @@ export function ScoreSliders({ initialMatchWeight, shortlist, onReRank }: ScoreS
             : "border-[#2D7D3E] text-[#2D7D3E] hover:bg-[#E8F5E9]"
         }`}
       >
-        {reranked ? "✓ Re-ranked!" : "Re-rank candidates"}
+        {reranked ? <><Check className="w-4 h-4" /> Re-ranked!</> : "Re-rank candidates"}
       </button>
     </div>
   );

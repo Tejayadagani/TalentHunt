@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { ConversationViewer, ConversationMessage } from "./ConversationViewer";
 import { motion } from "framer-motion";
-import { BookmarkCheck, Bookmark, Mail } from "lucide-react";
+import { BookmarkCheck, Bookmark, Mail, Check } from "lucide-react";
 
 export interface CandidateResult {
   rank: number;
@@ -124,8 +124,8 @@ Best regards`
       {/* ── Skills ── */}
       <div className="px-5 py-4 flex flex-wrap gap-2">
         {candidate.skills.slice(0, 8).map(skill => (
-          <span key={skill} className="text-[12px] px-3 py-1 rounded-md font-medium" style={{ background: "rgba(45,125,62,0.1)", color: "#1A1A1A" }}>
-            {skill} ✓
+          <span key={skill} className="flex items-center gap-1 text-[12px] px-3 py-1 rounded-md font-medium" style={{ background: "rgba(45,125,62,0.1)", color: "#1A1A1A" }}>
+            {skill} <Check className="w-3 h-3 text-[#2D7D3E]" />
           </span>
         ))}
         {candidate.skills.length > 8 && (
