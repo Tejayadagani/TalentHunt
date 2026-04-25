@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+
+# Environment
+.env
+
+# ChromaDB — generated, do not commit
+backend/chroma_data/
+# OS
+.DS_Store
+Thumbs.db
+
+# Node / Next.js
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Markdown files (excluding README.md)
+*.md
+!README.md
+!*/README.md

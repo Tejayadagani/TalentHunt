@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: talentRadar-backend
+    env: python
+    buildCommand: "cd backend && pip install -r requirements.txt"
+    startCommand: "cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: LLM_PROVIDER
+        value: gemini
+      - key: GEMINI_API_KEY
+        sync: false        # paste manually in Render dashboard
+      - key: GROK_API_KEY
+        sync: false        # only needed if LLM_PROVIDER=grok
+      - key: FRONTEND_URL
+        sync: false        # e.g., https://talent-radar-frontend.vercel.app
+      - key: PYTHONPATH
+        value: .
+      - key: CHROMA_PERSIST_DIR
+        value: /opt/render/project/src/chroma_data
+    autoDeploy: true
