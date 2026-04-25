@@ -47,15 +47,19 @@ GROQ_MODELS       = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]
 GROQ_MODEL_IDX    = 0
 GROQ_BASE_URL     = "https://api.groq.com/openai/v1"
 
-# OpenRouter free-tier model rotation — verified live as of 2026-04-25
-# (Checked via openrouter.ai/models?q=free browser scan)
+# OpenRouter model rotation — prioritise models NOT on Venice's shared free-tier
+# DeepSeek models run on DeepSeek's own infra (separate rate limits from Venice).
 OPENROUTER_MODELS = [
-    os.getenv("OPENROUTER_MODEL", "nousresearch/hermes-3-llama-3.1-405b:free"),  # 131K ctx — very capable
-    "google/gemma-3-27b-it:free",                                                  # 131K ctx — Google, separate upstream
-    "meta-llama/llama-3.2-3b-instruct:free",                                       # 131K ctx — small but reliable
+    os.getenv("OPENROUTER_MODEL", "deepseek/deepseek-chat-v3-0324:free"),  # DeepSeek infra, fast + capable
+    "deepseek/deepseek-r1:free",                                            # DeepSeek reasoning model
+    "meta-llama/llama-3.2-3b-instruct:free",                               # Venice fallback — small but works
 ]
 OPENROUTER_MODEL_IDX = 0
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+
+# Models that don't support a dedicated 'system' role — for these we merge
+# the system prompt into the user message to avoid 400 INVALID_ARGUMENT errors.
+_NO_SYSTEM_ROLE_MODELS = {"google/gemma-3-27b-it:free", "google/gemma-3-12b-it:free"}
 
 MAX_RETRIES    = 6    # must be >= number of fallback tiers (Groq70B+Groq8B+3xOpenRouter)
 BASE_BACKOFF   = 1
@@ -193,12 +197,19 @@ async def _call_openrouter(system_prompt: str, user_prompt: str) -> str:
     model  = OPENROUTER_MODELS[OPENROUTER_MODEL_IDX]
     # Small sleep to avoid hammering free-tier upstream concurrently
     await asyncio.sleep(0.5)
-    response = await client.chat.completions.create(
-        model=model,
-        messages=[
+
+    # Some models (e.g. Gemma) don't support a system role — merge into user msg
+    if model in _NO_SYSTEM_ROLE_MODELS:
+        messages = [{"role": "user", "content": f"{system_prompt}\n\n{user_prompt}"}]
+    else:
+        messages = [
             {"role": "system", "content": system_prompt},
             {"role": "user",   "content": user_prompt},
-        ],
+        ]
+
+    response = await client.chat.completions.create(
+        model=model,
+        messages=messages,
         temperature=0.3,
     )
     return response.choices[0].message.content.strip()
