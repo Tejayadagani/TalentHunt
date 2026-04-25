@@ -20,23 +20,18 @@ sequenceDiagram
     API->>Agents: Trigger Async Pipeline
     
     %% Step 1
-    rect rgb(30, 40, 30)
     Note over Agents,LLM: Step 1: Parse & Structure JD
     Agents->>LLM: Agent 1 extracts skills & seniority
     LLM-->>Agents: Returns Structured JSON
     API-->>UI: (SSE Chunk) "Parsing job description..."
-    end
     
     %% Step 2
-    rect rgb(30, 40, 50)
     Note over Agents,DB: Step 2: Semantic Scouting
     Agents->>DB: Agent 2 embeds JD & queries Vector DB
     DB-->>Agents: Top 5 Candidate Matches
     API-->>UI: (SSE Chunk) "Searching talent pool..."
-    end
     
     %% Step 3
-    rect rgb(40, 30, 40)
     Note over Agents,LLM: Step 3: Parallel Interview Simulation
     par Candidate 1 (Asyncio Semaphore)
         loop 6 Conversation Turns
@@ -47,7 +42,7 @@ sequenceDiagram
         end
         Agents->>LLM: Agent 5 (Scorer) evaluates transcript
         LLM-->>Agents: JSON Interest Score & Explanation
-        Note right of LLM: If Groq hits 429 Rate Limit,<br/>auto-fallback to Gemini.
+        Note right of LLM: If Groq hits 429 Rate Limit, auto-fallback to Gemini.
         API-->>UI: (SSE Chunk) {Candidate 1 Data}
         UI->>UI: Live Re-sort & Update Dashboard
     and Candidates 2-5 (Concurrent)
@@ -57,7 +52,6 @@ sequenceDiagram
         LLM-->>Agents: JSON Interest Score
         API-->>UI: (SSE Chunk) {Candidate N Data}
         UI->>UI: Live Re-sort & Update Dashboard
-    end
     end
 
     API-->>UI: (SSE Chunk) {Status: Done}
