@@ -47,11 +47,12 @@ GROQ_MODELS       = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]
 GROQ_MODEL_IDX    = 0
 GROQ_BASE_URL     = "https://api.groq.com/openai/v1"
 
-# OpenRouter free-tier model rotation — if one upstream is throttled, try the next
+# OpenRouter free-tier model rotation — verified live as of 2026-04-25
+# (Checked via openrouter.ai/models?q=free browser scan)
 OPENROUTER_MODELS = [
-    os.getenv("OPENROUTER_MODEL", "qwen/qwen3-8b:free"),      # Qwen — very generous free tier
-    "microsoft/phi-4-reasoning:free",                          # MS Phi-4 — separate upstream
-    "mistralai/mistral-7b-instruct:free",                      # Mistral — different provider
+    os.getenv("OPENROUTER_MODEL", "nousresearch/hermes-3-llama-3.1-405b:free"),  # 131K ctx — very capable
+    "google/gemma-3-27b-it:free",                                                  # 131K ctx — Google, separate upstream
+    "meta-llama/llama-3.2-3b-instruct:free",                                       # 131K ctx — small but reliable
 ]
 OPENROUTER_MODEL_IDX = 0
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
@@ -130,11 +131,15 @@ async def call_llm(system_prompt: str, user_prompt: str) -> str:
                     PROVIDER = "openrouter"
                     continue
 
-                # 3. Rotate through OpenRouter models
-                if PROVIDER == "openrouter" and OPENROUTER_MODEL_IDX < len(OPENROUTER_MODELS) - 1:
+                # 3. Rotate on OpenRouter 429 OR 404 "No endpoints found"
+                is_openrouter_unavailable = (
+                    PROVIDER == "openrouter" and
+                    (is_rate_limit or _is_model_unavailable(exc))
+                )
+                if is_openrouter_unavailable and OPENROUTER_MODEL_IDX < len(OPENROUTER_MODELS) - 1:
                     OPENROUTER_MODEL_IDX += 1
                     next_model = OPENROUTER_MODELS[OPENROUTER_MODEL_IDX]
-                    log.warning(f"OpenRouter rate limit. Rotating to next model: {next_model}")
+                    log.warning(f"OpenRouter model unavailable/throttled. Rotating to: {next_model}")
                     continue
 
             wait = BASE_BACKOFF * (2 ** attempt)
@@ -234,6 +239,15 @@ def _is_rate_limit_error(exc: Exception) -> bool:
     )
     return any(kw in exc_str for kw in rate_limit_keywords)
 
+
+def _is_model_unavailable(exc: Exception) -> bool:
+    """
+    Return True if OpenRouter returned 404 'No endpoints found' — meaning
+    this specific free model is currently offline/unavailable upstream.
+    Should trigger rotation to the next model in the list.
+    """
+    exc_str = str(exc).lower()
+    return "404" in exc_str and "no endpoints found" in exc_str
 
 # ── Smoke-test (run directly: python -m app.llm_client) ──────────────────────
 if __name__ == "__main__":
