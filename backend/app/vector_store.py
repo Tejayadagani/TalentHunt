@@ -8,6 +8,9 @@ It is imported by:
 """
 
 import os
+# DISABLE CHROMADB TELEMETRY IMMEDIATELY
+os.environ["ANONYMIZED_TELEMETRY"] = "False"
+
 import chromadb
 from chromadb.config import Settings
 from chromadb.utils import embedding_functions
@@ -26,8 +29,6 @@ print("[vector_store] Embedding model ready.")
 # ── ChromaDB client ────────────────────────────────────────────────────────────
 def _get_client() -> chromadb.PersistentClient:
     """Return a persistent ChromaDB client pointed at CHROMA_PERSIST_DIR."""
-    # Explicitly disable telemetry
-    os.environ["ANONYMIZED_TELEMETRY"] = "False"
     return chromadb.PersistentClient(
         path=CHROMA_PERSIST_DIR,
         settings=Settings(anonymized_telemetry=False),
