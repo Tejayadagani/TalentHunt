@@ -23,7 +23,7 @@ const ShapeGrid = ({
   className = ''
 }: ShapeGridProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const requestRef = useRef<number>(null);
+  const requestRef = useRef<number | null>(null);
   const numSquaresX = useRef<number>(0);
   const numSquaresY = useRef<number>(0);
   const gridOffset = useRef({ x: 0, y: 0 });
@@ -242,7 +242,7 @@ const ShapeGrid = ({
 
       updateCellOpacities();
       drawGrid();
-      requestRef.current = requestAnimationFrame(updateAnimation) as any;
+      requestRef.current = requestAnimationFrame(updateAnimation);
     };
 
     const updateCellOpacities = () => {
@@ -384,7 +384,7 @@ const ShapeGrid = ({
     canvas.addEventListener('mousemove', handleMouseMove);
     canvas.addEventListener('mouseleave', handleMouseLeave);
 
-    requestRef.current = requestAnimationFrame(updateAnimation) as any;
+    requestRef.current = requestAnimationFrame(updateAnimation);
 
     return () => {
       window.removeEventListener('resize', resizeCanvas);
