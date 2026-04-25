@@ -116,8 +116,8 @@ export default function Home() {
     persistScouts(updated);
   };
 
-  const handleLoadScout = (loadedResults: ScoutResponseData) => {
-    setResults(loadedResults);
+  const handleLoadScout = (loadedResults: Record<string, unknown>) => {
+    setResults(loadedResults as ScoutResponseData);
     setShowSaved(false);
     setIsSaved(true);
   };

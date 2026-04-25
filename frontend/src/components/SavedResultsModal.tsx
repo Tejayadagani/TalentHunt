@@ -5,7 +5,7 @@ export interface SavedScout {
   id: string;
   timestamp: number;
   job_title: string;
-  results: any;
+  results: Record<string, unknown>;
 }
 
 export function SavedResultsModal({
@@ -18,7 +18,7 @@ export function SavedResultsModal({
   isOpen: boolean;
   onClose: () => void;
   savedScouts: SavedScout[];
-  onLoad: (results: any) => void;
+  onLoad: (results: Record<string, unknown>) => void;
   onDelete: (id: string) => void;
 }) {
   if (!isOpen) return null;
@@ -41,7 +41,7 @@ export function SavedResultsModal({
           {savedScouts.length === 0 ? (
             <div className="text-center py-10 text-muted-foreground">
               <p>No saved scouts yet.</p>
-              <p className="text-sm mt-1">Run a scout and click "Save Result" to see it here.</p>
+              <p className="text-sm mt-1">Run a scout and click &quot;Save Result&quot; to see it here.</p>
             </div>
           ) : (
             <div className="space-y-3">
