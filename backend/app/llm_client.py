@@ -46,7 +46,8 @@ GROQ_BASE_URL       = "https://api.groq.com/openai/v1"
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 
 # Per-agent configuration: allows using optimal models for each agent type.
-# This prevents one agent (e.g. fast parser) from consuming tokens needed by another (e.g. nuance scorer).
+# We ensure every agent has ALL 5 OpenRouter models available as fallbacks,
+# ordered by their specific preference, to maximize resilience.
 AGENT_CONFIGS = {
     0: { # Default
         "groq": ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"],
@@ -63,7 +64,9 @@ AGENT_CONFIGS = {
         "openrouter": [
             "meta-llama/llama-3.2-3b-instruct:free",
             "mistralai/mistral-7b-instruct:free",
-            "meta-llama/llama-3.3-70b-instruct:free"
+            "meta-llama/llama-3.3-70b-instruct:free",
+            "google/gemma-3-27b-it:free",
+            "nousresearch/hermes-3-llama-3.1-405b:free"
         ]
     },
     2: { # Talent Scout (semantic search generation)
@@ -71,7 +74,9 @@ AGENT_CONFIGS = {
         "openrouter": [
             "meta-llama/llama-3.2-3b-instruct:free",
             "google/gemma-3-27b-it:free",
-            "meta-llama/llama-3.3-70b-instruct:free"
+            "meta-llama/llama-3.3-70b-instruct:free",
+            "mistralai/mistral-7b-instruct:free",
+            "nousresearch/hermes-3-llama-3.1-405b:free"
         ]
     },
     3: { # Recruiter AI (requires high nuance, HR persona)
@@ -79,7 +84,9 @@ AGENT_CONFIGS = {
         "openrouter": [
             "nousresearch/hermes-3-llama-3.1-405b:free",
             "meta-llama/llama-3.3-70b-instruct:free",
-            "google/gemma-3-27b-it:free"
+            "google/gemma-3-27b-it:free",
+            "mistralai/mistral-7b-instruct:free",
+            "meta-llama/llama-3.2-3b-instruct:free"
         ]
     },
     4: { # Candidate AI (different persona from recruiter to prevent sameness)
@@ -87,7 +94,9 @@ AGENT_CONFIGS = {
         "openrouter": [
             "meta-llama/llama-3.3-70b-instruct:free",
             "nousresearch/hermes-3-llama-3.1-405b:free",
-            "mistralai/mistral-7b-instruct:free"
+            "mistralai/mistral-7b-instruct:free",
+            "google/gemma-3-27b-it:free",
+            "meta-llama/llama-3.2-3b-instruct:free"
         ]
     },
     5: { # Interest Scorer (requires high logical reasoning)
@@ -95,7 +104,9 @@ AGENT_CONFIGS = {
         "openrouter": [
             "nousresearch/hermes-3-llama-3.1-405b:free",
             "meta-llama/llama-3.3-70b-instruct:free",
-            "google/gemma-3-27b-it:free"
+            "google/gemma-3-27b-it:free",
+            "mistralai/mistral-7b-instruct:free",
+            "meta-llama/llama-3.2-3b-instruct:free"
         ]
     }
 }
@@ -192,7 +203,11 @@ async def call_llm(system_prompt: str, user_prompt: str, agent_id: int = 0) -> s
                     next_model = config["openrouter"][state["openrouter_idx"]]
                     log.warning(f"[Agent {agent_id}] OpenRouter error ({exc.__class__.__name__}). Rotating to: {next_model}")
                     continue
-                # All OpenRouter models exhausted — fall through to wait+retry
+                # All OpenRouter models exhausted
+                # If it's a 404/400 (unrecoverable), waiting won't help. Break and fail fast.
+                if is_unavailable:
+                    log.error(f"[Agent {agent_id}] Models exhausted and hit unrecoverable error ({exc}). Failing fast.")
+                    break
 
             wait = BASE_BACKOFF * (2 ** attempt)
 
@@ -294,6 +309,9 @@ def _is_rate_limit_error(exc: Exception) -> bool:
         "resourceexhausted",
         "quota",
         "too many requests",
+        "402",
+        "payment required",
+        "spend limit",
     )
     return any(kw in exc_str for kw in rate_limit_keywords)
 
@@ -305,7 +323,7 @@ def _is_model_unavailable(exc: Exception) -> bool:
     Should trigger rotation to the next model in the list.
     """
     exc_str = str(exc).lower()
-    return "404" in exc_str and "no endpoints found" in exc_str
+    return ("404" in exc_str and "no endpoints found" in exc_str) or ("400" in exc_str)
 
 # ── Smoke-test (run directly: python -m app.llm_client) ──────────────────────
 if __name__ == "__main__":
