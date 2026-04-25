@@ -92,6 +92,7 @@ async def parse_jd(jd_text: str) -> dict:
     raw_response = await call_llm(
         system_prompt=_SYSTEM_PROMPT,
         user_prompt=f"Extract the structured data from this job description:\n\n{jd_text}",
+        agent_id=1
     )
 
     log.info("[Agent 1] Raw LLM response received — parsing JSON …")

@@ -161,7 +161,7 @@ async def _call_recruiter(
         user_prompt = f"Conversation so far:\n{dialogue}\n\n{instruction}"
 
     try:
-        return (await call_llm(system, user_prompt)).strip()
+        return (await call_llm(system, user_prompt, agent_id=3)).strip()
     except Exception as exc:
         log.error(f"[Agent 3] LLM call failed on turn {turn}: {exc}")
         return "Thank you for your time. We'll be in touch soon."
@@ -263,7 +263,7 @@ async def _call_candidate(
     user_prompt = f"Conversation so far:\n{dialogue}\n\n{instruction}"
 
     try:
-        return (await call_llm(system, user_prompt)).strip()
+        return (await call_llm(system, user_prompt, agent_id=4)).strip()
     except Exception as exc:
         log.error(f"[Agent 4] LLM call failed on turn {turn}: {exc}")
         return "Sorry, I seem to have lost the connection. Could we continue?"

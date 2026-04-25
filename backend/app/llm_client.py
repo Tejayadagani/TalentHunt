@@ -42,22 +42,67 @@ class TelemetryFilter(logging.Filter):
 for handler in logging.root.handlers:
     handler.addFilter(TelemetryFilter())
 # ── Configuration ─────────────────────────────────────────────────────────────
-PROVIDER          = "groq"
-GROQ_MODELS       = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]
-GROQ_MODEL_IDX    = 0
-GROQ_BASE_URL     = "https://api.groq.com/openai/v1"
-
-# OpenRouter model rotation — browser-verified LIVE on 2026-04-25
-# Using models from different upstream providers for resilience.
-OPENROUTER_MODELS = [
-    os.getenv("OPENROUTER_MODEL", "meta-llama/llama-3.3-70b-instruct:free"),  # 66K ctx — confirmed live
-    "nousresearch/hermes-3-llama-3.1-405b:free",                               # 131K ctx — confirmed live
-    "mistralai/mistral-7b-instruct:free",                                      # 32K ctx  — confirmed live
-    "google/gemma-3-27b-it:free",                                              # 131K ctx — confirmed live (no system role)
-    "meta-llama/llama-3.2-3b-instruct:free",                                   # 131K ctx — confirmed live
-]
-OPENROUTER_MODEL_IDX = 0
+GROQ_BASE_URL       = "https://api.groq.com/openai/v1"
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+
+# Per-agent configuration: allows using optimal models for each agent type.
+# This prevents one agent (e.g. fast parser) from consuming tokens needed by another (e.g. nuance scorer).
+AGENT_CONFIGS = {
+    0: { # Default
+        "groq": ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"],
+        "openrouter": [
+            os.getenv("OPENROUTER_MODEL", "meta-llama/llama-3.3-70b-instruct:free"),
+            "nousresearch/hermes-3-llama-3.1-405b:free",
+            "mistralai/mistral-7b-instruct:free",
+            "google/gemma-3-27b-it:free",
+            "meta-llama/llama-3.2-3b-instruct:free"
+        ]
+    },
+    1: { # JD Parser (fast & simple extraction)
+        "groq": ["llama-3.1-8b-instant", "llama-3.3-70b-versatile"],
+        "openrouter": [
+            "meta-llama/llama-3.2-3b-instruct:free",
+            "mistralai/mistral-7b-instruct:free",
+            "meta-llama/llama-3.3-70b-instruct:free"
+        ]
+    },
+    2: { # Talent Scout (semantic search generation)
+        "groq": ["llama-3.1-8b-instant", "llama-3.3-70b-versatile"],
+        "openrouter": [
+            "meta-llama/llama-3.2-3b-instruct:free",
+            "google/gemma-3-27b-it:free",
+            "meta-llama/llama-3.3-70b-instruct:free"
+        ]
+    },
+    3: { # Recruiter AI (requires high nuance, HR persona)
+        "groq": ["llama-3.3-70b-versatile"],
+        "openrouter": [
+            "nousresearch/hermes-3-llama-3.1-405b:free",
+            "meta-llama/llama-3.3-70b-instruct:free",
+            "google/gemma-3-27b-it:free"
+        ]
+    },
+    4: { # Candidate AI (different persona from recruiter to prevent sameness)
+        "groq": ["llama-3.3-70b-versatile"],
+        "openrouter": [
+            "meta-llama/llama-3.3-70b-instruct:free",
+            "nousresearch/hermes-3-llama-3.1-405b:free",
+            "mistralai/mistral-7b-instruct:free"
+        ]
+    },
+    5: { # Interest Scorer (requires high logical reasoning)
+        "groq": ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"],
+        "openrouter": [
+            "nousresearch/hermes-3-llama-3.1-405b:free",
+            "meta-llama/llama-3.3-70b-instruct:free",
+            "google/gemma-3-27b-it:free"
+        ]
+    }
+}
+
+# Track fallback state independently per agent to prevent cascaded failures
+# Format: { agent_id: {"provider": "groq", "groq_idx": 0, "openrouter_idx": 0} }
+_AGENT_STATES = {}
 
 # Models that don't support a dedicated 'system' role — for these we merge
 # the system prompt into the user message to avoid 400 INVALID_ARGUMENT errors.
@@ -99,25 +144,29 @@ def _get_openrouter_client():
         )
     return _openrouter_client
 
-log.info("LLM Engine: 4-Tier Fallback — Groq70B → Groq8B → OpenRouter(3 models)")
+log.info("LLM Engine: Per-Agent Multi-Model Fallback initialized.")
 
 
 # ── Public: main entry point ──────────────────────────────────────────────────
-async def call_llm(system_prompt: str, user_prompt: str) -> str:
+async def call_llm(system_prompt: str, user_prompt: str, agent_id: int = 0) -> str:
     """
-    Call the configured LLM with tiered fallback logic.
-    70B -> 8B -> OpenRouter.
+    Call the configured LLM with tiered fallback logic specific to the agent's ID.
+    If agent 1 hits a limit, it does not throttle agent 3.
     """
     last_exc: Exception | None = None
     import asyncio
-    global PROVIDER, GROQ_MODEL_IDX, OPENROUTER_MODEL_IDX
+    
+    # Get or initialize state for this specific agent
+    state = _AGENT_STATES.setdefault(agent_id, {"provider": "groq", "groq_idx": 0, "openrouter_idx": 0})
+    config = AGENT_CONFIGS.get(agent_id, AGENT_CONFIGS[0])
 
     for attempt in range(MAX_RETRIES):
         try:
-            if PROVIDER == "openrouter":
-                return await _call_openrouter(system_prompt, user_prompt)
+            if state["provider"] == "openrouter":
+                model_name = config["openrouter"][state["openrouter_idx"]]
+                return await _call_openrouter(system_prompt, user_prompt, model=model_name)
             else:
-                model_name = GROQ_MODELS[GROQ_MODEL_IDX]
+                model_name = config["groq"][state["groq_idx"]]
                 return await _call_groq(system_prompt, user_prompt, model=model_name)
 
         except Exception as exc:
@@ -126,22 +175,22 @@ async def call_llm(system_prompt: str, user_prompt: str) -> str:
             is_unavailable   = _is_model_unavailable(exc)
 
             # ── Groq tier switches (only on rate-limit) ───────────────────────
-            if is_rate_limit and PROVIDER == "groq" and GROQ_MODEL_IDX == 0:
-                log.warning("Groq 70B limit hit. Switching to Groq 8B.")
-                GROQ_MODEL_IDX = 1
-                continue
-
-            if is_rate_limit and PROVIDER == "groq" and GROQ_MODEL_IDX == 1:
-                log.warning("Groq 8B limit hit. Switching to OpenRouter.")
-                PROVIDER = "openrouter"
-                continue
+            if is_rate_limit and state["provider"] == "groq":
+                if state["groq_idx"] < len(config["groq"]) - 1:
+                    log.warning(f"[Agent {agent_id}] Groq {config['groq'][state['groq_idx']]} limit hit. Switching to next Groq.")
+                    state["groq_idx"] += 1
+                    continue
+                else:
+                    log.warning(f"[Agent {agent_id}] Groq exhausted. Switching to OpenRouter.")
+                    state["provider"] = "openrouter"
+                    continue
 
             # ── OpenRouter model rotation (429 OR 404 — OUTSIDE rate-limit block)
-            if PROVIDER == "openrouter" and (is_rate_limit or is_unavailable):
-                if OPENROUTER_MODEL_IDX < len(OPENROUTER_MODELS) - 1:
-                    OPENROUTER_MODEL_IDX += 1
-                    next_model = OPENROUTER_MODELS[OPENROUTER_MODEL_IDX]
-                    log.warning(f"OpenRouter error ({exc.__class__.__name__}). Rotating to: {next_model}")
+            if state["provider"] == "openrouter" and (is_rate_limit or is_unavailable):
+                if state["openrouter_idx"] < len(config["openrouter"]) - 1:
+                    state["openrouter_idx"] += 1
+                    next_model = config["openrouter"][state["openrouter_idx"]]
+                    log.warning(f"[Agent {agent_id}] OpenRouter error ({exc.__class__.__name__}). Rotating to: {next_model}")
                     continue
                 # All OpenRouter models exhausted — fall through to wait+retry
 
@@ -189,11 +238,10 @@ def parse_json_response(text: str) -> dict:
 
 
 # ── Private: OpenRouter ───────────────────────────────────────────────────────
-async def _call_openrouter(system_prompt: str, user_prompt: str) -> str:
-    """Call OpenRouter with the current model in the rotation list."""
+async def _call_openrouter(system_prompt: str, user_prompt: str, model: str) -> str:
+    """Call OpenRouter with the provided model."""
     import asyncio
     client = _get_openrouter_client()
-    model  = OPENROUTER_MODELS[OPENROUTER_MODEL_IDX]
     # Small sleep to avoid hammering free-tier upstream concurrently
     await asyncio.sleep(0.5)
 

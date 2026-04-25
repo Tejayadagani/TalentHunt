@@ -156,7 +156,7 @@ async def score_conversation(
     )
 
     # ── Call LLM ─────────────────────────────────────────────────────────────
-    raw_response = await call_llm(system_prompt, user_prompt)
+    raw_response = await call_llm(system_prompt, user_prompt, agent_id=5)
     log.info(f"[Agent 5] Raw response received — parsing JSON …")
 
     # ── Parse and validate ────────────────────────────────────────────────────

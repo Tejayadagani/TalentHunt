@@ -207,7 +207,7 @@ async def _get_match_reason(jd_sum: str, candidate: dict) -> str:
     )
 
     try:
-        reason = await call_llm(_MATCH_REASON_SYSTEM, user_prompt)
+        reason = await call_llm(_MATCH_REASON_SYSTEM, user_prompt, agent_id=2)
         # Trim to a single sentence if the LLM goes over
         sentences = reason.replace("\n", " ").split(".")
         first = sentences[0].strip()
