@@ -47,12 +47,14 @@ GROQ_MODELS       = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]
 GROQ_MODEL_IDX    = 0
 GROQ_BASE_URL     = "https://api.groq.com/openai/v1"
 
-# OpenRouter model rotation — prioritise models NOT on Venice's shared free-tier
-# DeepSeek models run on DeepSeek's own infra (separate rate limits from Venice).
+# OpenRouter model rotation — browser-verified LIVE on 2026-04-25
+# Using models from different upstream providers for resilience.
 OPENROUTER_MODELS = [
-    os.getenv("OPENROUTER_MODEL", "deepseek/deepseek-chat-v3-0324:free"),  # DeepSeek infra, fast + capable
-    "deepseek/deepseek-r1:free",                                            # DeepSeek reasoning model
-    "meta-llama/llama-3.2-3b-instruct:free",                               # Venice fallback — small but works
+    os.getenv("OPENROUTER_MODEL", "meta-llama/llama-3.3-70b-instruct:free"),  # 66K ctx — confirmed live
+    "nousresearch/hermes-3-llama-3.1-405b:free",                               # 131K ctx — confirmed live
+    "mistralai/mistral-7b-instruct:free",                                      # 32K ctx  — confirmed live
+    "google/gemma-3-27b-it:free",                                              # 131K ctx — confirmed live (no system role)
+    "meta-llama/llama-3.2-3b-instruct:free",                                   # 131K ctx — confirmed live
 ]
 OPENROUTER_MODEL_IDX = 0
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
@@ -120,31 +122,28 @@ async def call_llm(system_prompt: str, user_prompt: str) -> str:
 
         except Exception as exc:
             last_exc = exc
-            is_rate_limit = _is_rate_limit_error(exc)
-            
-            if is_rate_limit:
-                # 1. Groq 70b -> Groq 8b
-                if PROVIDER == "groq" and GROQ_MODEL_IDX == 0:
-                    log.warning("Groq 70B limit hit. Switching to Groq 8B.")
-                    GROQ_MODEL_IDX = 1
-                    continue
-                
-                # 2. Groq 8b -> OpenRouter
-                if PROVIDER == "groq" and GROQ_MODEL_IDX == 1:
-                    log.warning("Groq 8B limit hit. Switching to OpenRouter.")
-                    PROVIDER = "openrouter"
-                    continue
+            is_rate_limit    = _is_rate_limit_error(exc)
+            is_unavailable   = _is_model_unavailable(exc)
 
-                # 3. Rotate on OpenRouter 429 OR 404 "No endpoints found"
-                is_openrouter_unavailable = (
-                    PROVIDER == "openrouter" and
-                    (is_rate_limit or _is_model_unavailable(exc))
-                )
-                if is_openrouter_unavailable and OPENROUTER_MODEL_IDX < len(OPENROUTER_MODELS) - 1:
+            # ── Groq tier switches (only on rate-limit) ───────────────────────
+            if is_rate_limit and PROVIDER == "groq" and GROQ_MODEL_IDX == 0:
+                log.warning("Groq 70B limit hit. Switching to Groq 8B.")
+                GROQ_MODEL_IDX = 1
+                continue
+
+            if is_rate_limit and PROVIDER == "groq" and GROQ_MODEL_IDX == 1:
+                log.warning("Groq 8B limit hit. Switching to OpenRouter.")
+                PROVIDER = "openrouter"
+                continue
+
+            # ── OpenRouter model rotation (429 OR 404 — OUTSIDE rate-limit block)
+            if PROVIDER == "openrouter" and (is_rate_limit or is_unavailable):
+                if OPENROUTER_MODEL_IDX < len(OPENROUTER_MODELS) - 1:
                     OPENROUTER_MODEL_IDX += 1
                     next_model = OPENROUTER_MODELS[OPENROUTER_MODEL_IDX]
-                    log.warning(f"OpenRouter model unavailable/throttled. Rotating to: {next_model}")
+                    log.warning(f"OpenRouter error ({exc.__class__.__name__}). Rotating to: {next_model}")
                     continue
+                # All OpenRouter models exhausted — fall through to wait+retry
 
             wait = BASE_BACKOFF * (2 ** attempt)
 
