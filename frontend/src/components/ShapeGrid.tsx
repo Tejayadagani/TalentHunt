@@ -262,13 +262,13 @@ const ShapeGrid = ({
         }
       }
 
-      for (const [key] of targets) {
+      targets.forEach((_, key) => {
         if (!cellOpacities.current.has(key)) {
           cellOpacities.current.set(key, 0);
         }
-      }
+      });
 
-      for (const [key, opacity] of cellOpacities.current) {
+      cellOpacities.current.forEach((opacity, key) => {
         const target = targets.get(key) || 0;
         const next = opacity + (target - opacity) * 0.15;
         if (next < 0.005) {
@@ -276,7 +276,7 @@ const ShapeGrid = ({
         } else {
           cellOpacities.current.set(key, next);
         }
-      }
+      });
     };
 
     const handleMouseMove = (event: MouseEvent) => {
