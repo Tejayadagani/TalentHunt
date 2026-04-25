@@ -10,17 +10,16 @@ It is imported by:
 import os
 import chromadb
 from chromadb.config import Settings
-from sentence_transformers import SentenceTransformer
+from chromadb.utils import embedding_functions
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 COLLECTION_NAME = "candidates"
 EMBEDDING_MODEL  = "all-MiniLM-L6-v2"      # ~80 MB, downloads once
 CHROMA_PERSIST_DIR = os.getenv("CHROMA_PERSIST_DIR", "./chroma_data")
 
-# ── Singleton: embedding model ─────────────────────────────────────────────────
 # Loaded once at import time so it is warm for every request.
-print(f"[vector_store] Loading embedding model '{EMBEDDING_MODEL}' …")
-_embedding_model = SentenceTransformer(EMBEDDING_MODEL)
+print(f"[vector_store] Loading default ONNX embedding model '{EMBEDDING_MODEL}' …")
+_embedding_fn = embedding_functions.DefaultEmbeddingFunction()
 print("[vector_store] Embedding model ready.")
 
 
@@ -49,7 +48,7 @@ def get_or_create_collection() -> chromadb.Collection:
 # ── Embedding helper ───────────────────────────────────────────────────────────
 def embed_text(text: str) -> list[float]:
     """Embed a single string and return a plain Python list of floats."""
-    return _embedding_model.encode(text, convert_to_numpy=True).tolist()
+    return _embedding_fn([text])[0]
 
 
 def build_candidate_text(candidate: dict) -> str:
