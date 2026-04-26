@@ -26,7 +26,7 @@ Strong knowledge of relational databases, particularly PostgreSQL.
 Experience with containerisation (Docker) and orchestration (Kubernetes).
 Familiarity with cloud platforms (AWS or GCP).
 
-![Input 1](/Users/sriramcharannalla/Talent Radar/input1.png)
+![Input 1](input1.png)
 
 ---
 
@@ -58,7 +58,7 @@ As each candidate finishes their simulated interview, they pop onto the screen. 
 }
 ```
 
-![Output 1 Pipeline Video](/Users/sriramcharannalla/Talent Radar/output1.mov)
+![Output 1 Pipeline Video](output1_compressed.mp4)
 
 ---
 
@@ -70,12 +70,12 @@ As each candidate finishes their simulated interview, they pop onto the screen. 
 Role: Lead Frontend Engineer
 Looking for an expert UI developer to lead our migration to Next.js. Must have deep knowledge of React, Server Components, Tailwind CSS, and state management (Zustand/Redux). You will work closely with design to implement pixel-perfect glassmorphism interfaces and complex animations using Framer Motion. 4+ years of experience required.
 
-![Input 2](/Users/sriramcharannalla/Talent Radar/input2.png)
+![Input 2](input2.png)
 
 ### 2. The Output
 The AI evaluates candidates not just on their static skills, but on how they communicate their passion for UI/UX during the simulated conversation.
 
-![Output 2](/Users/sriramcharannalla/Talent Radar/output2.png)
+![Output 2](output2.png)
 
 ---
 
@@ -91,4 +91,4 @@ The AI evaluates candidates not just on their static skills, but on how they com
 
 Once a suitable candidate is found, the recruiter can initiate outreach directly from the dashboard using the **Send offer** button. 
 
-![Send Offer Button Action](/Users/sriramcharannalla/Talent Radar/mail.png)
+![Send Offer Button Action](mail.png)
