@@ -9,60 +9,56 @@ TalentRadar is a premium, AI-driven recruitment engine designed to transform raw
 Our architecture is designed for high-concurrency and real-time feedback using a multi-agent orchestration pattern.
 
 ```mermaid
-flowchart TD
-    %% Define Theme Colors for perfect Dark/Light Mode Contrast
-    classDef user fill:#2D7D3E,stroke:#1F5A2B,stroke-width:2px,color:#fff
-    classDef frontend fill:#1A1A1A,stroke:#4A4A4A,stroke-width:2px,color:#fff
-    classDef backend fill:#111827,stroke:#374151,stroke-width:2px,color:#fff
-    classDef agent fill:#D4AF37,stroke:#A68312,stroke-width:2px,color:#000
-    classDef db fill:#0A0A0A,stroke:#D4AF37,stroke-width:2px,color:#fff
-    classDef external fill:#1F5A2B,stroke:#2D7D3E,stroke-width:2px,color:#fff
+flowchart LR
+    classDef userNode fill:#2D7D3E,stroke:#1F5A2B,stroke-width:2px,color:#fff,font-weight:bold
+    classDef feNode fill:#0f172a,stroke:#334155,stroke-width:2px,color:#e2e8f0
+    classDef beNode fill:#1e1b4b,stroke:#4338ca,stroke-width:2px,color:#e0e7ff
+    classDef agentNode fill:#78350f,stroke:#d97706,stroke-width:2px,color:#fef3c7,font-weight:bold
+    classDef dbNode fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#d1fae5
+    classDef llmNode fill:#312e81,stroke:#818cf8,stroke-width:2px,color:#e0e7ff
+    classDef fallbackNode fill:#7f1d1d,stroke:#f87171,stroke-width:2px,color:#fee2e2
 
-    User((User)):::user
+    U((👤 User)):::userNode
 
-    subgraph Client [Frontend Layer - Next.js]
-        Input[Raw Job Description Input]:::frontend
-        Dashboard[Live Ranking Dashboard]:::frontend
+    subgraph FE ["🖥️ Frontend — Next.js"]
+        direction TB
+        JD["📝 JD Input Form"]:::feNode
+        DASH["📊 Live Dashboard"]:::feNode
     end
 
-    subgraph Server [Backend Layer - FastAPI]
-        Endpoint[POST /api/scout/stream]:::backend
-        SSE[SSE Stream Generator]:::backend
+    subgraph BE ["⚡ Backend — FastAPI"]
+        direction TB
+        API["/api/scout/stream"]:::beNode
+        SSE["SSE Stream"]:::beNode
     end
 
-    subgraph Pipeline [Multi-Agent Pipeline]
-        A1[Agent 1: Parse & Structure JD]:::agent
-        A2[Agent 2: Embed & Semantic Match]:::agent
-        A3[Agents 3 & 4: Simulate Interview]:::agent
-        A5[Agent 5: Evaluate & Score]:::agent
+    subgraph AGENTS ["🤖 Multi-Agent Pipeline"]
+        direction TB
+        A1["🔍 Agent 1\nJD Parser"]:::agentNode
+        A2["🎯 Agent 2\nTalent Scout"]:::agentNode
+        A34["💬 Agents 3+4\nRecruiter ↔ Candidate"]:::agentNode
+        A5["⭐ Agent 5\nInterest Scorer"]:::agentNode
+        A1 --> A2 --> A34 --> A5
     end
 
-    subgraph Data [Data & AI Services]
-        Chroma[(ChromaDB)]:::db
-        Groq[Groq API: Llama 3]:::external
-        OpenRouter[OpenRouter: Safety Net]:::external
+    subgraph LLM ["🧠 LLM Engine — Per-Agent Routing"]
+        direction TB
+        GROQ["⚡ Groq\nLlama 3.3 70B · 3.1 8B"]:::llmNode
+        OR["🔄 OpenRouter Fallback\nHermes 405B · Llama 3.3\nMistral 7B · Gemma 27B\nLlama 3.2 3B"]:::fallbackNode
+        GROQ -. "429 → rotate" .-> OR
+        OR -. "all exhausted → loop back" .-> GROQ
     end
 
-    %% Step-by-Step Flow
-    User -->|1. Pastes Text| Input
-    Input -->|2. Submits| Endpoint
-    Endpoint -->|3. Triggers| A1
+    DB[("🗄️ ChromaDB\nall-MiniLM-L6-v2")]:::dbNode
 
-    A1 <-->|JSON Structuring| Groq
-    A1 -->|Structured JD| A2
-
-    A2 <-->|Top 5 Query| Chroma
-    A2 -->|Candidates| A3
-
-    A3 <-->|Parallel 6-Turn Chat| Groq
-    A3 -->|Transcripts| A5
-
-    A5 <-->|Interest Scoring| Groq
-    A5 -.->|If 429 Rate Limit| OpenRouter
-    
-    A5 -->|Yield JSON Chunk| SSE
-    SSE -->|Server-Sent Events| Dashboard
-    Dashboard -->|Live Re-sorts| User
+    U -->|"Paste JD"| JD
+    JD -->|"POST"| API
+    API --> A1
+    A2 <-->|"Semantic Search"| DB
+    A1 & A2 & A34 & A5 <-->|"call_llm()"| GROQ
+    A5 -->|"yield result"| SSE
+    SSE -->|"Server-Sent Events"| DASH
+    DASH -->|"Live ranked cards"| U
 ```
 
 ---
