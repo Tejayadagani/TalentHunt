@@ -39,7 +39,7 @@ log = logging.getLogger(__name__)
 
 # ── Rate-limit guard ──────────────────────────────────────────────────────────
 # Parallel execution semaphore to stay under LLM TPM/RPM limits.
-_CONCURRENCY_LIMIT = 2   # Evaluate 2 candidates at a time
+_CONCURRENCY_LIMIT = 1   # Evaluate 1 candidate at a time to prevent API rate-limit bursts
 _SEMAPHORE = asyncio.Semaphore(_CONCURRENCY_LIMIT)
 
 # Fields from the candidate profile that must never appear in the API response
