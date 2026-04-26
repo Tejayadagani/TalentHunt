@@ -87,6 +87,32 @@ TalentRadar utilizes a **5-Agent Pipeline** to evaluate candidates with extreme 
 
 ---
 
+## ⚙️ Resilience & Rate Limits (Multi-Model Fallback)
+
+Because TalentRadar's 5-Agent Pipeline evaluates candidates via highly conversational, multi-turn interviews, it consumes tokens very rapidly. A standard 4-candidate pipeline run can consume up to 30,000 tokens within 30 seconds.
+
+**The Problem:** Free-tier API keys (like Groq) have strict limitations on both Requests-Per-Minute (RPM) and Daily Tokens (TPM). The massive burst of parallel agent calls easily exhausts these free-tier limits, resulting in `429 Too Many Requests` errors.
+
+**The Solution:**
+To prevent the application from crashing, we implemented an **Infinite State Carousel Fallback** architecture. 
+As shown in the `backend/.env.example`, we utilize **OpenRouter** as a secondary safety net:
+
+```env
+# Get your key at: https://console.groq.com
+GROQ_API_KEY=your_groq_api_key_here
+
+# Fallback api key for rate limits
+OPENROUTER_API_KEY=your_open_router_api_key
+```
+
+**How the Fallback Logic Works:**
+1. **Primary Engine:** All agents start by querying the lightning-fast Groq endpoints.
+2. **Exhaustion:** If Groq returns a `429 Rate Limit` error, the backend cleanly catches it and hot-swaps the agent's internal state to point to OpenRouter.
+3. **Model Rotation:** OpenRouter provides access to a massive list of free-tier models (Llama 3.3, Hermes 405B, Mistral, Gemma). The pipeline will automatically rotate down this list if specific OpenRouter models are currently unavailable (e.g. returning `404 Not Found`).
+4. **Infinite Carousel:** If the pipeline is incredibly unlucky and exhausts *all* 7 fallback models across both platforms, it gracefully loops the state back to Groq and applies a capped exponential backoff. This ensures the agents never get permanently stuck on dead models, allowing them to instantly resume evaluation once the API limits reset.
+
+---
+
 ## 🛠️ Tech Stack
 
 - **Backend**: Python 3.12, FastAPI, Asyncio
