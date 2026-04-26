@@ -26,7 +26,7 @@ Strong knowledge of relational databases, particularly PostgreSQL.
 Experience with containerisation (Docker) and orchestration (Kubernetes).
 Familiarity with cloud platforms (AWS or GCP).
 
-*[ Placeholder: Insert Screenshot of the Input Form here ]*
+![Input 1](/Users/sriramcharannalla/Talent Radar/input1.png)
 
 ---
 
@@ -38,7 +38,7 @@ Once submitted, the UI enters the dynamic loading state. The backend utilizes Se
 2. `Searching pool...` (Agent 2 embeds the JD and queries ChromaDB for the Top 5 matches)
 3. `Simulating interviews for 5 candidates...` (Agents 3 & 4 converse, Agent 5 scores)
 
-*[ Placeholder: Insert Screenshot of the dynamic loading state here ]*
+
 
 ---
 
@@ -58,7 +58,7 @@ As each candidate finishes their simulated interview, they pop onto the screen. 
 }
 ```
 
-*[ Placeholder: Insert Screenshot of the final Candidate Dashboard / Shortlist here ]*
+![Output 1 Pipeline Video](/Users/sriramcharannalla/Talent Radar/output1.mov)
 
 ---
 
@@ -70,12 +70,12 @@ As each candidate finishes their simulated interview, they pop onto the screen. 
 Role: Lead Frontend Engineer
 Looking for an expert UI developer to lead our migration to Next.js. Must have deep knowledge of React, Server Components, Tailwind CSS, and state management (Zustand/Redux). You will work closely with design to implement pixel-perfect glassmorphism interfaces and complex animations using Framer Motion. 4+ years of experience required.
 
-*[ Placeholder: Insert Screenshot of the Input Form here ]*
+![Input 2](/Users/sriramcharannalla/Talent Radar/input2.png)
 
 ### 2. The Output
 The AI evaluates candidates not just on their static skills, but on how they communicate their passion for UI/UX during the simulated conversation.
 
-*[ Placeholder: Insert Screenshot of the Frontend Engineer Shortlist here ]*
+![Output 2](/Users/sriramcharannalla/Talent Radar/output2.png)
 
 ---
 
@@ -84,3 +84,11 @@ The AI evaluates candidates not just on their static skills, but on how they com
 - **Match Score (Agent 2)**: A purely mathematical semantic similarity score between the parsed JD vector and the candidate's historical vector in ChromaDB.
 - **Interest Score (Agent 5)**: A behavioral score derived from reading the transcript of the simulated 6-turn interview. It measures how relevant the candidate's answers and questions were to the *specific* nuances of the JD.
 - **Combined Score**: A weighted average controlled by the sliders on the UI (e.g., 60% Match, 40% Interest).
+
+---
+
+## Actions: Send Offer
+
+Once a suitable candidate is found, the recruiter can initiate outreach directly from the dashboard using the **Send offer** button. 
+
+![Send Offer Button Action](/Users/sriramcharannalla/Talent Radar/mail.png)
