@@ -58,7 +58,7 @@ As each candidate finishes their simulated interview, they pop onto the screen. 
 }
 ```
 
-<video src="docs/assets/output1_compressed.mp4" controls="controls" muted="muted" width="100%"></video>
+https://github.com/user-attachments/assets/2745e2aa-ab6a-44e7-b5e5-2b37917bd463
 
 ---
 
