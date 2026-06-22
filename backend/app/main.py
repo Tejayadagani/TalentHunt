@@ -82,7 +82,34 @@ async def lifespan(app: FastAPI):
         log.info(f"ChromaDB ready — {count} candidates indexed.")
 
         if count == 0:
-            log.info("ChromaDB is empty. Auto-seeding disabled for 100K candidate dataset.")
+            log.info("ChromaDB is empty. Auto-seeding 50 sample candidates for sandbox...")
+            try:
+                import json
+                with open("data/candidates.json") as f:
+                    c_data = json.load(f)
+                
+                from app.vector_store import get_or_create_collection
+                col = get_or_create_collection()
+                
+                docs, ids, metadatas = [], [], []
+                for c in c_data:
+                    cid = str(c.get("candidate_id", c.get("id")))
+                    p = c.get("profile", c)
+                    skills_str = " ".join(s.get("name","") if isinstance(s,dict) else str(s) for s in c.get("skills",[]))
+                    doc = (p.get("summary","") + " " + skills_str).strip() or "candidate"
+                    
+                    docs.append(doc)
+                    ids.append(cid)
+                    metadatas.append({
+                        "name": str(p.get("name","")[:50]),
+                        "title": str(p.get("current_title","")[:50]),
+                        "pre_interview_score": 0.5
+                    })
+                
+                col.add(documents=docs, ids=ids, metadatas=metadatas)
+                log.info("Auto-seeding complete! ChromaDB is ready.")
+            except Exception as e:
+                log.error(f"Auto-seeder failed: {e}")
     except Exception as exc:
         log.error(f"Startup pre-warm failed: {exc}")
 
