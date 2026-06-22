@@ -209,11 +209,13 @@ def query_candidates(query_text: str, top_k: int = 15) -> list[dict]:
     # Guard against None (empty collection edge-case).
     raw_metadatas = results.get("metadatas") or []
     raw_distances = results.get("distances") or []
+    raw_ids = results.get("ids") or []
 
     metadatas = list(raw_metadatas[0]) if raw_metadatas else [] # type: ignore
     distances = list(raw_distances[0]) if raw_distances else [] # type: ignore
+    ids = list(raw_ids[0]) if raw_ids else [] # type: ignore
 
-    for meta, distance in zip(metadatas, distances):
+    for meta, distance, cid in zip(metadatas, distances, ids):
         # ChromaDB 0.5.x can occasionally return a raw string for a metadata
         # entry if the document was stored without a metadata dict. Skip those.
         if not isinstance(meta, dict):
@@ -222,6 +224,7 @@ def query_candidates(query_text: str, top_k: int = 15) -> list[dict]:
 
         # Reconstruct the candidate dict from stored metadata
         candidate: dict[str, Any] = dict(meta)
+        candidate["id"] = cid
 
         def _safe_int(val: Any, default: int = 0) -> int:
             try:
