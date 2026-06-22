@@ -82,11 +82,11 @@ async def lifespan(app: FastAPI):
         log.info(f"ChromaDB ready — {count} candidates indexed.")
 
         if count == 0:
-            log.info("ChromaDB is empty. Auto-seeding 50 sample candidates for sandbox...")
+            log.info("ChromaDB is empty. Auto-seeding 1000 offline candidates for sandbox...")
             try:
                 import json
-                with open("data/candidates.json") as f:
-                    c_data = json.load(f)
+                with open("data/precomputed_scores.json") as f:
+                    c_data = json.load(f)[:100]  # LIMIT TO 100 TO PREVENT RENDER BOOT TIMEOUT
                 
                 from app.vector_store import get_or_create_collection
                 col = get_or_create_collection()
