@@ -86,7 +86,10 @@ async def lifespan(app: FastAPI):
             try:
                 import json
                 with open("data/precomputed_scores.json") as f:
-                    c_data = json.load(f)[:100]  # LIMIT TO 100 TO PREVENT RENDER BOOT TIMEOUT
+                    c_data = json.load(f)
+                
+                with open("data/1000_embeddings.json") as f:
+                    embeds = json.load(f)
                 
                 from app.vector_store import get_or_create_collection
                 col = get_or_create_collection()
@@ -106,8 +109,8 @@ async def lifespan(app: FastAPI):
                         "pre_interview_score": 0.5
                     })
                 
-                col.add(documents=docs, ids=ids, metadatas=metadatas)
-                log.info("Auto-seeding complete! ChromaDB is ready.")
+                col.add(documents=docs, embeddings=embeds, ids=ids, metadatas=metadatas)
+                log.info("Auto-seeding complete! ChromaDB is ready with 1000 candidates.")
             except Exception as e:
                 log.error(f"Auto-seeder failed: {e}")
     except Exception as exc:
