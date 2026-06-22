@@ -53,9 +53,9 @@ def get_full_candidate(cid: str):
     global _full_candidates_cache
     if _full_candidates_cache is None:
         try:
-            with open("data/candidates.json", "r") as f:
+            with open("data/precomputed_scores.json", "r") as f:
                 c_data = json.load(f)
-            _full_candidates_cache = {str(c["candidate_id"]): c for c in c_data}
+            _full_candidates_cache = {str(c.get("candidate_id", c.get("id"))): c for c in c_data}
         except Exception:
             _full_candidates_cache = {}
     return _full_candidates_cache.get(str(cid), {})
