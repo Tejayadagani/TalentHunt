@@ -152,8 +152,8 @@ export default function ScoutPage() {
     if (!results || !results.parsed_jd || selectedIds.size === 0) return;
     
     // Get the full candidate objects for the selected IDs
-    const selectedCandidates = results.shortlist.filter(c => {
-      const cid = c.id || (c as any).candidate_id;
+    const selectedCandidates = results.shortlist.filter((c, idx) => {
+      const cid = c.id || (c as any).candidate_id || String(idx);
       return selectedIds.has(cid);
     });
     
