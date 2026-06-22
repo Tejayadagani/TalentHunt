@@ -86,8 +86,9 @@ export default function ScoutPage() {
     setLoadingMessage("Parsing JD and searching talent pool (Fast Mode)...");
     
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+      let apiUrl = process.env.NEXT_PUBLIC_API_URL;
       if (!apiUrl) throw new Error("NEXT_PUBLIC_API_URL is not defined.");
+      apiUrl = apiUrl.replace(/\/+$/, ""); // Remove trailing slashes
       
       const res = await fetch(`${apiUrl}/api/scout/fast`, {
         method: "POST",
@@ -123,8 +124,9 @@ export default function ScoutPage() {
     setLoadingMessage("Loading precomputed offline results...");
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+      let apiUrl = process.env.NEXT_PUBLIC_API_URL;
       if (!apiUrl) throw new Error("NEXT_PUBLIC_API_URL is not defined.");
+      apiUrl = apiUrl.replace(/\/+$/, "");
 
       const res = await fetch(`${apiUrl}/api/demo`);
       if (!res.ok) {
