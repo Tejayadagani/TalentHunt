@@ -1,0 +1,13 @@
+{
+  "interview_score": 0.55,
+  "breakdown": {
+    "technical_depth": 0.6,
+    "production_mindset": 0.5,
+    "domain_relevance": 0.4,
+    "communication": 0.7,
+    "motivation_signal": 0.6
+  },
+  "reasoning": "Anil demonstrated some technical depth in his experience with AI and machine learning, particularly with fine-tuning LLMs and experimenting with vector search and embeddings. However, his technical background is more focused on software development and HR, which may not directly align with the fintech domain. Anil's communication skills are strong, and he provided clear explanations of his experience and interests. He also showed genuine interest in the role and the company's mission, but could have asked more specific questions about the team's tech and challenges.",
+  "candidate_id": "CAND_0048484",
+  "name": "Anil Menon"
+}

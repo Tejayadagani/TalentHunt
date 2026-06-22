@@ -36,7 +36,23 @@ function ScoreBar({ value, color }: { value: number; color: string }) {
   );
 }
 
-export function CandidateCard({ candidate }: { candidate: CandidateResult }) {
+export function CandidateCard({ 
+  candidate,
+  onStartInterview,
+  isInterviewing,
+  isSelected,
+  onSelectToggle,
+  hideInterviewButton,
+  isInterviewComplete
+}: { 
+  candidate: CandidateResult;
+  onStartInterview?: () => void;
+  isInterviewing?: boolean;
+  isSelected?: boolean;
+  onSelectToggle?: () => void;
+  hideInterviewButton?: boolean;
+  isInterviewComplete?: boolean;
+}) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [savedLater, setSavedLater] = useState(false);
 
@@ -86,7 +102,17 @@ Best regards`
       whileHover={{ y: -2 }}
     >
       {/* ── Header ── */}
-      <div className="flex items-start gap-4 p-5 pb-4">
+      <div className="flex items-start gap-4 p-5 pb-4 cursor-pointer" onClick={onSelectToggle}>
+        {onSelectToggle && (
+          <div className="shrink-0 mt-2">
+            <input 
+              type="checkbox" 
+              checked={!!isSelected}
+              onChange={() => {}} // Handled by parent div click
+              className="w-5 h-5 rounded border-[#4A9D5F] bg-[#1A1A1A] text-[#4A9D5F] focus:ring-[#4A9D5F] focus:ring-offset-[#0A0A0A] cursor-pointer"
+            />
+          </div>
+        )}
         <div className="w-9 h-9 rounded-full bg-[#2D7D3E] flex items-center justify-center shrink-0 text-white text-[13px] font-bold shadow-sm">
           #{candidate.rank}
         </div>
@@ -157,17 +183,30 @@ Best regards`
 
       {/* ── Actions ── */}
       <div className="flex flex-wrap items-center gap-2 px-5 py-4 border-t border-[#333] bg-[#0A0A0A]/50">
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="h-10 px-5 rounded-lg border-2 border-[#4A9D5F] text-[#4A9D5F] hover:bg-[#1A3A22]/50 font-semibold text-[13px] transition-all active:scale-[0.97]"
-        >
-          {isExpanded ? "Hide conversation" : "View conversation"}
-        </button>
+        {(!candidate.conversation_transcript || candidate.conversation_transcript.length === 0) ? (
+          !hideInterviewButton && (
+            <button
+              onClick={onStartInterview}
+              disabled={isInterviewing}
+              className={`h-10 px-5 rounded-lg border-2 font-semibold text-[13px] transition-all flex items-center gap-2
+                ${isInterviewing ? 'border-[#D4AF37] text-[#D4AF37] opacity-70 cursor-not-allowed' : 'border-[#4A9D5F] text-[#4A9D5F] hover:bg-[#1A3A22]/50 active:scale-[0.97]'}`}
+            >
+              {isInterviewing ? "Interviewing..." : "Send Interview"}
+            </button>
+          )
+        ) : (
+          <button
+            onClick={(e) => { e.stopPropagation(); setIsExpanded(!isExpanded); }}
+            className="h-10 px-5 rounded-lg border-2 border-[#4A9D5F] text-[#4A9D5F] hover:bg-[#1A3A22]/50 font-semibold text-[13px] transition-all active:scale-[0.97]"
+          >
+            {isExpanded ? "Hide conversation" : "View conversation"}
+          </button>
+        )}
 
         <button
-          onClick={handleSendOffer}
-          disabled={!candidate.email}
-          title={candidate.email ? `Send offer to ${candidate.email}` : "No email available"}
+          onClick={(e) => { e.stopPropagation(); handleSendOffer(); }}
+          disabled={!isInterviewComplete}
+          title={!isInterviewComplete ? "Complete interview first" : "Send offer email"}
           className="h-10 px-5 rounded-lg bg-[#2D7D3E] hover:bg-[#1F5A2B] disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold text-[13px] transition-all active:scale-[0.97] flex items-center gap-1.5"
         >
           <Mail className="w-3.5 h-3.5" />
@@ -175,7 +214,7 @@ Best regards`
         </button>
 
         <button
-          onClick={toggleSaveForLater}
+          onClick={(e) => { e.stopPropagation(); toggleSaveForLater(); }}
           className={`h-10 px-4 rounded-lg text-[13px] font-medium flex items-center gap-1.5 transition-all ${
             savedLater ? "text-[#4A9D5F] bg-[#1A3A22]/50" : "text-[#A0A0A0] hover:text-white hover:bg-[#333]"
           }`}

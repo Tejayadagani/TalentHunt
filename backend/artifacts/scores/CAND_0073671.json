@@ -1,0 +1,13 @@
+{
+  "interview_score": 0.31,
+  "breakdown": {
+    "technical_depth": 0.2,
+    "production_mindset": 0.5,
+    "domain_relevance": 0.0,
+    "communication": 0.5,
+    "motivation_signal": 0.5
+  },
+  "reasoning": "Ritu demonstrated a low technical depth as she didn't mention any specific AI or ML concepts relevant to the Senior AI Engineer role. She also didn't show any understanding of the fintech domain, which is a major concern. However, she was clear and concise in her communication, and showed genuine interest in the role, asking specific questions about the team and projects. A major concern is that she has no relevant experience in AI engineering, and her current role as a Mechanical Engineer at Dunder Mifflin seems unrelated to the position.",
+  "candidate_id": "CAND_0073671",
+  "name": "Ritu Shah"
+}

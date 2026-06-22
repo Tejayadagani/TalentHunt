@@ -1,0 +1,13 @@
+{
+  "interview_score": 0.55,
+  "breakdown": {
+    "technical_depth": 0.6,
+    "production_mindset": 0.5,
+    "domain_relevance": 0.4,
+    "communication": 0.7,
+    "motivation_signal": 0.6
+  },
+  "reasoning": "Pooja demonstrated some technical depth in her experience with embeddings-based retrieval systems, vector databases, and evaluation frameworks for ranking systems. However, her answers were often vague and lacked specific details about her projects or the tools she used. She showed some interest in the fintech domain, but her experience is more aligned with mechanical engineering. Her communication was clear and concise, but she didn't ask any specific questions about the team's tech or roadmap. She did show some motivation for the role, but it was more generic and didn't demonstrate a deep understanding of the company's mission or challenges.",
+  "candidate_id": "CAND_0056302",
+  "name": "Pooja Malhotra"
+}

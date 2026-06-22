@@ -1,0 +1,13 @@
+{
+  "interview_score": 0.495,
+  "breakdown": {
+    "technical_depth": 0.5,
+    "production_mindset": 0.5,
+    "domain_relevance": 0.2,
+    "communication": 0.8,
+    "motivation_signal": 0.6
+  },
+  "reasoning": "Nisha demonstrated a basic understanding of AI concepts, mentioning embeddings and sentence transformers. However, she didn't delve deeper into technical details or provide specific examples. Her production mindset is neutral as she didn't discuss scale, reliability, or operations. Her domain relevance is low as she didn't mention any fintech-specific experience or knowledge. Her communication skills are strong, with clear and concise answers. Her motivation signal is moderate as she showed interest in the role but didn't ask specific questions about the team's tech or challenges.",
+  "candidate_id": "CAND_0010094",
+  "name": "Nisha Goyal"
+}

@@ -1,0 +1,67 @@
+{
+  "candidate_id": "CAND_0012133",
+  "name": "Aditya Singh",
+  "turns": 6,
+  "transcript": [
+    {
+      "role": "recruiter",
+      "turn": 1,
+      "message": "Hello, it's wonderful to connect with you today. My name is Rohan, and I'm a recruiter with a growing fintech company. I came across your profile and was impressed with your experience in AI engineering, so I'm excited to learn more about your background. Can you start by telling me a bit about your current role and what you've been working on lately?"
+    },
+    {
+      "role": "candidate",
+      "turn": 1,
+      "message": "Hello Rohan, nice to connect with you as well. Currently, I'm working as an HR Manager at Initech, which may seem unrelated to AI engineering, but I've been able to apply my technical skills in various projects, including implementing workflow automation using Airflow and exploring the applications of Vector Search and Hugging Face Transformers. My recent work has been more focused on the operational side, but I'm eager to leverage my technical expertise in a more core role."
+    },
+    {
+      "role": "recruiter",
+      "turn": 2,
+      "message": "It sounds like you've been able to apply your technical skills in creative ways, even in a non-technical role. I'm curious to know what sparked your interest in exploring opportunities like the Senior AI Engineer role we have available, and what specifically drew you to this type of position?"
+    },
+    {
+      "role": "candidate",
+      "turn": 2,
+      "message": "I've been keeping an eye on the fintech industry's advancements in AI and machine learning, and I'm intrigued by the potential applications of these technologies in streamlining financial processes and improving customer experiences. The Senior AI Engineer role at your company seems like a great opportunity to dive deeper into these areas and contribute to the development of innovative solutions."
+    },
+    {
+      "role": "recruiter",
+      "turn": 3,
+      "message": "That's really interesting, and it's great to hear that you're excited about the potential applications of AI in fintech. As we discuss this opportunity further, I'd like to get a sense of your expectations - what kind of compensation package are you looking for in a Senior AI Engineer role like this one?"
+    },
+    {
+      "role": "candidate",
+      "turn": 3,
+      "message": "I'm glad you're interested in discussing the opportunity further, Rohan. To be honest, I'm open to exploring the compensation package that aligns with the company's offerings and the industry standards. I'd prefer not to discuss specific numbers at this stage, but I'm confident that we can have a productive conversation about it once we've had a chance to discuss the role in more detail."
+    },
+    {
+      "role": "recruiter",
+      "turn": 4,
+      "message": "I completely understand your approach, and we can definitely discuss the details of the role before diving into specific numbers. As we move forward, I'd like to know more about your current situation - what's your availability like, and if you were to move forward with this opportunity, what kind of notice period would you need to serve in your current role?"
+    },
+    {
+      "role": "candidate",
+      "turn": 4,
+      "message": "My current availability is quite flexible, and I'm open to discussing the opportunity further. If I were to move forward with this role, I would need to serve a notice period of 60 days, as per my current company's policies. I want to ensure a smooth transition and complete any outstanding tasks before making a move."
+    },
+    {
+      "role": "recruiter",
+      "turn": 5,
+      "message": "Now that we've discussed your background, interest in the role, and availability, I'd love to open the floor for any questions you may have about the Senior AI Engineer position or our team - what would you like to know more about regarding this opportunity?"
+    },
+    {
+      "role": "candidate",
+      "turn": 5,
+      "message": "I'd like to know more about the team I'd be working with, specifically the dynamics and how the Senior AI Engineer role fits into the overall organizational structure. I'm also curious to know more about the company's approach to AI and machine learning, and how they see these technologies evolving in the next 6-12 months."
+    },
+    {
+      "role": "recruiter",
+      "turn": 6,
+      "message": "Thank you so much for taking the time to speak with me today, it's been an absolute pleasure to learn more about your background and interests. I'm really excited about the potential fit between your skills and our team's work, and I'll be in touch within the next few days to discuss next steps. In the meantime, I wish you all the best with your current role and future endeavors, and I look forward to catching up with you soon."
+    },
+    {
+      "role": "candidate",
+      "turn": 6,
+      "message": "It was great speaking with you too, Rohan, and I appreciate the time you took to discuss the opportunity. I'm looking forward to hearing from you soon and learning more about the next steps. Thank you for your kind wishes, and I wish the company all the best as well. Have a great day."
+    }
+  ]
+}

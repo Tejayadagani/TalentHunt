@@ -1,0 +1,67 @@
+{
+  "candidate_id": "CAND_0028830",
+  "name": "Saanvi Hegde",
+  "turns": 6,
+  "transcript": [
+    {
+      "role": "recruiter",
+      "turn": 1,
+      "message": "Hello, thank you for taking the time to speak with me today. My name is Rohan, and I'm a recruiter at FinSpark, a fintech company that's passionate about leveraging AI to drive innovation in the financial services industry. Can you start by telling me a bit about your current role and what you've been working on lately?"
+    },
+    {
+      "role": "candidate",
+      "turn": 1,
+      "message": "I'm Saanvi Hegde, nice to speak with you, Rohan. Currently, I'm working as an HR Manager at Infosys, where I've been focusing on implementing various HR technologies to streamline our recruitment and talent management processes. My team and I have been working on integrating Databricks with our existing HR systems to enhance data-driven decision-making."
+    },
+    {
+      "role": "recruiter",
+      "turn": 2,
+      "message": "That sounds like a fascinating project, Saanvi. Although your background is in HR, I'm excited to explore how your technical skills and experience might translate to a role in AI engineering. Can you tell me, what sparked your interest in AI and machine learning, and do you have any experience working with AI-related technologies outside of your current role?"
+    },
+    {
+      "role": "candidate",
+      "turn": 2,
+      "message": "I've always been interested in the intersection of technology and business, and as I delved deeper into HR, I realized that AI and machine learning could greatly enhance our processes and decision-making. In my free time, I've been experimenting with various AI-related technologies, including Hugging Face Transformers and Sentence Transformers, and I've even built a few personal projects using these tools to explore their capabilities."
+    },
+    {
+      "role": "recruiter",
+      "turn": 3,
+      "message": "It's great to hear that you've been exploring AI-related technologies in your free time, Saanvi. Now that we've discussed your background and interests, I'd love to dive into the specifics of this role. What specifically drew you to this Senior AI Engineer position at FinSpark, and do you think your skills and experience align with the requirements of the job?"
+    },
+    {
+      "role": "candidate",
+      "turn": 3,
+      "message": "I was particularly drawn to this role at FinSpark because of the company's focus on leveraging AI to drive innovation in the financial services industry, which aligns with my own interests and goals. Upon reviewing the job description, I believe my experience with Hugging Face Transformers and Sentence Transformers, as well as my understanding of recommendation systems and semantic search, could be a good fit for the position."
+    },
+    {
+      "role": "recruiter",
+      "turn": 4,
+      "message": "Now that we've discussed your interest in the role and how your skills align with the position, I'd like to talk about compensation. Can you tell me, what are you currently earning in your role as an HR Manager at Infosys, and what are your expectations for a salary in a Senior AI Engineer position?"
+    },
+    {
+      "role": "candidate",
+      "turn": 4,
+      "message": "I'm not comfortable discussing my current salary, Rohan. However, I can tell you that I'm open to exploring compensation options that align with industry standards for a Senior AI Engineer position."
+    },
+    {
+      "role": "recruiter",
+      "turn": 5,
+      "message": "Now that we've discussed compensation, I'd like to move on to the next topic. What's your current notice period at Infosys, and are you available to join FinSpark immediately, or do you have any other commitments that might impact your start date?"
+    },
+    {
+      "role": "candidate",
+      "turn": 5,
+      "message": "My notice period at Infosys is 90 days, which I'm committed to honoring. As for joining FinSpark immediately, I'd need to discuss the details of the offer and ensure a smooth transition at my current role before making any commitments."
+    },
+    {
+      "role": "recruiter",
+      "turn": 6,
+      "message": "Saanvi, it was an absolute pleasure speaking with you today. I appreciate the time you took to share your background, interests, and qualifications with me. I'm excited to discuss this opportunity further with you, and I'll be in touch within the next few days to let you know the next steps. In the meantime, I wish you all the best, and I hope you have a fantastic day. Thank you again for your time, and I look forward to speaking with you soon."
+    },
+    {
+      "role": "candidate",
+      "turn": 6,
+      "message": "It was a pleasure speaking with you too, Rohan. I appreciate the time you took to discuss the Senior AI Engineer position at FinSpark, and I'm looking forward to hearing from you soon. I wish you and the FinSpark team all the best, and I hope we can continue the conversation soon. Have a great day."
+    }
+  ]
+}

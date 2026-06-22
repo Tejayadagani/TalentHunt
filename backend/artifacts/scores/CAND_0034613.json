@@ -1,0 +1,13 @@
+{
+  "interview_score": 0.55,
+  "breakdown": {
+    "technical_depth": 0.4,
+    "production_mindset": 0.5,
+    "domain_relevance": 0.6,
+    "communication": 0.7,
+    "motivation_signal": 0.8
+  },
+  "reasoning": "Meera demonstrated a decent level of technical depth, mentioning fine-tuning LLMs and working with microservices. However, she didn't delve deeper into specific algorithms or data structures. She showed a production mindset by mentioning her experience with Airflow, Terraform, and Docker, but didn't discuss scale, reliability, or monitoring. Her domain relevance is moderate, as she expressed interest in the fintech domain but didn't name any companies or products. Her communication skills are good, as she provided clear and concise answers. Finally, she showed a strong motivation signal by asking specific questions about the role and the team.",
+  "candidate_id": "CAND_0034613",
+  "name": "Meera Arora"
+}

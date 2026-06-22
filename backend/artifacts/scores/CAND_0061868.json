@@ -1,0 +1,13 @@
+{
+  "interview_score": 0.425,
+  "breakdown": {
+    "technical_depth": 0.4,
+    "production_mindset": 0.5,
+    "domain_relevance": 0.2,
+    "communication": 0.6,
+    "motivation_signal": 0.5
+  },
+  "reasoning": "Shreya demonstrated some technical knowledge, mentioning Vector Search and FAISS, but her answers lacked depth and specific examples. She showed a production mindset by discussing employee onboarding and data management, but it's not directly relevant to the fintech domain. Her communication was clear, but she struggled to provide direct answers to technical questions. Shreya showed genuine interest in the role, asking about the team's tech and mission, but her background in HR and lack of direct AI experience are concerns. She also didn't ask specific questions about the team's challenges or roadmap.",
+  "candidate_id": "CAND_0061868",
+  "name": "Shreya Chopra"
+}

@@ -1,0 +1,13 @@
+{
+  "interview_score": 0.555,
+  "breakdown": {
+    "technical_depth": 0.5,
+    "production_mindset": 0.5,
+    "domain_relevance": 0.5,
+    "communication": 0.8,
+    "motivation_signal": 0.6
+  },
+  "reasoning": "Atharv demonstrated a neutral technical depth, mentioning specific technologies like Spring Boot, Redis, and Spark, but not delving into the specifics of AI engineering. He showed a production mindset by mentioning his current role as an HR Manager and his experience working with various technologies. However, he didn't explicitly mention any production-related concerns or strategies. Atharv's domain relevance is neutral as he didn't explicitly mention any fintech-specific technologies or experiences. His communication skills are strong, with clear and concise answers. Finally, Atharv showed a moderate motivation signal by asking specific questions about the team and the role, but didn't ask any technical questions about the position.",
+  "candidate_id": "CAND_0004196",
+  "name": "Atharv Sharma"
+}

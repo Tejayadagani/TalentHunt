@@ -1,0 +1,13 @@
+{
+  "interview_score": 0.55,
+  "breakdown": {
+    "technical_depth": 0.6,
+    "production_mindset": 0.5,
+    "domain_relevance": 0.4,
+    "communication": 0.7,
+    "motivation_signal": 0.6
+  },
+  "reasoning": "Anil demonstrated some relevant technical experience in AI engineering, particularly in fine-tuning LLMs and working with FAISS for vector search. However, his technical depth could be improved as he didn't provide specific algorithms, data structures, or architectures. He also didn't mention any production systems or scale-related concerns. Anil's domain relevance is somewhat limited as he didn't mention any fintech-specific companies, products, or regulations. He showed a clear and concise communication style, but his motivation signal could be stronger as he didn't ask specific questions about the team's tech, roadmap, or challenges.",
+  "candidate_id": "CAND_0011104",
+  "name": "Anil Chowdary"
+}

@@ -1,0 +1,13 @@
+{
+  "interview_score": 0.465,
+  "breakdown": {
+    "technical_depth": 0.4,
+    "production_mindset": 0.5,
+    "domain_relevance": 0.4,
+    "communication": 0.6,
+    "motivation_signal": 0.5
+  },
+  "reasoning": "Sunil demonstrated some technical depth in his understanding of AI engineering concepts, particularly in information retrieval and recommendation systems. However, his lack of formal training in AI or machine learning and limited experience with specific technologies like embeddings-based retrieval systems or vector databases, raises concerns about his ability to meet the role's requirements. He showed a production mindset by acknowledging the need for reliability and scalability in a production environment, but his experience as a Mechanical Engineer at Infosys does not directly translate to the fintech domain. His communication was clear and structured, but he did not ask specific questions about the team's tech, roadmap, or challenges, which could have indicated a stronger motivation signal.",
+  "candidate_id": "CAND_0039098",
+  "name": "Sunil Saxena"
+}

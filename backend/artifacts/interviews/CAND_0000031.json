@@ -1,0 +1,67 @@
+{
+  "candidate_id": "CAND_0000031",
+  "name": "Ela Singh",
+  "turns": 6,
+  "transcript": [
+    {
+      "role": "recruiter",
+      "turn": 1,
+      "message": "Hello, it's wonderful to connect with you today. My name is Rohan, and I'm a recruiter with a growing fintech company. I came across your profile and was impressed with your experience in AI engineering, so I'm excited to learn more about your background. Can you start by telling me a bit about your current role and what you've been working on lately?"
+    },
+    {
+      "role": "candidate",
+      "turn": 1,
+      "message": "Hello Rohan, nice to connect with you too. I'm currently working as a Recommendation Systems Engineer at Swiggy, where I've been focusing on developing and deploying machine learning models to improve our recommendation algorithms. Lately, I've been exploring the use of embeddings and information retrieval techniques, such as FAISS and Pinecone, to enhance our model's performance and efficiency. My work involves a lot of collaboration with cross-functional teams to ensure seamless integration of our models into the larger product ecosystem."
+    },
+    {
+      "role": "recruiter",
+      "turn": 2,
+      "message": "That's fascinating work, and it's great to hear you're exploring embeddings and information retrieval techniques. It sounds like your experience could be a good fit for our Senior AI Engineer role, which involves building and optimizing embeddings-based retrieval systems. What sparked your interest in this specific opportunity, and are you looking to make a change or explore new challenges in the fintech domain?"
+    },
+    {
+      "role": "candidate",
+      "turn": 2,
+      "message": "I'm intrigued by the opportunity to apply my skills in a new domain, and fintech seems like an exciting space with a lot of potential for innovation. My current role at Swiggy has given me a strong foundation in building and deploying machine learning models, and I'm eager to explore how I can leverage my expertise in embeddings and information retrieval to drive impact in a different industry. I'm looking to take on new challenges and continue growing as a professional, so I'm open to learning more about the Senior AI Engineer role and how it aligns with my skills and interests."
+    },
+    {
+      "role": "recruiter",
+      "turn": 3,
+      "message": "It's great to hear that you're looking to take on new challenges and explore the fintech domain. As we discuss the Senior AI Engineer role further, I'd like to get a sense of your expectations regarding compensation - what salary range are you currently thinking of for your next opportunity?"
+    },
+    {
+      "role": "candidate",
+      "turn": 3,
+      "message": "My salary expectation is \u20b90L per annum, but I'm more focused on finding the right fit and opportunity for growth rather than a specific number. I'm looking for a role that aligns with my skills and interests, and I'm open to discussing the compensation package in more detail if we decide to move forward. Could you tell me more about the overall compensation and benefits package for the Senior AI Engineer role at your company?"
+    },
+    {
+      "role": "recruiter",
+      "turn": 4,
+      "message": "I appreciate your flexibility and focus on finding the right fit. Before we dive deeper into the details, I'd like to discuss your current situation - if you were to join our company, what's your notice period like at Swiggy, and when would you be available to start?"
+    },
+    {
+      "role": "candidate",
+      "turn": 4,
+      "message": "My notice period at Swiggy is 60 days, which is standard for our company. I'd need to provide a formal notice and ensure a smooth transition of my responsibilities before joining a new role."
+    },
+    {
+      "role": "recruiter",
+      "turn": 5,
+      "message": "Now that we've discussed your current situation and notice period, I'd love to open the floor for any questions you may have about the Senior AI Engineer role or our team - what would you like to know more about regarding this opportunity or our company culture?"
+    },
+    {
+      "role": "candidate",
+      "turn": 5,
+      "message": "I'd like to know more about the team I'd be working with, specifically the dynamics and how the Senior AI Engineer role fits into the overall organizational structure. Could you tell me more about the team's composition, their areas of focus, and how they collaborate with other teams within the company?"
+    },
+    {
+      "role": "recruiter",
+      "turn": 6,
+      "message": "Thank you so much for taking the time to speak with me today, it's been an absolute pleasure getting to know you and discussing the Senior AI Engineer role. I really appreciate your thoughtful questions about our team and company culture - I'll make sure to share more information with you in the coming days. I'll be in touch within the next few days to let you know the next steps, and I wish you all the best in your job search. Take care, and I look forward to speaking with you soon!"
+    },
+    {
+      "role": "candidate",
+      "turn": 6,
+      "message": "It was great speaking with you too, Rohan. I appreciate the time you took to discuss the Senior AI Engineer role and answer my questions about the team and company culture. I'm looking forward to hearing from you soon and learning more about the next steps in the process. Have a great day and thank you again for the opportunity to connect."
+    }
+  ]
+}

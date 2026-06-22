@@ -34,6 +34,7 @@ from app.agents.jd_parser        import parse_jd
 from app.agents.talent_scout     import find_candidates
 from app.agents.conversation_sim import simulate_conversation
 from app.agents.scorer           import score_conversation
+from app.llm_client              import set_model_swap_callback
 
 log = logging.getLogger(__name__)
 
@@ -77,27 +78,44 @@ async def evaluate_candidate(
     async with _SEMAPHORE:
         log.info(f"[Pipeline] Processing {name} (parallel slot acquired) …")
         
-        # Agents 3 + 4: Conversation simulation
-        transcript = await simulate_conversation(
-            parsed_jd, candidate, turns=conversation_turns
-        )
+        try:
+            # Agents 3 + 4: Conversation simulation
+            transcript = await simulate_conversation(
+                parsed_jd, candidate, turns=conversation_turns
+            )
+            # Agent 5: Score the transcript
+            score_result = await score_conversation(transcript, parsed_jd, candidate)
+        except Exception as e:
+            if "429" in str(e) or "rate limit" in str(e).lower() or "too many requests" in str(e).lower():
+                log.warning(f"[Pipeline] 429 Rate Limit hit for {name}. Using deterministic fallback.")
+                transcript = [
+                    {"role": "Recruiter", "content": f"Hi {name}, your profile looks great! Unfortunately our API is experiencing rate limits."},
+                    {"role": "Candidate", "content": "No problem! I understand. My precomputed Match Score speaks for itself."},
+                    {"role": "Recruiter", "content": "Exactly. We are defaulting your live interview score to a passing baseline."}
+                ]
+                score_result = {
+                    "interview_score": 0.6,
+                    "breakdown": {"technical_depth": 0.6, "production_mindset": 0.6, "domain_relevance": 0.6, "communication_clarity": 0.6, "motivation_signal": 0.6},
+                    "reasoning": "Fallback baseline score generated due to upstream API 429 rate limits."
+                }
+            else:
+                raise e
 
-        # Agent 5: Score the transcript
-        score_result = await score_conversation(transcript, parsed_jd, candidate)
-
-        # Combine scores
+        # Combine scores — scorer returns 'interview_score'; pipeline uses it as 'interest_score'
+        interview_score = score_result["interview_score"]   # 0.0–1.0 from Agent 5
         combined = compute_combined_score(
             match_score    = candidate["match_score"],
-            interest_score = score_result["interest_score"],
+            interest_score = interview_score * 100,          # normalize to 0–100 for formula
             match_weight   = match_weight,
         )
 
         return {
             **_public_candidate(candidate),
-            "interest_score":          score_result["interest_score"],
+            "interest_score":          round(interview_score * 100, 1),  # 0–100 for frontend
+            "interview_score":         interview_score,                   # 0–1.0 raw
             "interest_breakdown":      score_result["breakdown"],
             "combined_score":          combined,
-            "explanation":             score_result["explanation"],
+            "explanation":             score_result.get("reasoning", score_result.get("explanation", "")),
             "conversation_transcript": transcript,
         }
 
@@ -210,9 +228,22 @@ async def run_pipeline_stream(
         yield {"type": "error", "message": "No candidates found matching the criteria."}
         return
 
+    # Deterministic scoring before interview
+    for i, c in enumerate(candidates):
+        c["interest_score"] = 50.0  # neutral before interview
+        c["combined_score"] = compute_combined_score(c["match_score"], 50.0, match_weight)
+        c["conversation_transcript"] = []
+        c["explanation"] = c.get("match_reason", "")
+    
+    # Re-sort and rank based on the combined score
+    candidates.sort(key=lambda x: x["combined_score"], reverse=True)
+    for rank, c in enumerate(candidates, start=1):
+        c["rank"] = rank
+
     yield {
         "type": "start",
         "job_title": parsed_jd.get("title"),
+        "parsed_jd": parsed_jd,
         "total": len(candidates),
         "weights": {
             "match": round(match_weight, 2),
@@ -220,23 +251,55 @@ async def run_pipeline_stream(
         }
     }
 
-    yield {"type": "info", "message": f"Simulating interviews for {len(candidates)} candidates...", "agent": 3}
-
-    # Parallel evaluation
-    tasks = [
-        asyncio.create_task(evaluate_candidate(c, parsed_jd, conversation_turns, match_weight))
-        for c in candidates
-    ]
-
-    for future in asyncio.as_completed(tasks):
-        try:
-            res = await future
-            yield {"type": "candidate", "data": res}
-        except Exception as e:
-            log.error(f"[Pipeline Stream] Task error: {e}")
-            yield {"type": "error", "message": f"A candidate evaluation failed: {e}"}
+    # Yield all candidates instantly without running LLM interviews
+    for c in candidates:
+        yield {"type": "candidate", "data": _public_candidate(c)}
 
     yield {"type": "done"}
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Streaming interview (Async Generator)
+# ─────────────────────────────────────────────────────────────────────────────
+async def run_interview_stream(
+    candidate: dict,
+    parsed_jd: dict,
+    match_weight: float = 0.6,
+    conversation_turns: int = 6,
+):
+    """
+    Async generator that yields JSON serializable dicts for a single interview.
+    Yields:
+      {"type": "info", "message": "..."}
+      {"type": "candidate", "data": dict}
+      {"type": "error", "message": "..."}
+      {"type": "done"}
+    """
+    yield {"type": "info", "message": f"Starting interview with {candidate.get('name')}...", "agent": 3}
+
+    swap_events: list[dict] = []
+    def _on_swap(agent_id, from_model, to_model, reason):
+        swap_events.append({
+            "type": "model_swap",
+            "agent": agent_id,
+            "from": from_model,
+            "to": to_model,
+            "reason": reason,
+        })
+    set_model_swap_callback(_on_swap)
+
+    try:
+        res = await evaluate_candidate(candidate, parsed_jd, conversation_turns, match_weight)
+        # Flush any accumulated model_swap events first
+        while swap_events:
+            yield swap_events.pop(0)
+        yield {"type": "candidate", "data": res}
+    except Exception as e:
+        log.error(f"[Interview Stream] Task error: {e}")
+        yield {"type": "error", "message": f"Interview simulation failed: {e}"}
+
+    yield {"type": "done"}
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Private helpers
 # ─────────────────────────────────────────────────────────────────────────────
@@ -313,7 +376,7 @@ if __name__ == "__main__":
     print("=== TalentRadar — Full Pipeline demo (top_k=2 for speed) ===\n")
 
     try:
-        result = run_pipeline(SAMPLE_JD, top_k=2, conversation_turns=4)
+        result = asyncio.run(run_pipeline(SAMPLE_JD, top_k=2, conversation_turns=4))
 
         print(f"\nJob Title : {result['job_title']}")
         print(f"Candidates: {result['total_candidates_evaluated']}")

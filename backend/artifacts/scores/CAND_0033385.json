@@ -1,0 +1,13 @@
+{
+  "interview_score": 0.555,
+  "breakdown": {
+    "technical_depth": 0.5,
+    "production_mindset": 0.5,
+    "domain_relevance": 0.5,
+    "communication": 0.8,
+    "motivation_signal": 0.6
+  },
+  "reasoning": "Nisha demonstrated a decent technical background, mentioning feature engineering, fine-tuning language models, and implementing recommendation systems. However, she didn't delve into specific algorithms, data structures, or architectures. She also didn't show a strong production mindset, focusing more on her current role as an HR Manager. Her domain relevance is neutral, as she didn't mention any fintech-specific experience or knowledge. Her communication skills are good, with clear and concise answers. Her motivation signal is moderate, as she asked some questions about the role but didn't show a strong interest in the fintech domain or the specific challenges of the Senior AI Engineer position.",
+  "candidate_id": "CAND_0033385",
+  "name": "Nisha Sen"
+}

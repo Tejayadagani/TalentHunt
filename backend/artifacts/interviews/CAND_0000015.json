@@ -1,0 +1,67 @@
+{
+  "candidate_id": "CAND_0000015",
+  "name": "Rahul Agarwal",
+  "turns": 6,
+  "transcript": [
+    {
+      "role": "recruiter",
+      "turn": 1,
+      "message": "Hello, thank you for taking the time to speak with me today. My name is Rohan, and I'm a recruiter at FinSpark, a fintech company that's passionate about leveraging AI to drive innovation in the financial industry. Can you start by telling me a bit about your current role and what you've been working on lately?"
+    },
+    {
+      "role": "candidate",
+      "turn": 1,
+      "message": "Hello Rohan, nice to speak with you. I'm currently working as a Software Engineer at Razorpay, where I've been focusing on developing computer vision models using PyTorch and integrating them with our existing systems. Recently, I've been exploring the use of Qdrant for efficient similarity searches and Weights & Biases for experiment tracking, which has been quite interesting."
+    },
+    {
+      "role": "recruiter",
+      "turn": 2,
+      "message": "That's fascinating work you're doing at Razorpay, especially with Qdrant and Weights & Biases. It sounds like you have a strong foundation in AI and machine learning. What sparked your interest in exploring this Senior AI Engineer role at FinSpark, and are you looking to make a change or take on new challenges in the fintech domain?"
+    },
+    {
+      "role": "candidate",
+      "turn": 2,
+      "message": "I've been following FinSpark's work in the fintech space and was impressed by the company's commitment to innovation and AI-driven solutions. As for what sparked my interest, I'd say it's the opportunity to work on more complex problems and expand my skill set in areas like BigQuery and Next.js, which I believe could be valuable in driving business growth. I'm open to exploring new challenges and seeing how my skills align with FinSpark's goals, but I'd like to learn more about the role and the team I'd be working with."
+    },
+    {
+      "role": "recruiter",
+      "turn": 3,
+      "message": "It's great that you're looking to expand your skill set and take on new challenges. As we discuss the Senior AI Engineer role further, I'd like to get a sense of your expectations - what kind of compensation package are you looking for in your next role?"
+    },
+    {
+      "role": "candidate",
+      "turn": 3,
+      "message": "My current compensation package is not something I typically discuss openly, but since you've asked directly, I can share that my salary expectation is \u20b90L per annum. I want to emphasize that my primary focus is on finding the right fit and opportunities for growth, rather than just the compensation. Could you tell me more about the overall benefits and perks that FinSpark offers to its employees, and what a typical career path looks like for a Senior AI Engineer within the company?"
+    },
+    {
+      "role": "recruiter",
+      "turn": 4,
+      "message": "I completely understand your perspective on compensation, and I appreciate your openness. FinSpark does offer a comprehensive benefits package, including health insurance, flexible working hours, and opportunities for professional growth, but I'd be happy to discuss those details further if you're interested. For now, I'd like to know: what's your current notice period at Razorpay, and how soon would you be available to join FinSpark if you were to be offered the Senior AI Engineer role?"
+    },
+    {
+      "role": "candidate",
+      "turn": 4,
+      "message": "My notice period at Razorpay is 90 days, so if I were to be offered the Senior AI Engineer role at FinSpark, I'd be available to join after completing my notice period. I'd like to discuss the onboarding process and any expectations FinSpark may have during this transition period to ensure a smooth handover of my current responsibilities."
+    },
+    {
+      "role": "recruiter",
+      "turn": 5,
+      "message": "Now that we've discussed the logistics of your potential transition to FinSpark, I'd love to give you the opportunity to ask any questions you may have about the role, the team, or the company culture - what would you like to know more about regarding the Senior AI Engineer position or FinSpark in general?"
+    },
+    {
+      "role": "candidate",
+      "turn": 5,
+      "message": "I do have a few questions, actually. Could you tell me more about the team I'd be working with, and what the typical workflow and collaboration process looks like for the Senior AI Engineer role? Additionally, I'm interested in learning more about FinSpark's approach to innovation and how the company encourages experimentation and learning from failures. What kind of resources and support are available for professional development and staying up-to-date with the latest advancements in AI and machine learning?"
+    },
+    {
+      "role": "recruiter",
+      "turn": 6,
+      "message": "It was an absolute pleasure speaking with you and learning more about your background and interests. I want to thank you for taking the time to share your thoughts and questions about the Senior AI Engineer role at FinSpark. I'll be in touch within the next few days to discuss the next steps and provide you with an update on your application. Until then, I wish you all the best and appreciate the opportunity to have connected with you - have a great day and look forward to being in touch soon."
+    },
+    {
+      "role": "candidate",
+      "turn": 6,
+      "message": "It was great speaking with you too, Rohan. I appreciate the time you took to discuss the Senior AI Engineer role and answer my questions about FinSpark. I'm looking forward to hearing from you soon and learning about the next steps in the process. Have a great day and thank you again for the opportunity to connect."
+    }
+  ]
+}

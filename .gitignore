@@ -14,6 +14,7 @@ build/
 .env.*.local
 
 # ChromaDB — generated, do not commit
+chroma_data/
 backend/chroma_data/
 # OS
 .DS_Store
@@ -34,3 +35,12 @@ frontend/out/
 !README.md
 !*/README.md
 !SAMPLE_RUNS.md
+!EVALUATION.md
+
+# Large Data & Artifacts (Do not commit to Github)
+*.npy
+*.jsonl
+*.jsonl.gz
+backend/data/*.json
+backend/data/*.jsonl
+backend/data/*.txt

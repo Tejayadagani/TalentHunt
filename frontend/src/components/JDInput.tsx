@@ -12,9 +12,10 @@ export interface ScoutFormData {
 interface JDInputProps {
   onSubmit: (data: ScoutFormData) => void;
   isLoading: boolean;
+  onDemoSubmit?: () => void;
 }
 
-export function JDInput({ onSubmit, isLoading }: JDInputProps) {
+export function JDInput({ onSubmit, isLoading, onDemoSubmit }: JDInputProps) {
   const [jdText, setJdText] = useState("");
   const [topK, setTopK] = useState(5);
   const [matchWeight, setMatchWeight] = useState(0.6);
@@ -112,17 +113,19 @@ export function JDInput({ onSubmit, isLoading }: JDInputProps) {
 
       {/* Scout button */}
       <div className="px-5 pb-5 pt-4">
-        <button
-          onClick={handleSubmit}
-          disabled={!isReady}
-          className={`w-full h-[48px] rounded-lg text-[15px] font-bold transition-all active:scale-[0.98] ${
-            isReady
-              ? "bg-[#2D7D3E] hover:bg-[#1F5A2B] text-white shadow-sm hover:shadow-md"
-              : "bg-[#333] text-[#777] cursor-not-allowed"
-          }`}
-        >
-          {isLoading ? "Scouting…" : "Scout candidates →"}
-        </button>
+        <div className="flex flex-col gap-3">
+          <button
+            onClick={handleSubmit}
+            disabled={!isReady}
+            className={`w-full h-[48px] rounded-lg text-[15px] font-bold transition-all active:scale-[0.98] ${
+              isReady
+                ? "bg-[#2D7D3E] hover:bg-[#1F5A2B] text-white shadow-sm hover:shadow-md"
+                : "bg-[#333] text-[#777] cursor-not-allowed"
+            }`}
+          >
+            {isLoading ? "Scouting…" : "Scout candidates →"}
+          </button>
+        </div>
         {!isLoading && charCount < 50 && charCount > 0 && (
           <p className="text-[12px] text-center text-[#A0A0A0] mt-2">Add at least 50 characters to continue</p>
         )}

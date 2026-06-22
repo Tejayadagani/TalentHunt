@@ -174,7 +174,9 @@ def _candidate_system_prompt(candidate: dict) -> str:
     name         = candidate.get("name", "the candidate")
     title        = candidate.get("current_title", "Software Engineer")
     company      = candidate.get("current_company", "my current employer")
-    skills       = ", ".join(candidate.get("skills", []))
+    raw_skills   = candidate.get("skills", [])
+    skills_names = [s.get("name", "") if isinstance(s, dict) else str(s) for s in raw_skills]
+    skills       = ", ".join(skills_names)
     seniority    = candidate.get("seniority", "mid")
     yoe          = candidate.get("years_of_experience", 0)
     location     = candidate.get("location", "")
@@ -328,7 +330,7 @@ if __name__ == "__main__":
     print("─" * 70)
 
     try:
-        transcript = simulate_conversation(SAMPLE_JD, SAMPLE_CANDIDATE, turns=6)
+        transcript = asyncio.run(simulate_conversation(SAMPLE_JD, SAMPLE_CANDIDATE, turns=6))
         print()
         for entry in transcript:
             role = entry["role"].upper()

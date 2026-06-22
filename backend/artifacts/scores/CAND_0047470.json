@@ -1,0 +1,13 @@
+{
+  "interview_score": 0.57,
+  "breakdown": {
+    "technical_depth": 0.6,
+    "production_mindset": 0.5,
+    "domain_relevance": 0.4,
+    "communication": 0.7,
+    "motivation_signal": 0.8
+  },
+  "reasoning": "Karan demonstrated some technical depth in his experience with vector databases like Pinecone and Hugging Face Transformers. However, his answers were not as specific as I would have liked, and he didn't delve into the technical details of embeddings-based retrieval systems or hybrid search infrastructure. He showed a production mindset by mentioning scalability and efficiency in his previous project, but didn't discuss reliability, monitoring, or cost optimization. His domain relevance is somewhat limited, as his experience is more in HR and not directly in fintech. His communication was clear and concise, and he showed genuine interest in the role and asked specific questions about the team's tech and projects. One concern is that Karan's answers seemed to be more focused on his previous experience rather than the specific requirements of the Senior AI Engineer role at FinSpark.",
+  "candidate_id": "CAND_0047470",
+  "name": "Karan Sharma"
+}

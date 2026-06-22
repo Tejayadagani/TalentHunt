@@ -1,0 +1,13 @@
+{
+  "interview_score": 0.615,
+  "breakdown": {
+    "technical_depth": 0.6,
+    "production_mindset": 0.5,
+    "domain_relevance": 0.7,
+    "communication": 0.8,
+    "motivation_signal": 0.5
+  },
+  "reasoning": "Rahul demonstrated a good understanding of AI and machine learning concepts, particularly in natural language processing and computer vision. He mentioned specific technologies like Hugging Face Transformers and Pinecone, which shows some technical depth. However, his background is in HR, and he lacks direct experience in the fintech domain. He also didn't ask specific questions about the team's tech, roadmap, or challenges, which could indicate a lack of genuine interest in the role. Overall, Rahul's communication was clear and structured, but his technical depth and motivation signal could be improved.",
+  "candidate_id": "CAND_0000847",
+  "name": "Rahul Chatterjee"
+}

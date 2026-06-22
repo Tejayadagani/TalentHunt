@@ -1,0 +1,13 @@
+{
+  "interview_score": 0.425,
+  "breakdown": {
+    "technical_depth": 0.4,
+    "production_mindset": 0.5,
+    "domain_relevance": 0.2,
+    "communication": 0.6,
+    "motivation_signal": 0.5
+  },
+  "reasoning": "The candidate demonstrated some technical depth by mentioning Hugging Face Transformers and fine-tuning LLMs, but it was not specific to the fintech domain. They showed a production mindset by discussing data pipelines and recommendation systems, but did not delve into system constraints or performance characteristics. The candidate's domain relevance was low as they did not mention any fintech-specific companies, products, or regulations. Their communication was clear and structured, but not concise. The motivation signal was neutral as they did not ask specific questions about the team's tech or challenges.",
+  "candidate_id": "CAND_0060624",
+  "name": "Rohan Nair"
+}

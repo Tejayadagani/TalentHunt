@@ -6,9 +6,22 @@ import { Loader2 } from "lucide-react";
 interface ShortlistTableProps {
   candidates: CandidateResult[];
   isLoading?: boolean;
+  onStartInterview?: (candidate: CandidateResult) => void;
+  interviewingId?: string | null;
+  selectedIds?: Set<string>;
+  onToggleSelect?: (id: string) => void;
+  hideInterviewButton?: boolean;
 }
 
-export function ShortlistTable({ candidates, isLoading }: ShortlistTableProps) {
+export function ShortlistTable({ 
+  candidates, 
+  isLoading, 
+  onStartInterview, 
+  interviewingId,
+  selectedIds,
+  onToggleSelect,
+  hideInterviewButton
+}: ShortlistTableProps) {
   if (!candidates || candidates.length === 0) {
     if (isLoading) {
       return (
@@ -28,16 +41,27 @@ export function ShortlistTable({ candidates, isLoading }: ShortlistTableProps) {
 
   return (
     <div className="space-y-4">
-      {candidates.map((candidate, idx) => (
-        <motion.div
-          key={candidate.id || idx}
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35, delay: idx * 0.08 }}
-        >
-          <CandidateCard candidate={candidate} />
-        </motion.div>
-      ))}
+      {candidates.map((candidate, idx) => {
+        const cid = candidate.id || (candidate as any).candidate_id || String(idx);
+        return (
+          <motion.div
+            key={cid}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, delay: idx * 0.08 }}
+          >
+            <CandidateCard 
+              candidate={candidate} 
+              onStartInterview={onStartInterview ? () => onStartInterview(candidate) : undefined}
+              isInterviewing={interviewingId === cid}
+              isSelected={selectedIds ? selectedIds.has(cid) : false}
+              onSelectToggle={onToggleSelect ? () => onToggleSelect(cid) : undefined}
+              hideInterviewButton={hideInterviewButton}
+              isInterviewComplete={candidate.conversation_transcript && candidate.conversation_transcript.length > 0}
+            />
+          </motion.div>
+        );
+      })}
     </div>
   );
 }

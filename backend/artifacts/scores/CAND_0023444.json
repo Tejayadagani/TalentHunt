@@ -1,0 +1,13 @@
+{
+  "interview_score": 0.445,
+  "breakdown": {
+    "technical_depth": 0.5,
+    "production_mindset": 0.5,
+    "domain_relevance": 0.2,
+    "communication": 0.6,
+    "motivation_signal": 0.4
+  },
+  "reasoning": "Zara Arora demonstrated a neutral technical depth, failing to mention specific AI or ML concepts relevant to the role. She also didn't show a production mindset, focusing on her current role as a Mechanical Engineer. Although she expressed interest in the fintech domain, her background in mechanical engineering doesn't align with the required skills for this role. Her communication was clear, but not structured, and she didn't ask specific questions about the team's tech or challenges. She showed some motivation for the role, but her answers were generic and didn't demonstrate a deep understanding of the position.",
+  "candidate_id": "CAND_0023444",
+  "name": "Zara Arora"
+}

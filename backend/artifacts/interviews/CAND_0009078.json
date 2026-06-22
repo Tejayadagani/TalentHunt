@@ -1,0 +1,67 @@
+{
+  "candidate_id": "CAND_0009078",
+  "name": "Sunil Kapoor",
+  "turns": 6,
+  "transcript": [
+    {
+      "role": "recruiter",
+      "turn": 1,
+      "message": "Hello, thank you for taking the time to speak with me today. My name is Rohan, and I'm a recruiter at FinSpark, a fintech company that's passionate about leveraging AI to drive innovation in the financial industry. Can you start by telling me a bit about your current role and what you've been working on lately?"
+    },
+    {
+      "role": "candidate",
+      "turn": 1,
+      "message": "I'm Sunil Kapoor, nice to speak with you, Rohan. Currently, I'm a Mechanical Engineer at Dunder Mifflin, but I've been exploring opportunities to leverage my skills in software development and AI. Lately, I've been working on projects involving data engineering, machine learning, and software development using various tools like Kubeflow, Snowflake, and Angular."
+    },
+    {
+      "role": "recruiter",
+      "turn": 2,
+      "message": "It sounds like you have a diverse set of skills, and I'm curious to know how you think your experience in mechanical engineering has influenced your approach to software development and AI."
+    },
+    {
+      "role": "candidate",
+      "turn": 2,
+      "message": "My background in mechanical engineering has actually helped me develop a strong foundation in problem-solving and analytical thinking, which I believe has been beneficial in software development and AI. I've found that the principles of mechanical engineering, such as understanding complex systems and optimizing processes, can be applied to software development and AI in meaningful ways."
+    },
+    {
+      "role": "recruiter",
+      "turn": 3,
+      "message": "That's fascinating, Sunil, and I can see how your unique blend of skills would be valuable in our industry. Now, I'd love to know more about your interest in this Senior AI Engineer role at FinSpark - what specifically drew you to this opportunity, and do you have any experience working in the fintech space?"
+    },
+    {
+      "role": "candidate",
+      "turn": 3,
+      "message": "I'm drawn to the Senior AI Engineer role at FinSpark because of the company's focus on leveraging AI to drive innovation in the financial industry, which aligns with my interests in AI and its applications. While I don't have direct experience working in the fintech space, I believe my experience in data engineering and machine learning can be applied to this domain, and I'm excited about the opportunity to learn and grow with FinSpark."
+    },
+    {
+      "role": "recruiter",
+      "turn": 4,
+      "message": "Now that we've discussed your background and interest in the role, I'd like to talk about compensation. Can you walk me through your current compensation package, including your base salary, bonuses, and any additional benefits you receive?"
+    },
+    {
+      "role": "candidate",
+      "turn": 4,
+      "message": "I'm not comfortable discussing my current compensation package in detail, Rohan. However, I'm open to discussing the compensation for the Senior AI Engineer role at FinSpark. Could you share more information about the company's compensation structure and what I can expect in terms of salary and benefits?"
+    },
+    {
+      "role": "recruiter",
+      "turn": 5,
+      "message": "Now that we've discussed compensation, I'd like to talk about your availability and notice period. If you were to join FinSpark, what kind of notice period would you need to give your current employer, and when would you be available to start?"
+    },
+    {
+      "role": "candidate",
+      "turn": 5,
+      "message": "I'd be happy to discuss my notice period with you, Rohan. To be specific, I would need a notice period of 150 days if I were to join FinSpark. As for my availability to start, I'm open to discussing the details, but I'd like to know more about the company's expectations and timeline for the Senior AI Engineer role."
+    },
+    {
+      "role": "recruiter",
+      "turn": 6,
+      "message": "Thank you so much, Sunil, for taking the time to speak with me today - I really appreciate your candor and enthusiasm for the role. I'll be in touch within the next few days to discuss next steps and answer any additional questions you may have. In the meantime, I wish you all the best in your job search and look forward to the possibility of working together at FinSpark."
+    },
+    {
+      "role": "candidate",
+      "turn": 6,
+      "message": "Thank you, Rohan, for the opportunity to speak with you today. I appreciate your time and the information you've shared about the Senior AI Engineer role at FinSpark. I'm looking forward to hearing from you soon and discussing the next steps in the process. Have a great day and I wish FinSpark all the best in its endeavors."
+    }
+  ]
+}

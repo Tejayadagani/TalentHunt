@@ -1,0 +1,13 @@
+{
+  "interview_score": 0.52,
+  "breakdown": {
+    "technical_depth": 0.4,
+    "production_mindset": 0.5,
+    "domain_relevance": 0.6,
+    "communication": 0.7,
+    "motivation_signal": 0.5
+  },
+  "reasoning": "Deepak demonstrated some technical depth by mentioning Django, React, and Hugging Face Transformers, but his answers were mostly high-level and lacked specific details about algorithms, data structures, or architectures. He showed a production mindset by mentioning Django and React, but didn't discuss scale, reliability, or monitoring. His domain relevance is moderate, as he mentioned fintech and risk management, but didn't name any specific companies or products. His communication was clear and structured, but sometimes evasive. Finally, his motivation signal was neutral, as he didn't ask specific questions about the team's tech or roadmap.",
+  "candidate_id": "CAND_0023074",
+  "name": "Deepak Bansal"
+}

@@ -1,0 +1,13 @@
+{
+  "interview_score": 0.615,
+  "breakdown": {
+    "technical_depth": 0.6,
+    "production_mindset": 0.5,
+    "domain_relevance": 0.7,
+    "communication": 0.8,
+    "motivation_signal": 0.5
+  },
+  "reasoning": "Rajesh demonstrated some technical depth in his experience with vector databases (FAISS) and embeddings (Hugging Face Transformers and LangChain). However, his lack of direct experience with hybrid search infrastructure and limited discussion on production mindset and domain relevance are concerns. He showed good communication skills, providing clear and concise answers, but his motivation signal was neutral, as he didn't ask specific questions about the team's tech, roadmap, or challenges.",
+  "candidate_id": "CAND_0041211",
+  "name": "Rajesh Ghosh"
+}

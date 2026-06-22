@@ -1,0 +1,13 @@
+{
+  "interview_score": 0.425,
+  "breakdown": {
+    "technical_depth": 0.4,
+    "production_mindset": 0.5,
+    "domain_relevance": 0.2,
+    "communication": 0.6,
+    "motivation_signal": 0.5
+  },
+  "reasoning": "Priya demonstrated some technical depth in her experience with vector databases and retrieval systems, although it was not directly related to her current role. She also showed a production mindset by mentioning her willingness to learn and adapt to new technologies. However, her domain relevance was low as she didn't mention any specific fintech companies, products, or standards. Her communication skills were good, and she showed a motivation signal by asking questions about the company and the role. One concern is that she didn't demonstrate a strong understanding of the required skills for the Senior AI Engineer role, such as embeddings-based retrieval systems, evaluation frameworks for ranking systems, and offline-to-online correlation.",
+  "candidate_id": "CAND_0035542",
+  "name": "Priya Khanna"
+}

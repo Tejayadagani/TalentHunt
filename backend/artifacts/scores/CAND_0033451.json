@@ -1,0 +1,13 @@
+{
+  "interview_score": 0.54,
+  "breakdown": {
+    "technical_depth": 0.6,
+    "production_mindset": 0.5,
+    "domain_relevance": 0.4,
+    "communication": 0.7,
+    "motivation_signal": 0.5
+  },
+  "reasoning": "Krishna demonstrated some technical depth in his understanding of embeddings, vector search, and database integration. However, his experience with AI and machine learning is mostly on the data analysis side, and he didn't delve into specific algorithms or architectures. He showed a production mindset by mentioning the importance of problem-solving skills and attention to detail, but didn't discuss scale, reliability, or monitoring. His domain relevance is limited, as he didn't mention any fintech-specific companies, products, or standards. His communication was clear and concise, but he didn't ask specific questions about the team's tech or roadmap. His motivation signal was neutral, as he didn't ask any questions about the role or the company.",
+  "candidate_id": "CAND_0033451",
+  "name": "Krishna Iyer"
+}

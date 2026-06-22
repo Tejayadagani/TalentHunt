@@ -1,0 +1,13 @@
+{
+  "interview_score": 0.565,
+  "breakdown": {
+    "technical_depth": 0.6,
+    "production_mindset": 0.5,
+    "domain_relevance": 0.4,
+    "communication": 0.8,
+    "motivation_signal": 0.6
+  },
+  "reasoning": "Ananya demonstrated some technical depth in her experience with vector databases like Pinecone and FAISS, as well as her understanding of evaluation metrics like NDCG, MRR, and MAP. However, her background as a Mechanical Engineer at Stark Industries and lack of direct experience in the fintech domain raise concerns about her domain relevance. Her communication skills were strong, with clear and concise explanations, but she didn't ask specific questions about the team's tech or challenges, which could indicate a lower motivation signal. Overall, Ananya's answers provided some insight into her technical skills, but more context and experience in the fintech domain would be beneficial for this role.",
+  "candidate_id": "CAND_0091691",
+  "name": "Ananya Mukherjee"
+}

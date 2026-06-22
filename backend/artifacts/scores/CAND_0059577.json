@@ -1,0 +1,13 @@
+{
+  "interview_score": 0.565,
+  "breakdown": {
+    "technical_depth": 0.6,
+    "production_mindset": 0.5,
+    "domain_relevance": 0.4,
+    "communication": 0.8,
+    "motivation_signal": 0.6
+  },
+  "reasoning": "Ishaan demonstrated some technical depth in his experience with embeddings and vector search using FAISS and LangChain. However, his background as a Mechanical Engineer and lack of direct experience in AI and fintech domains are concerns. He showed enthusiasm for the role and willingness to learn, but his answers were not always specific or detailed. He also didn't ask any specific questions about the team's tech, roadmap, or challenges, which could indicate a lack of genuine interest in the role.",
+  "candidate_id": "CAND_0059577",
+  "name": "Ishaan Ghosh"
+}

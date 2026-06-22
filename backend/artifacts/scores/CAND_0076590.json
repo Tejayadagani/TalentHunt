@@ -1,0 +1,13 @@
+{
+  "interview_score": 0.5,
+  "breakdown": {
+    "technical_depth": 0.5,
+    "production_mindset": 0.5,
+    "domain_relevance": 0.5,
+    "communication": 0.5,
+    "motivation_signal": 0.5
+  },
+  "reasoning": "Reyansh demonstrated a neutral technical depth as he didn't delve into specific AI or ML concepts. He also didn't showcase a production mindset, as he didn't mention scale, reliability, or monitoring. His domain relevance is neutral as he didn't mention any fintech-specific companies, products, or regulations. His communication was clear but lacked structure and concision. Finally, his motivation signal was neutral as he didn't ask specific questions about the team's tech or challenges. Reyansh's responses were generic and didn't provide any specific examples from his experience.",
+  "candidate_id": "CAND_0076590",
+  "name": "Reyansh Mehta"
+}

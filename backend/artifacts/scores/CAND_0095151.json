@@ -1,0 +1,13 @@
+{
+  "interview_score": 0.445,
+  "breakdown": {
+    "technical_depth": 0.4,
+    "production_mindset": 0.5,
+    "domain_relevance": 0.2,
+    "communication": 0.6,
+    "motivation_signal": 0.7
+  },
+  "reasoning": "Ishaan demonstrated some technical depth in his knowledge of vector databases and embeddings-based retrieval systems, specifically mentioning FAISS and Sentence Transformers. However, his experience is mostly in HR and he lacks direct experience as a Senior AI Engineer. He showed a production mindset by asking about the team's dynamics and the specific responsibilities of the role. His domain relevance is low as he doesn't have direct experience in the fintech domain. His communication skills are good, and he provided clear and concise answers. He showed a motivation signal by asking specific questions about the team and the role, and expressing enthusiasm for learning more about FinSpark's approach to AI engineering.",
+  "candidate_id": "CAND_0095151",
+  "name": "Ishaan Singh"
+}

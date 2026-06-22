@@ -2,6 +2,20 @@
 
 import Link from "next/link";
 import { ArrowRight, CheckCircle2, FileText, Radar, ListOrdered, Trophy } from "lucide-react";
+import { motion } from "framer-motion";
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.15 }
+  }
+};
 
 // ── SVG Radar Logo ─────────────────────────────────────────
 function RadarLogo({ size = 32, color = "#2D7D3E" }: { size?: number; color?: string }) {
@@ -66,7 +80,10 @@ function FloatingCard({ name, role, score, delay, x, y }: {
   name: string; role: string; score: number; delay: number; x: string; y: string;
 }) {
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, delay: delay + 0.5 }}
       className="absolute hidden md:block"
       style={{
         left: x, top: y,
@@ -96,14 +113,14 @@ function FloatingCard({ name, role, score, delay, x, y }: {
           50% { transform: translateY(-10px); }
         }
       `}</style>
-    </div>
+    </motion.div>
   );
 }
 
 // ── Stats row ─────────────────────────────────────────────
 const STATS = [
   { value: "5", label: "AI agents working in parallel" },
-  { value: "< 3min", label: "Average time to shortlist" },
+  { value: "< 1min", label: "Average time to shortlist" },
   { value: "100%", label: "Transparent scoring" },
   { value: "0", label: "Black boxes" },
 ];
@@ -226,81 +243,85 @@ export default function LandingPage() {
 
       {/* ── STATS ── */}
       <section className="px-6 py-12 bg-white border-y border-[#E0E0E0]">
-        <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
+        <motion.div
+          initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={staggerContainer}
+          className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8"
+        >
           {STATS.map((stat, i) => (
-            <div key={i} className="text-center">
+            <motion.div key={i} variants={fadeUp} className="text-center">
               <p className="text-[36px] font-black text-[#2D7D3E] leading-none mb-1">{stat.value}</p>
               <p className="text-[13px] text-[#4A4A4A] leading-snug">{stat.label}</p>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </section>
 
       {/* ── HOW IT WORKS ── */}
       <section id="how-it-works" className="px-6 py-20 max-w-5xl mx-auto">
-        <div className="text-center mb-14">
+        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center mb-14">
           <p className="text-[13px] font-bold text-[#2D7D3E] uppercase tracking-widest mb-3">The process</p>
           <h2 className="text-[36px] font-black text-[#1A1A1A] mb-3">How it works</h2>
           <p className="text-[16px] text-[#4A4A4A] max-w-lg mx-auto">Three steps from raw job description to a shortlist you can actually act on.</p>
-        </div>
+        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-0 relative">
+        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer} className="grid grid-cols-1 md:grid-cols-3 gap-0 relative">
           {/* connector line */}
           <div className="hidden md:block absolute top-16 left-1/6 right-1/6 h-px bg-gradient-to-r from-[#2D7D3E] to-[#D4AF37]" style={{ left: "20%", right: "20%", top: "44px" }} />
 
           {STEPS.map((step, i) => (
-            <div key={i} className="relative flex flex-col items-center text-center px-6 pb-8">
+            <motion.div key={i} variants={fadeUp} className="relative flex flex-col items-center text-center px-6 pb-8 group">
               {/* Icon circle */}
               <div
-                className="w-20 h-20 rounded-2xl mb-5 flex items-center justify-center shadow-md relative z-10"
-                style={{ background: i === 1 ? "#2D7D3E" : "white", border: `2px solid ${i === 1 ? "#2D7D3E" : "#E0E0E0"}` }}
+                className="w-20 h-20 rounded-2xl mb-5 flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow relative z-10 bg-white"
+                style={{ border: `2px solid ${i === 1 ? "#2D7D3E" : "#E0E0E0"}` }}
               >
-                <step.Icon className="w-8 h-8" style={{ color: i === 1 ? "#fff" : "#2D7D3E" }} />
+                <step.Icon className="w-8 h-8 transition-transform group-hover:scale-110" style={{ color: "#2D7D3E" }} />
               </div>
               <div className="text-[12px] font-bold text-[#2D7D3E] uppercase tracking-widest mb-2">{step.n}</div>
               <h3 className="text-[17px] font-bold text-[#1A1A1A] mb-3 leading-snug">{step.title}</h3>
               <p className="text-[14px] text-[#4A4A4A] leading-relaxed">{step.desc}</p>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </section>
 
       {/* ── WHY ── */}
       <section id="why" className="px-6 py-20" style={{ background: "linear-gradient(180deg, #F5F5F5 0%, #E8F5E9 100%)" }}>
         <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center mb-12">
             <p className="text-[13px] font-bold text-[#2D7D3E] uppercase tracking-widest mb-3">Why choose us</p>
             <h2 className="text-[36px] font-black text-[#1A1A1A] mb-3">Built different.</h2>
             <p className="text-[16px] text-[#4A4A4A]">Most ATS tools find who can do the job. We find who <em>wants</em> the job.</p>
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer} className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {WHY.map((item, i) => (
-              <div
+              <motion.div
                 key={i}
-                className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-all hover:-translate-y-1"
-                style={{ border: "1px solid #E0E0E0", borderTop: "4px solid #2D7D3E" }}
+                variants={fadeUp}
+                className="bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all hover:-translate-y-1"
+                style={{ border: "1px solid rgba(224,224,224,0.5)", borderTop: "4px solid #2D7D3E" }}
               >
-                <div className="w-8 h-8 rounded-full bg-[#2D7D3E] flex items-center justify-center mb-4">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#2D7D3E] to-[#1F5A2B] flex items-center justify-center mb-4 shadow-sm">
                   <CheckCircle2 className="w-4 h-4 text-white" />
                 </div>
                 <h3 className="text-[15px] font-bold text-[#1A1A1A] mb-2">{item.title}</h3>
                 <p className="text-[13px] text-[#4A4A4A] leading-relaxed">{item.desc}</p>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ── SAMPLE OUTPUT ── */}
       <section id="preview" className="px-6 py-20 max-w-4xl mx-auto">
-        <div className="text-center mb-12">
+        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center mb-12">
           <p className="text-[13px] font-bold text-[#2D7D3E] uppercase tracking-widest mb-3">Sample output</p>
           <h2 className="text-[36px] font-black text-[#1A1A1A] mb-3">What you actually get</h2>
           <p className="text-[16px] text-[#4A4A4A]">Real data, transparent reasoning, ready to act on — every time.</p>
-        </div>
+        </motion.div>
 
-        <div className="rounded-2xl overflow-hidden shadow-xl" style={{ border: "1px solid #333", background: "#1A1A1A" }}>
+        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="rounded-2xl overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.15)]" style={{ border: "1px solid #333", background: "#1A1A1A" }}>
           {/* Header bar */}
           <div className="flex items-center gap-2 px-5 py-3 border-b border-[#333]">
             <div className="w-3 h-3 rounded-full bg-[#FF5F57]" />
@@ -371,14 +392,14 @@ export default function LandingPage() {
               Get results like this for your role →
             </Link>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* ── FINAL CTA ── */}
       <section className="px-6 py-24 text-center relative overflow-hidden" style={{ background: "linear-gradient(135deg, #1F5A2B 0%, #2D7D3E 100%)" }}>
         <RadarAnimation />
-        <div className="relative z-10">
-          <h2 className="text-[40px] font-black text-white mb-4 leading-tight">
+        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="relative z-10">
+          <h2 className="text-[40px] font-black text-white mb-4 leading-tight drop-shadow-md">
             Your next great hire<br />is already in the pool.
           </h2>
           <p className="text-[16px] text-[#D4E8D8] mb-10 max-w-lg mx-auto">
@@ -386,13 +407,13 @@ export default function LandingPage() {
           </p>
           <Link
             href="/scout"
-            className="inline-flex items-center gap-2 font-bold text-[17px] px-10 py-5 rounded-xl shadow-2xl transition-all hover:shadow-3xl hover:scale-[1.04] active:scale-[0.98]"
+            className="group inline-flex items-center gap-2 font-bold text-[17px] px-10 py-5 rounded-xl shadow-xl transition-all hover:shadow-2xl hover:scale-[1.04] active:scale-[0.98]"
             style={{ background: "#D4AF37", color: "#1A1A1A" }}
           >
             Start scouting — it&apos;s free
-            <ArrowRight className="w-5 h-5" />
+            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Link>
-        </div>
+        </motion.div>
       </section>
 
       {/* ── FOOTER ── */}

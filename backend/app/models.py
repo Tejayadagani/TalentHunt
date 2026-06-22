@@ -45,6 +45,31 @@ class ScoutRequest(BaseModel):
     )
 
 
+class InterviewRequest(BaseModel):
+    """Request body for POST /api/interview/stream."""
+    candidate: dict = Field(
+        ...,
+        description="The candidate dictionary to interview.",
+    )
+    parsed_jd: dict = Field(
+        ...,
+        description="The parsed JD dictionary.",
+    )
+    match_weight: float = Field(
+        default=0.6,
+        ge=0.0,
+        le=1.0,
+        description="Weight for Match Score in combined ranking (0.0–1.0).",
+    )
+    conversation_turns: int = Field(
+        default=6,
+        ge=2,
+        le=10,
+        description="Number of recruiter↔candidate turns per simulation (2–10).",
+    )
+
+
+
 class RerankRequest(BaseModel):
     """Request body for POST /api/rerank — re-rank without LLM calls."""
     shortlist: list[dict] = Field(

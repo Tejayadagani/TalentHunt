@@ -1,9 +1,8 @@
 """
-scorer.py — Agent 5: Scorer & Explainer.
+scorer.py — Agent 5: Technical Interview Scorer & Explainer.
 
-Reads the full conversation transcript produced by Agents 3 & 4 and derives
-an Interest Score from what the candidate *revealed* in conversation —
-not from their private profile data.
+Reads the full conversation transcript produced by Agents 3 & 4 and
+evaluates the candidate's technical performance across 5 dimensions.
 
 Public API
 ----------
@@ -12,101 +11,129 @@ Public API
 Output schema
 -------------
 {
-  "interest_score": int,          # 0–100, sum of all four breakdown dims
+  "interview_score": float,        # 0.0–1.0, weighted average of 5 dimensions
   "breakdown": {
-    "enthusiasm":          int,   # 0–30
-    "proactive_questions": int,   # 0–25
-    "salary_alignment":    int,   # 0–25
-    "availability":        int    # 0–20
+    "technical_depth":    float,   # 0–10 (weight 0.30)
+    "production_mindset": float,   # 0–10 (weight 0.25)
+    "domain_relevance":   float,   # 0–10 (weight 0.20)
+    "communication":      float,   # 0–10 (weight 0.15)
+    "motivation_signal":  float    # 0–10 (weight 0.10)
   },
-  "explanation": str              # 2–3 sentences for a recruiter
+  "reasoning": str                 # 2-3 sentence recruiter-facing explanation
+                                   # citing specific transcript evidence
 }
 
 Privacy note
 ------------
   `interest_level` from the candidate profile is intentionally NOT passed
-  to this agent — the scorer must infer interest purely from the transcript.
+  to this agent — the scorer must infer everything purely from the transcript.
+
+Dimension definitions
+---------------------
+  technical_depth (×0.30):
+    Does the candidate demonstrate genuine technical depth?
+    Specific algorithms, architectures, trade-offs, numbers, constraints.
+
+  production_mindset (×0.25):
+    Does the candidate think about scale, reliability, monitoring, cost?
+    Mentions of SLAs, oncall, incident response, performance tuning.
+
+  domain_relevance (×0.20):
+    Does their experience align with the JD domain (fintech/AI/SaaS)?
+    Named companies, products, or standards relevant to the domain.
+
+  communication_clarity (×0.15):
+    Are explanations clear, structured, and concise?
+    Avoids filler, explains reasoning, directly answers questions.
+
+  motivation_signal (×0.10):
+    Does the candidate show genuine interest in THIS role and company?
+    Specific questions about the team, tech, growth — not generic.
 """
 
 import logging
 
-from app.llm_client import call_llm, parse_json_response
+from app.llm_client import call_llm, parse_json_response, heal_json
 from app.agents.jd_parser import jd_summary
 
 log = logging.getLogger(__name__)
 
-# ── Score dimension bounds (must sum to 100) ──────────────────────────────────
-_MAX_ENTHUSIASM     = 30
-_MAX_PROACTIVE      = 25
-_MAX_SALARY         = 25
-_MAX_AVAILABILITY   = 20
-_MAX_INTEREST_SCORE = _MAX_ENTHUSIASM + _MAX_PROACTIVE + _MAX_SALARY + _MAX_AVAILABILITY  # 100
+# ── Dimension weights (must sum to 1.0) ───────────────────────────────────────
+DIMENSION_WEIGHTS = {
+    "technical_depth":    0.30,
+    "production_mindset": 0.25,
+    "domain_relevance":   0.20,
+    "communication":      0.15,
+    "motivation_signal":  0.10,
+}   # sum = 1.00
+
+# Each dimension is scored 0–10 by the LLM, then normalized to 0–1 before fusion
+_MAX_DIM_SCORE = 10
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # System prompt builder
 # ─────────────────────────────────────────────────────────────────────────────
 def _build_system_prompt(parsed_jd: dict, candidate_name: str) -> str:
-    """Build the Agent 5 system prompt with JD salary context injected."""
-    jd_sum = jd_summary(parsed_jd)
+    """Build the Agent 5 system prompt with JD context injected."""
+    jd_sum    = jd_summary(parsed_jd)
+    title     = parsed_jd.get("title", "the role")
+    domain    = parsed_jd.get("domain", "tech")
+    skills    = ", ".join(parsed_jd.get("required_skills", []))
 
-    salary_range = parsed_jd.get("salary_range")
-    if salary_range:
-        sal_min  = salary_range.get("min", 0)
-        sal_max  = salary_range.get("max", 0)
-        currency = salary_range.get("currency", "INR")
-        salary_context = (
-            f"The JD salary range is {currency} {sal_min:,}–{sal_max:,}. "
-            f"Score salary_alignment based on how close the candidate's stated "
-            f"expectation is to this range. Full marks if within range, "
-            f"partial if slightly outside, 0 if far outside or not discussed."
-        )
-    else:
-        salary_context = (
-            "No salary range was specified in the JD. "
-            "Award full salary_alignment marks (25) if the candidate mentioned "
-            "a reasonable expectation, or 12 if they did not discuss salary at all."
-        )
-
-    return f"""You are an expert talent evaluator. Read the conversation transcript below between a recruiter and a candidate, then produce a structured Interest Score.
+    return f"""You are a senior technical interviewer evaluating a candidate for a {title} role.
 
 Job context: {jd_sum}
 Candidate name: {candidate_name}
 
-{salary_context}
+Read the conversation transcript below and score the candidate on EXACTLY these 5 dimensions.
+Score each dimension from 0 to 10 based ONLY on what is said in the transcript.
 
-Evaluate these four dimensions (each scored 0 to their maximum):
+DIMENSIONS (score 0–10 each):
 
-1. enthusiasm (max {_MAX_ENTHUSIASM}):
-   - Positive tone, excitement, and genuine interest expressed throughout the call.
-   - Did the candidate say they are actively looking for this type of role?
-   - Were their responses engaged and enthusiastic vs flat and short?
+1. technical_depth (weight 30%):
+   Does the candidate demonstrate genuine technical depth?
+   HIGH score: specific algorithms, data structures, architectures, trade-offs, exact numbers,
+   system constraints, performance characteristics.
+   LOW score: vague answers ("I've worked with it"), buzzwords without substance.
+   Required skills for this role: {skills}
 
-2. proactive_questions (max {_MAX_PROACTIVE}):
-   - Did the candidate ask thoughtful questions about the role, team, tech stack, or company?
-   - Quality matters more than quantity — a single insightful question scores higher than two generic ones.
-   - No questions at all = 0.
+2. production_mindset (weight 25%):
+   Does the candidate think about production systems?
+   HIGH score: mentions scale, reliability, monitoring, cost optimization, SLAs, incident response,
+   CI/CD, testing, rollback strategies.
+   LOW score: focuses only on feature development, no mention of operations or reliability.
 
-3. salary_alignment (max {_MAX_SALARY}):
-   - Was the candidate's stated salary expectation within or close to the JD range?
-   - If the candidate did not mention salary when asked = partial credit.
-   - If salary was not discussed at all = award 12 (neutral).
+3. domain_relevance (weight 20%):
+   Does the candidate's experience align with the {domain} domain?
+   HIGH score: names companies, products, standards, or regulations relevant to {domain}.
+   LOW score: generic tech experience with no domain fit signals.
 
-4. availability (max {_MAX_AVAILABILITY}):
-   - Did the candidate mention availability or a start date?
-   - Notice period ≤ 30 days = full marks. 31–45 days = partial. > 45 days = low marks.
-   - Mentioned another competing offer = deduct points.
+4. communication (weight 15%):
+   Are explanations clear, structured, and concise?
+   HIGH score: direct answers, clear structure, explains reasoning, no filler.
+   LOW score: rambling, evasive, over-qualifies every statement.
 
-Return ONLY valid JSON in this exact format — no markdown, no code fences, no extra keys:
+5. motivation_signal (weight 10%):
+   Does the candidate show genuine interest in THIS specific role?
+   HIGH score: asks specific questions about the team's tech, roadmap, or challenges.
+   LOW score: no questions, generic interest, mentions other competing offers.
+
+SCORING RULES:
+- Score ONLY based on the transcript — never assume knowledge not demonstrated.
+- If a dimension is not testable from this transcript (e.g. no technical questions were asked),
+  award 5/10 (neutral).
+- Do NOT reward salary alignment or notice period availability — those are irrelevant here.
+
+Return ONLY valid JSON in this EXACT format with no markdown, no extra keys:
 {{
-  "interest_score": <integer, sum of all four dimensions, 0-{_MAX_INTEREST_SCORE}>,
-  "breakdown": {{
-    "enthusiasm":          <integer 0-{_MAX_ENTHUSIASM}>,
-    "proactive_questions": <integer 0-{_MAX_PROACTIVE}>,
-    "salary_alignment":    <integer 0-{_MAX_SALARY}>,
-    "availability":        <integer 0-{_MAX_AVAILABILITY}>
-  }},
-  "explanation": "<2–3 sentences written for a recruiter, mentioning key positive signals and any concerns>"
+  "technical_depth":    <integer 0-10>,
+  "production_mindset": <integer 0-10>,
+  "domain_relevance":   <integer 0-10>,
+  "communication":      <integer 0-10>,
+  "motivation_signal":  <integer 0-10>,
+  "reasoning": "<2-3 sentences for a recruiter. Cite specific things the candidate said.
+   Mention at least 2 factual claims from the transcript. Acknowledge any concern if one exists.>"
 }}"""
 
 
@@ -119,40 +146,35 @@ async def score_conversation(
     candidate: dict,
 ) -> dict:
     """
-    Analyse a conversation transcript and return a structured Interest Score.
-
-    Args:
-        transcript:  list of {"role": str, "turn": int, "message": str} dicts
-                     (output of conversation_sim.simulate_conversation)
-        parsed_jd:   Structured JD dict from Agent 1.
-        candidate:   Candidate profile dict.
-                     NOTE: interest_level is intentionally NOT used here —
-                     the score is derived only from what the transcript reveals.
+    Analyse a conversation transcript and return a structured Interview Score.
 
     Returns:
         {
-          "interest_score": int,
-          "breakdown": {"enthusiasm": int, "proactive_questions": int,
-                        "salary_alignment": int, "availability": int},
-          "explanation": str
+          "interview_score": float,      # 0.0–1.0
+          "breakdown": {
+            "technical_depth": float,    # 0.0–1.0 (raw/10)
+            "production_mindset": float,
+            "domain_relevance": float,
+            "communication": float,
+            "motivation_signal": float,
+          },
+          "reasoning": str              # evidence-citing recruiter summary
         }
     """
     candidate_name = candidate.get("name", "the candidate")
     log.info(f"[Agent 5] Scoring conversation for {candidate_name} …")
 
     if not transcript:
-        log.warning(f"[Agent 5] Empty transcript for {candidate_name} — returning zero score.")
-        return _zero_score("No conversation transcript was available to score.")
+        log.warning(f"[Agent 5] Empty transcript for {candidate_name} — returning neutral score.")
+        return _neutral_score("No conversation transcript was available to evaluate.")
 
     # ── Format transcript for the LLM ────────────────────────────────────────
     transcript_text = _format_transcript(transcript)
-
-    system_prompt = _build_system_prompt(parsed_jd, candidate_name)
-    user_prompt   = (
+    system_prompt   = _build_system_prompt(parsed_jd, candidate_name)
+    user_prompt     = (
         f"Here is the full conversation transcript:\n\n"
         f"{transcript_text}\n\n"
-        f"Now evaluate the candidate's interest level using the four dimensions "
-        f"and return the JSON score."
+        f"Now evaluate {candidate_name} on the 5 dimensions and return the JSON score."
     )
 
     # ── Call LLM ─────────────────────────────────────────────────────────────
@@ -162,30 +184,19 @@ async def score_conversation(
     # ── Parse and validate ────────────────────────────────────────────────────
     try:
         parsed = parse_json_response(raw_response)
-        result = _validate_and_fix(parsed, candidate_name)
-    except Exception as exc:
-        log.error(f"[Agent 5] JSON parse error for {candidate_name}: {exc}")
-        
-        # HEAL: If it looks like truncation, try to close the JSON manually
-        if "Expecting" in str(exc) or "Unterminated" in str(exc):
-            log.warning("[Agent 5] Attempting to heal truncated JSON …")
-            try:
-                # Add closing quote if missing, then closing braces
-                healed = raw_response.strip()
-                if not healed.endswith('"}'):
-                    if not healed.endswith('"'): healed += '"'
-                    if not healed.endswith('}'): healed += '}'
-                    if not healed.endswith('}'): healed += '}'
-                parsed = parse_json_response(healed)
-                result = _validate_and_fix(parsed, candidate_name)
-            except Exception:
-                result = _zero_score(f"Scoring failed due to a critical truncation error: {exc}")
-        else:
-            result = _zero_score(f"Scoring failed due to a parsing error: {exc}")
+    except Exception as e:
+        log.warning(f"[Agent 5] JSON parse failed, attempting heal: {e}")
+        try:
+            parsed = heal_json(raw_response)
+        except Exception as heal_err:
+            log.error(f"[Agent 5] JSON healing failed for {candidate_name}: {heal_err}")
+            return _neutral_score(f"Scoring failed due to JSON parse error for {candidate_name}.")
+
+    result = _validate_and_normalize(parsed, candidate_name)
 
     log.info(
         f"[Agent 5] Scored {candidate_name}: "
-        f"interest_score={result['interest_score']}  "
+        f"interview_score={result['interview_score']:.3f}  "
         f"breakdown={result['breakdown']}"
     )
     return result
@@ -195,13 +206,7 @@ async def score_conversation(
 # Private helpers
 # ─────────────────────────────────────────────────────────────────────────────
 def _format_transcript(transcript: list[dict]) -> str:
-    """
-    Render the transcript as a clean dialogue string for the LLM.
-
-    Example output:
-        [Turn 1] RECRUITER: Hi, I'm Sarah …
-        [Turn 1] CANDIDATE: Thanks for reaching out …
-    """
+    """Render the transcript as a clean dialogue string for the LLM."""
     lines = []
     for entry in transcript:
         role    = entry.get("role", "unknown").upper()
@@ -211,53 +216,67 @@ def _format_transcript(transcript: list[dict]) -> str:
     return "\n\n".join(lines)
 
 
-def _validate_and_fix(data: dict, candidate_name: str) -> dict:
+def _validate_and_normalize(data: dict, candidate_name: str) -> dict:
     """
-    Validate the LLM's JSON output and clamp scores within allowed bounds.
-    Also recomputes interest_score from the breakdown to prevent hallucinated sums.
+    Clamp each dimension to 0–10, compute weighted interview_score (0.0–1.0).
+    Always recomputes from parts — never trusts a pre-computed sum.
     """
-    breakdown_raw = data.get("breakdown", {})
+    def safe_int(v, default=5):
+        try:
+            return max(0, min(_MAX_DIM_SCORE, int(float(v))))
+        except (TypeError, ValueError):
+            return default
 
-    enthusiasm     = _clamp(int(breakdown_raw.get("enthusiasm",          0)), 0, _MAX_ENTHUSIASM)
-    proactive      = _clamp(int(breakdown_raw.get("proactive_questions", 0)), 0, _MAX_PROACTIVE)
-    salary         = _clamp(int(breakdown_raw.get("salary_alignment",    0)), 0, _MAX_SALARY)
-    availability   = _clamp(int(breakdown_raw.get("availability",        0)), 0, _MAX_AVAILABILITY)
+    td  = safe_int(data.get("technical_depth",    5))
+    pm  = safe_int(data.get("production_mindset", 5))
+    dr  = safe_int(data.get("domain_relevance",   5))
+    cc  = safe_int(data.get("communication",      5))
+    ms  = safe_int(data.get("motivation_signal",  5))
 
-    # Always recompute the total from parts — do not trust the LLM's sum
-    interest_score = enthusiasm + proactive + salary + availability
+    # Weighted average; divide by 10 to normalize each dimension 0→1
+    interview_score = (
+        (td / 10) * DIMENSION_WEIGHTS["technical_depth"]    +
+        (pm / 10) * DIMENSION_WEIGHTS["production_mindset"] +
+        (dr / 10) * DIMENSION_WEIGHTS["domain_relevance"]   +
+        (cc / 10) * DIMENSION_WEIGHTS["communication"]      +
+        (ms / 10) * DIMENSION_WEIGHTS["motivation_signal"]
+    )
+    interview_score = max(0.0, min(1.0, interview_score))   # clamp to [0, 1]
 
-    explanation = str(data.get("explanation", "")).strip()
-    if not explanation:
-        explanation = f"Interest score for {candidate_name} computed from transcript analysis."
+    reasoning = str(data.get("reasoning", "")).strip()
+    if not reasoning:
+        reasoning = (
+            f"{candidate_name} completed the interview. "
+            f"Technical depth score: {td}/10. Production mindset: {pm}/10."
+        )
 
     return {
-        "interest_score": interest_score,
+        "interview_score": round(interview_score, 4),
         "breakdown": {
-            "enthusiasm":          enthusiasm,
-            "proactive_questions": proactive,
-            "salary_alignment":    salary,
-            "availability":        availability,
+            "technical_depth":    round(td / 10, 2),
+            "production_mindset": round(pm / 10, 2),
+            "domain_relevance":   round(dr / 10, 2),
+            "communication":      round(cc / 10, 2),
+            "motivation_signal":  round(ms / 10, 2),
         },
-        "explanation": explanation,
+        "reasoning": reasoning,
     }
 
 
-def _clamp(value: int, lo: int, hi: int) -> int:
-    """Return value clamped to [lo, hi]."""
-    return max(lo, min(hi, value))
-
-
-def _zero_score(explanation: str) -> dict:
-    """Return a safe zero-score result with an explanation."""
+def _neutral_score(reasoning: str) -> dict:
+    """Return a neutral 5/10 score for all dimensions when transcript unavailable."""
     return {
-        "interest_score": 0,
+        "interview_score": round(
+            sum(DIMENSION_WEIGHTS.values()) * 0.5, 4
+        ),   # 0.50
         "breakdown": {
-            "enthusiasm":          0,
-            "proactive_questions": 0,
-            "salary_alignment":    0,
-            "availability":        0,
+            "technical_depth":    0.5,
+            "production_mindset": 0.5,
+            "domain_relevance":   0.5,
+            "communication":      0.5,
+            "motivation_signal":  0.5,
         },
-        "explanation": explanation,
+        "reasoning": reasoning,
     }
 
 
@@ -265,66 +284,24 @@ def _zero_score(explanation: str) -> dict:
 # Quick demo  (python -m app.agents.scorer)
 # ─────────────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    import json, sys
+    import json, sys, asyncio
 
-    # Simulate an enthusiastic transcript
-    TRANSCRIPT_HIGH = [
-        {"role": "recruiter", "turn": 1,
-         "message": "Hi Arjun! Thanks for taking the time. Could you tell me a bit about your current role?"},
-        {"role": "candidate", "turn": 1,
-         "message": "Absolutely! I'm a senior backend engineer at Zepto, building payment APIs in FastAPI and PostgreSQL. "
-                    "I've been there six years and I'm genuinely excited about fintech infrastructure challenges."},
-        {"role": "recruiter", "turn": 2,
-         "message": "That sounds great. What's drawing you to consider a new opportunity right now?"},
-        {"role": "candidate", "turn": 2,
-         "message": "I've been looking for exactly this kind of role — a senior backend position in fintech with a strong Python stack. "
-                    "Could you tell me more about the team size and the deployment infrastructure? I'd love to know if you're on Kubernetes."},
-        {"role": "recruiter", "turn": 3,
-         "message": "We use a mix of ECS and Kubernetes on AWS. In terms of compensation, what are you looking for?"},
-        {"role": "candidate", "turn": 3,
-         "message": "I'm looking at around ₹28L per annum. I'm very flexible on other benefits though. "
-                    "What does the engineering culture look like — how are on-call rotations handled?"},
-        {"role": "recruiter", "turn": 4,
-         "message": "On-call is light — roughly one week in six. When could you start if things move forward?"},
-        {"role": "candidate", "turn": 4,
-         "message": "My notice period is 30 days so I could start within a month. I'm keen to move quickly if the role is the right fit. "
-                    "Is there a technical interview step I should prepare for?"},
-        {"role": "recruiter", "turn": 5,
-         "message": "Yes, a system design round and a take-home. Any other questions before I let you go?"},
-        {"role": "candidate", "turn": 5,
-         "message": "Just one — what does the growth path look like for someone joining at senior level? "
-                    "Is there a staff engineer track?"},
-        {"role": "recruiter", "turn": 6,
-         "message": "Absolutely — we have a clear IC track up to staff and principal. Thanks so much Arjun, we'll be in touch within 3 days!"},
-        {"role": "candidate", "turn": 6,
-         "message": "Thank you Sarah, I really enjoyed this conversation. Looking forward to hearing from you!"},
-    ]
-
-    TRANSCRIPT_LOW = [
-        {"role": "recruiter", "turn": 1,
-         "message": "Hi! Thanks for speaking with us. Could you tell me about your current role?"},
-        {"role": "candidate", "turn": 1,
-         "message": "Sure. I'm at Flipkart. Principal engineer."},
-        {"role": "recruiter", "turn": 2,
-         "message": "Great. What's making you consider a new opportunity?"},
-        {"role": "candidate", "turn": 2,
-         "message": "I'm not really looking. I just took the call. I already have an offer from another company I'm considering."},
-        {"role": "recruiter", "turn": 3,
-         "message": "Understood. What compensation would it take for you to consider this?"},
-        {"role": "candidate", "turn": 3,
-         "message": "Significantly more than I make now. I'd need at least ₹1Cr. I don't think this role is at that level."},
-        {"role": "recruiter", "turn": 4,
-         "message": "When would you be available to start if things did work out?"},
-        {"role": "candidate", "turn": 4,
-         "message": "90 days minimum notice. Probably more."},
-        {"role": "recruiter", "turn": 5,
-         "message": "Any questions for me?"},
-        {"role": "candidate", "turn": 5,
-         "message": "Not really."},
-        {"role": "recruiter", "turn": 6,
-         "message": "Thanks for your time. We'll be in touch."},
-        {"role": "candidate", "turn": 6,
-         "message": "Sure. Bye."},
+    HIGH_TRANSCRIPT = [
+        {"role": "recruiter", "turn": 1, "message": "Tell me about a system you built at scale."},
+        {"role": "candidate", "turn": 1, "message":
+            "At Zepto I designed a payment routing system handling 50K TPS using async FastAPI + PostgreSQL "
+            "with read replicas. We had P99 < 80ms and zero downtime deploys via blue-green on ECS. "
+            "I implemented circuit breakers using tenacity to handle Razorpay gateway timeouts."},
+        {"role": "recruiter", "turn": 2, "message": "How did you handle reliability?"},
+        {"role": "candidate", "turn": 2, "message":
+            "We ran 3 replicas with Kubernetes liveness probes and PagerDuty alerting on p99 spikes. "
+            "We also had a chaos engineering day monthly using Gremlin to test failure modes. "
+            "SLA was 99.95% uptime — we hit it for 18 months straight."},
+        {"role": "recruiter", "turn": 3, "message": "What draws you to fintech specifically?"},
+        {"role": "candidate", "turn": 3, "message":
+            "Fintech is where reliability really matters — a missed payment affects real people. "
+            "I want to understand more about your compliance stack. Are you PCI-DSS Level 1? "
+            "And what does your on-call rotation look like?"},
     ]
 
     SAMPLE_JD = {
@@ -337,22 +314,19 @@ if __name__ == "__main__":
         "salary_range": {"min": 2000000, "max": 3500000, "currency": "INR"},
     }
 
-    SAMPLE_CANDIDATE = {"name": "Arjun Mehta", "salary_expectation_inr": 2800000}
-
-    print("=== TalentRadar — Agent 5: Scorer demo ===\n")
+    print("=== TalentRadar — Agent 5: Technical Scorer demo ===\n")
 
     try:
-        print("── Scoring HIGH-INTEREST transcript ──")
-        high = score_conversation(TRANSCRIPT_HIGH, SAMPLE_JD, SAMPLE_CANDIDATE)
-        print(json.dumps(high, indent=2))
+        result = asyncio.run(score_conversation(
+            HIGH_TRANSCRIPT, SAMPLE_JD, {"name": "Arjun Mehta"}
+        ))
+        print(json.dumps(result, indent=2))
 
-        print("\n── Scoring LOW-INTEREST transcript ──")
-        low = score_conversation(TRANSCRIPT_LOW, SAMPLE_JD, {"name": "Aisha Baig"})
-        print(json.dumps(low, indent=2))
-
-        assert high["interest_score"] > low["interest_score"], \
-            f"Expected high > low but got {high['interest_score']} vs {low['interest_score']}"
-        print(f"\n✓ High score ({high['interest_score']}) > Low score ({low['interest_score']}) — scorer is working correctly!")
+        assert 0.0 <= result["interview_score"] <= 1.0, "interview_score out of range!"
+        assert len(result["breakdown"]) == 5, "Expected 5 breakdown dimensions!"
+        assert all(k in result["breakdown"] for k in DIMENSION_WEIGHTS), "Missing dimension keys!"
+        print(f"\n✓ interview_score={result['interview_score']}  reasoning='{result['reasoning'][:80]}...'")
+        print("✓ All assertions passed!")
 
     except Exception as e:
         print(f"\n✗ Failed: {e}")

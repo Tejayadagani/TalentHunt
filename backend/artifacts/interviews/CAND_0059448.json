@@ -1,0 +1,67 @@
+{
+  "candidate_id": "CAND_0059448",
+  "name": "Vivaan Vora",
+  "turns": 6,
+  "transcript": [
+    {
+      "role": "recruiter",
+      "turn": 1,
+      "message": "Hello, thank you for taking the time to speak with me today. My name is Rohan, and I'm a recruiter here at FinSpark, a fintech company that's passionate about using AI to drive innovation in the financial industry. Can you start by telling me a bit about your current role and what you've been working on lately?"
+    },
+    {
+      "role": "candidate",
+      "turn": 1,
+      "message": "I'm Vivaan Vora, nice to speak with you, Rohan. Currently, I'm working as an HR Manager at Wipro, where I've been handling various HR-related projects, including talent acquisition, employee engagement, and process improvements. Lately, I've been focusing on implementing new HR technologies to streamline our processes and enhance employee experience."
+    },
+    {
+      "role": "recruiter",
+      "turn": 2,
+      "message": "It sounds like you've had a diverse range of experiences in your current role, but I'm actually looking for a Senior AI Engineer to join our team. Can you tell me a bit about your background in AI and engineering, and what motivated you to consider a role in this field?"
+    },
+    {
+      "role": "candidate",
+      "turn": 2,
+      "message": "To be honest, my background is more in software development, and I've worked on various projects that involve AI and machine learning, such as reinforcement learning and recommendation systems. I've also experimented with some AI-related technologies like LangChain and Hugging Face Transformers in my free time, but my primary focus has been on HR and software development."
+    },
+    {
+      "role": "recruiter",
+      "turn": 3,
+      "message": "It's great that you've had some experience with AI and machine learning, even if it's not your primary focus. What sparked your interest in this Senior AI Engineer role at FinSpark, and what do you think you could bring to our team in terms of AI expertise?"
+    },
+    {
+      "role": "candidate",
+      "turn": 3,
+      "message": "I'm intrigued by FinSpark's mission to drive innovation in the financial industry using AI, and I think my experience with reinforcement learning and recommendation systems could be valuable in this context. I'm also interested in exploring how my skills in software development, particularly with technologies like React and Flask, could be applied to AI engineering."
+    },
+    {
+      "role": "recruiter",
+      "turn": 4,
+      "message": "It sounds like you have a strong foundation in software development and some experience with AI, which is great. Can you tell me a bit about your expectations in terms of compensation for this role, and what you're looking for in a salary?"
+    },
+    {
+      "role": "candidate",
+      "turn": 4,
+      "message": "I'm not sure I'm the best fit for this role, considering my background is more in HR and software development rather than AI engineering. However, I'm open to exploring opportunities and discussing how my skills could be applied to this position. If you'd like to proceed, I'd be happy to discuss the role further and answer any additional questions you may have."
+    },
+    {
+      "role": "recruiter",
+      "turn": 5,
+      "message": "It seems like you're still interested in exploring the opportunity, and I appreciate your honesty about your background. If you were to consider this role further, what would your ideal notice period be if you were to leave your current position at Wipro?"
+    },
+    {
+      "role": "candidate",
+      "turn": 5,
+      "message": "My current notice period at Wipro is 60 days, which is standard for our company. I'd be happy to discuss this further if we decide to move forward with the opportunity."
+    },
+    {
+      "role": "recruiter",
+      "turn": 6,
+      "message": "Thank you so much, Vivaan, for being open and honest about your background and interests. I appreciate the time you took to speak with me today, and I'm grateful for your candor about your fit for the role. I'll be in touch within the next few days to let you know the next steps, and I wish you all the best in your career endeavors."
+    },
+    {
+      "role": "candidate",
+      "turn": 6,
+      "message": "Thank you, Rohan, for having me in today. I appreciate your time and consideration, and I'm glad I could have an open and honest conversation about my background and interests. I wish FinSpark all the best in finding the right candidate for the role, and I look forward to hearing from you if there's any further discussion or opportunity."
+    }
+  ]
+}

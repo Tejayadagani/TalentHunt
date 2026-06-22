@@ -1,0 +1,13 @@
+{
+  "interview_score": 0.425,
+  "breakdown": {
+    "technical_depth": 0.4,
+    "production_mindset": 0.5,
+    "domain_relevance": 0.2,
+    "communication": 0.6,
+    "motivation_signal": 0.5
+  },
+  "reasoning": "Sai Reddy demonstrated some technical depth in his experience with data engineering and machine learning concepts, but it was not specific to the required skills for the Senior AI Engineer role. He showed a production mindset by asking about the company culture and team's experience with Agile and Scrum methodologies. However, his domain relevance was low as he didn't mention any fintech-specific experience or knowledge. His communication was clear and structured, and he showed genuine interest in the role by asking thoughtful questions. One concern is that he didn't ask any specific technical questions about the role or the company's technology stack.",
+  "candidate_id": "CAND_0000770",
+  "name": "Sai Reddy"
+}

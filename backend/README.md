@@ -22,3 +22,8 @@ uvicorn app.main:app --reload
 ```
 
 API docs available at: http://localhost:8000/docs
+
+## Architecture Notes
+
+**Responsibility Split (Agent 2):**
+In the offline pipeline, `03_pre_score.py` handles the heavy semantic retrieval and full multi-signal math scoring across candidates. Despite its name, `05_agent2_scout.py` primarily serves as a metadata mapper and filter that prepares the previously scored results for the UI and the interview simulation stages. The true mathematical "Scouting" and ranking happens in `03_pre_score.py`.

@@ -1,0 +1,13 @@
+{
+  "interview_score": 0.485,
+  "breakdown": {
+    "technical_depth": 0.5,
+    "production_mindset": 0.5,
+    "domain_relevance": 0.2,
+    "communication": 0.8,
+    "motivation_signal": 0.5
+  },
+  "reasoning": "Sunil demonstrated a neutral technical depth, failing to mention specific AI/ML concepts relevant to the role. He showed a production mindset by discussing notice periods and compensation, but didn't delve into system constraints or performance characteristics. His domain relevance is low as he lacks direct experience in fintech. His communication skills are strong, with clear and concise explanations. However, his motivation signal is neutral as he didn't ask specific questions about the team's tech or challenges. He did express enthusiasm for the role, but it's unclear if he's genuinely interested in the fintech domain.",
+  "candidate_id": "CAND_0009078",
+  "name": "Sunil Kapoor"
+}

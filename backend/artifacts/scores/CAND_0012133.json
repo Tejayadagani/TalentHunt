@@ -1,0 +1,13 @@
+{
+  "interview_score": 0.555,
+  "breakdown": {
+    "technical_depth": 0.4,
+    "production_mindset": 0.5,
+    "domain_relevance": 0.6,
+    "communication": 0.8,
+    "motivation_signal": 0.7
+  },
+  "reasoning": "Aditya demonstrated some technical depth by mentioning Vector Search and Hugging Face Transformers, but his answers were not specific enough to showcase genuine expertise. He showed a production mindset by discussing workflow automation and operational tasks, but didn't delve into system constraints or performance characteristics. His domain relevance is moderate, as he expressed interest in fintech but didn't mention any specific companies, products, or regulations. His communication skills are strong, as he provided clear and concise answers. Finally, Aditya showed a motivation signal by asking specific questions about the team and company's approach to AI and machine learning.",
+  "candidate_id": "CAND_0012133",
+  "name": "Aditya Singh"
+}

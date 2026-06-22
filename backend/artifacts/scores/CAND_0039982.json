@@ -1,0 +1,13 @@
+{
+  "interview_score": 0.655,
+  "breakdown": {
+    "technical_depth": 0.6,
+    "production_mindset": 0.5,
+    "domain_relevance": 0.7,
+    "communication": 0.8,
+    "motivation_signal": 0.9
+  },
+  "reasoning": "Aryan demonstrated a good understanding of AI concepts, particularly in the fintech domain. He mentioned fine-tuning LLMs, information retrieval, and recommendation systems, which aligns with the required skills. However, his technical depth could be improved by providing more specific examples or technical details. Aryan showed a genuine interest in the role and the company, asking questions about the team's tech and roadmap, which is a strong motivation signal.",
+  "candidate_id": "CAND_0039982",
+  "name": "Aryan Sen"
+}

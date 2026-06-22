@@ -1,0 +1,13 @@
+{
+  "interview_score": 0.615,
+  "breakdown": {
+    "technical_depth": 0.5,
+    "production_mindset": 0.5,
+    "domain_relevance": 0.8,
+    "communication": 0.8,
+    "motivation_signal": 0.6
+  },
+  "reasoning": "Saanvi demonstrated a good understanding of AI-related technologies, particularly Hugging Face Transformers and Sentence Transformers. She also showed a clear interest in the fintech domain, citing FinSpark's focus on leveraging AI to drive innovation in the financial services industry. However, her technical depth was limited, and she didn't provide specific examples of her experience with embeddings-based retrieval systems, vector databases, or hybrid search infrastructure, which are key requirements for the Senior AI Engineer role. Additionally, she didn't ask any specific questions about the team's tech, roadmap, or challenges, which could have indicated a stronger motivation signal.",
+  "candidate_id": "CAND_0028830",
+  "name": "Saanvi Hegde"
+}

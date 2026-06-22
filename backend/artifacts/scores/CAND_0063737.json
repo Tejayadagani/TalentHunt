@@ -1,0 +1,13 @@
+{
+  "interview_score": 0.425,
+  "breakdown": {
+    "technical_depth": 0.4,
+    "production_mindset": 0.5,
+    "domain_relevance": 0.2,
+    "communication": 0.6,
+    "motivation_signal": 0.5
+  },
+  "reasoning": "Aisha demonstrated some technical depth in her background, mentioning Vector Search, Recommendation Systems, and Fine-tuning LLMs. However, she didn't delve into specific algorithms or architectures, which is a concern for this role. She showed a production mindset by mentioning her desire to drive innovation and solve complex problems, but didn't discuss system constraints, performance characteristics, or reliability. Her domain relevance is low as she didn't mention any fintech-specific companies, products, or regulations. Her communication was clear and structured, but sometimes evasive. She showed genuine interest in the role, asking specific questions about the team and company culture.",
+  "candidate_id": "CAND_0063737",
+  "name": "Aisha Mittal"
+}

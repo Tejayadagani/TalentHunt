@@ -1,0 +1,14 @@
+{
+  "interview_score": 0.5,
+  "breakdown": {
+    "technical_depth": 0.5,
+    "production_mindset": 0.5,
+    "domain_relevance": 0.5,
+    "communication": 0.5,
+    "motivation_signal": 0.5
+  },
+  "reasoning": "Scoring failed: Error code: 429 - {'error': {'message': 'Rate limit reached for model `llama-3.3-70b-versatile` in organization `org_01km84yccefzp83bqm752dxpve` service tier `on_demand` on tokens per day (TPD): Limit 100000, Used 97999, Requested 3824. Please try again in 26m15.072s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}",
+  "candidate_id": "CAND_0028748",
+  "name": "Pari Patel",
+  "error": "Error code: 429 - {'error': {'message': 'Rate limit reached for model `llama-3.3-70b-versatile` in organization `org_01km84yccefzp83bqm752dxpve` service tier `on_demand` on tokens per day (TPD): Limit 100000, Used 97999, Requested 3824. Please try again in 26m15.072s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}"
+}

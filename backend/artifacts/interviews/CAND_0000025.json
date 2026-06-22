@@ -1,0 +1,67 @@
+{
+  "candidate_id": "CAND_0000025",
+  "name": "Anika Kumar",
+  "turns": 6,
+  "transcript": [
+    {
+      "role": "recruiter",
+      "turn": 1,
+      "message": "Hello, it's wonderful to connect with you today. My name is Rohan, and I'm a recruiter with a growing fintech company. I came across your profile and was impressed with your experience in AI engineering, so I'm excited to learn more about your background. Can you start by telling me a bit about your current role and what you've been working on lately?"
+    },
+    {
+      "role": "candidate",
+      "turn": 1,
+      "message": "Hello Rohan, nice to connect with you too. Currently, I'm working as a Frontend Engineer at Tech Mahindra, where I've been focusing on developing scalable and efficient frontend applications using JavaScript and TypeScript. Recently, I've been involved in designing and implementing data pipelines using Apache Flink and Redis, which has been an interesting challenge. I'm looking forward to exploring new opportunities and learning more about your company."
+    },
+    {
+      "role": "recruiter",
+      "turn": 2,
+      "message": "It sounds like you've had a chance to work on some diverse projects, from frontend development to data pipelines. I'm curious to know what sparked your interest in exploring new opportunities, and specifically, what drew you to this Senior AI Engineer role at our fintech company - what is it about this opportunity that resonates with you?"
+    },
+    {
+      "role": "candidate",
+      "turn": 2,
+      "message": "I've been with Tech Mahindra for a while now, and while I've enjoyed my time there, I feel like I'm ready for a new challenge that can leverage my skills in a more impactful way. The Senior AI Engineer role at your fintech company caught my attention because of the opportunity to work with technologies like LangChain and GCP, which align with my interests and skills. I'm looking for a role that can offer me growth and the chance to contribute to innovative projects, and your company's focus on AI engineering seems like a good fit."
+    },
+    {
+      "role": "recruiter",
+      "turn": 3,
+      "message": "It's great to hear that our company's focus on AI engineering aligns with your interests and skills. As we discuss this opportunity further, I'd like to get a sense of your expectations regarding compensation - what salary range are you currently thinking of for a role like this, considering your experience and qualifications?"
+    },
+    {
+      "role": "candidate",
+      "turn": 3,
+      "message": "My salary expectation for a Senior AI Engineer role is \u20b90L per annum, considering my 7.3 years of experience and qualifications in technologies like JavaScript, Spark, and GCP. I believe this amount reflects my skills and experience, and I'm open to discussing this further as we explore the opportunity. I'd also like to mention that I have a notice period of 120 days, which I'd like to ensure is factored into our discussion."
+    },
+    {
+      "role": "recruiter",
+      "turn": 4,
+      "message": "Thank you for sharing your salary expectations and notice period with me, it's helpful to have that information as we move forward. I'll make sure to factor in your 120-day notice period as we discuss the next steps. Can you tell me a bit more about your availability to join our team in either Pune or Noida, are you open to relocating to either of these locations for this opportunity?"
+    },
+    {
+      "role": "candidate",
+      "turn": 4,
+      "message": "I'm currently based in Vizag, and while I'm open to exploring opportunities in other locations, I would need to consider the relocation aspects carefully. Relocating to either Pune or Noida would be a significant change for me, and I'd like to discuss the company's relocation support and overall package before making a decision. Could you provide more information about the company's relocation policies and what kind of support I can expect if I were to join the team in either of these locations?"
+    },
+    {
+      "role": "recruiter",
+      "turn": 5,
+      "message": "I completely understand your concerns about relocation, and I'd be happy to provide more information about our company's relocation policies. Before I do that, I wanted to check if you have any other questions about the role itself, the team you'd be working with, or anything else related to the Senior AI Engineer position that I haven't addressed yet?"
+    },
+    {
+      "role": "candidate",
+      "turn": 5,
+      "message": "I appreciate your willingness to provide more information about the company's relocation policies. To be honest, I'm still learning more about the role and the team, so I do have a few questions. Could you tell me more about the day-to-day responsibilities of the Senior AI Engineer position, and what a typical project workflow would look like? I'd also appreciate any insights you can share about the team I'd be working with, their expertise, and how they collaborate with each other."
+    },
+    {
+      "role": "recruiter",
+      "turn": 6,
+      "message": "It was an absolute pleasure speaking with you today, and I appreciate the time you took to share your thoughts and experiences with me. I'm confident that your skills and passion for AI engineering would be a great fit for our team, and I'm excited to move forward with the next steps. I'll be in touch with you within the next few days to discuss the details of the role and answer any additional questions you may have. In the meantime, I wish you all the best in your job search, and I look forward to the opportunity to work with you soon. Thank you again for your time, and have a wonderful day!"
+    },
+    {
+      "role": "candidate",
+      "turn": 6,
+      "message": "It was great speaking with you too, Rohan, and I appreciate the time you took to discuss the opportunity with me. I'm looking forward to hearing from you soon and learning more about the role and the team. Thank you for your kind words and for considering me for the Senior AI Engineer position - I wish you and the company all the best as well, and I hope to have a positive update soon. Have a wonderful day!"
+    }
+  ]
+}

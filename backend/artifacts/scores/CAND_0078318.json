@@ -1,0 +1,13 @@
+{
+  "interview_score": 0.615,
+  "breakdown": {
+    "technical_depth": 0.5,
+    "production_mindset": 0.5,
+    "domain_relevance": 0.8,
+    "communication": 0.8,
+    "motivation_signal": 0.6
+  },
+  "reasoning": "Reyansh demonstrated a decent technical background, mentioning technologies like Hugging Face Transformers and Vector Search. However, he didn't delve deeper into specific algorithms or architectures. He showed some understanding of the fintech domain, mentioning FinSpark's focus on AI-driven innovation in the financial sector. His communication was clear and structured, but he didn't ask specific questions about the team's tech or challenges. He expressed genuine interest in the role, but didn't demonstrate a strong motivation signal, as he didn't ask any questions about the team's roadmap or specific responsibilities.",
+  "candidate_id": "CAND_0078318",
+  "name": "Reyansh Dutta"
+}

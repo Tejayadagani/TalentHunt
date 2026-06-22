@@ -1,0 +1,13 @@
+{
+  "interview_score": 0.545,
+  "breakdown": {
+    "technical_depth": 0.5,
+    "production_mindset": 0.5,
+    "domain_relevance": 0.5,
+    "communication": 0.8,
+    "motivation_signal": 0.5
+  },
+  "reasoning": "Naina demonstrated a neutral technical depth, mentioning some AI concepts and tools but lacking direct experience as a Senior AI Engineer. She showed a production mindset by mentioning tools like Hugging Face Transformers and Vector Search, but didn't elaborate on their application in a production environment. Her domain relevance is neutral as she didn't mention any specific fintech companies, products, or standards. Her communication skills are strong, with clear and concise answers. However, her motivation signal is low as she didn't ask specific questions about the team's tech, roadmap, or challenges, and expressed doubts about her fit for the role.",
+  "candidate_id": "CAND_0028725",
+  "name": "Naina Trivedi"
+}

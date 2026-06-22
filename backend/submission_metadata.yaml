@@ -1,0 +1,97 @@
+name: TalentRadar
+tagline: "Intelligent Candidate Discovery & Ranking — Redrob AI Hackathon"
+team:
+  - name: "DharmaTeja Yadagani"
+
+architecture:
+  pipeline:
+    - id: 1
+      name: "JD Parser"
+      description: "Parses raw job description into structured JSON with required_skills, seniority, disqualifiers"
+    - id: 2
+      name: "Talent Scout"
+      description: "ChromaDB semantic search + pre_interview_score re-ranking; returns top-40"
+    - id: 3
+      name: "Hiring Manager (Interviewer)"
+      description: "Generates 6 profile-specific technical questions from JD + candidate resume"
+    - id: 4
+      name: "Candidate Simulator"
+      description: "Responds using ONLY facts from the candidate profile — no hallucination"
+    - id: 5
+      name: "Technical Scorer"
+      description: "Evaluates transcript on 5 dimensions: technical_depth, production_mindset, domain_relevance, communication, motivation_signal"
+
+scoring:
+  pre_interview_score:
+    formula: "0.35 × semantic + 0.25 × career + 0.20 × skill + 0.20 × behavioral"
+    weights_sum: 1.00
+    components:
+      semantic:
+        weight: 0.35
+        method: "cosine similarity (L2-normalized all-MiniLM-L6-v2 embeddings)"
+      career:
+        weight: 0.25
+        signals: ["product_company", "title_match_GOOD_TITLES", "yoe_fit_5_9_years", "github_activity_score"]
+      skill:
+        weight: 0.20
+        signals: ["required_skills_overlap", "assessment_scores", "endorsements", "duration_months", "career_description_text"]
+      behavioral:
+        weight: 0.20
+        signals: ["open_to_work", "last_active_date", "recruiter_response_rate", "notice_period_days", "interview_completion_rate", "verified_signals"]
+
+  interview_score:
+    formula: "(technical_depth×0.30 + production_mindset×0.25 + domain_relevance×0.20 + communication×0.15 + motivation_signal×0.10) / 10"
+    weights_sum: 1.00
+    dimensions:
+      technical_depth:    {weight: 0.30, scale: "0-10"}
+      production_mindset: {weight: 0.25, scale: "0-10"}
+      domain_relevance:   {weight: 0.20, scale: "0-10"}
+      communication:      {weight: 0.15, scale: "0-10"}
+      motivation_signal:  {weight: 0.10, scale: "0-10"}
+
+  final_score:
+    top_40:  "0.60 × pre_interview_score + 0.40 × interview_score"
+    rank_41_100: "pre_interview_score only"
+
+  disqualifiers:
+    honeypot:         {multiplier: 0.00, rules: 5}
+    consulting_only:  {multiplier: 0.25}
+    wrong_domain:     {multiplier: 0.40}
+    ok:               {multiplier: 1.00}
+
+submission:
+  command: "python rank.py --candidates ./candidates.jsonl --out ./submission.csv"
+  output: "submission.csv"
+  rows: 100
+  columns: ["candidate_id", "rank", "score", "reasoning"]
+  constraints:
+    max_wall_time_seconds: 300
+    max_ram_gb: 16
+    requires_gpu: false
+    api_calls: 0
+
+precompute_pipeline:
+  - "python precompute/01_embed.py"
+  - "python precompute/02_chromadb.py"
+  - "python precompute/03_pre_score.py"
+  - "python precompute/04_agent1_jd_parser.py"
+  - "python precompute/05_agent2_scout.py"
+  - "python precompute/06_agents34_interview.py"
+  - "python precompute/07_agent5_scorer.py"
+  - "python precompute/08_combine.py"
+
+demo:
+  type: "HuggingFace Spaces (Gradio)"
+  file: "backend/sandbox/app.py"
+  dashboard: "Next.js frontend at /frontend"
+
+llm_providers:
+  primary: "Groq (llama-3.3-70b-versatile)"
+  fallback:
+    - "meta-llama/llama-3.3-70b-instruct:free (OpenRouter)"
+    - "nousresearch/hermes-3-llama-3.1-405b:free (OpenRouter)"
+    - "mistralai/mistral-nemo:free (OpenRouter)"
+    - "google/gemma-2-9b-it:free (OpenRouter)"
+
+embedding_model: "all-MiniLM-L6-v2 (384-dim, CPU, ~80MB)"
+vector_store: "ChromaDB (persistent local)"

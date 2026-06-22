@@ -1,0 +1,13 @@
+{
+  "interview_score": 0.48,
+  "breakdown": {
+    "technical_depth": 0.5,
+    "production_mindset": 0.5,
+    "domain_relevance": 0.2,
+    "communication": 0.7,
+    "motivation_signal": 0.6
+  },
+  "reasoning": "Aisha demonstrated a neutral technical depth, mentioning tools like Apache Beam and Kafka but not delving into specific algorithms or architectures. She showed a production mindset by mentioning workflows and challenges, but it was not a strong focus. Her domain relevance is low as she lacks direct experience in fintech. Her communication skills are good, with clear and concise answers. Aisha showed a moderate motivation signal by asking questions about the team and company culture, but her interest in the fintech industry is not strongly demonstrated. She mentioned being open to exploring a new industry, but it's not clear if she has a genuine passion for fintech.",
+  "candidate_id": "CAND_0095646",
+  "name": "Aisha Iyengar"
+}

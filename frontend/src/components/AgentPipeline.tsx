@@ -36,6 +36,7 @@ type NodeStatus = "idle" | "active" | "done";
 
 /* ── Helpers ────────────────────────────────────────────────────────────── */
 function getStatus(id: number, active: number, completed: number): NodeStatus {
+  if (active === 6) return "done";
   const parallel = active >= 3 && (id === 3 || id === 4);
   const scorerActive = active >= 3 && id === 5 && completed > 0;
   if (id < active && !parallel)     return "done";

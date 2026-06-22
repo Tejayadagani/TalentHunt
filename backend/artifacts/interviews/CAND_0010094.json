@@ -1,0 +1,67 @@
+{
+  "candidate_id": "CAND_0010094",
+  "name": "Nisha Goyal",
+  "turns": 6,
+  "transcript": [
+    {
+      "role": "recruiter",
+      "turn": 1,
+      "message": "Hello, thank you for taking the time to speak with me today. My name is Rohan, and I'm a recruiter here at FinSpark, a fintech company that's passionate about using AI to drive innovation in the financial industry. Can you start by telling me a bit about your current role and what you've been working on lately?"
+    },
+    {
+      "role": "candidate",
+      "turn": 1,
+      "message": "I'm Nisha Goyal, nice to speak with you, Rohan. Currently, I'm working as an HR Manager at Tata Consultancy Services, where I've been handling various HR-related projects, including talent acquisition, employee engagement, and process improvements. Lately, I've been focusing on implementing new HR technologies to streamline our processes and enhance employee experience."
+    },
+    {
+      "role": "recruiter",
+      "turn": 2,
+      "message": "It sounds like you've been quite busy with your HR role, but I'm actually looking for a Senior AI Engineer to join our team. Can you tell me a bit about your background in AI or machine learning, and what motivated you to consider a career change into this field?"
+    },
+    {
+      "role": "candidate",
+      "turn": 2,
+      "message": "I do have a background in AI, although it's not directly related to my current HR role. In my previous role as a software professional, I worked on projects involving natural language processing, specifically with techniques like embeddings and sentence transformers. I also experimented with generative adversarial networks, or GANs, for image generation tasks."
+    },
+    {
+      "role": "recruiter",
+      "turn": 3,
+      "message": "It's great to hear about your experience with NLP and GANs, Nisha. I'm curious to know, what sparked your interest in this Senior AI Engineer role at FinSpark, and what do you think you can bring to our team in terms of AI expertise?"
+    },
+    {
+      "role": "candidate",
+      "turn": 3,
+      "message": "I'm drawn to FinSpark's mission of leveraging AI to drive innovation in the financial industry, and I believe my experience with AI can be applied to real-world problems in this space. I'm particularly interested in the potential applications of NLP and embeddings in areas like information retrieval and recommendation systems, which I think could be valuable assets to your team."
+    },
+    {
+      "role": "recruiter",
+      "turn": 4,
+      "message": "It sounds like you have a strong foundation in AI and a genuine interest in our company's mission. Can you tell me, what are your current salary expectations for a Senior AI Engineer role, and how does that align with your previous experience and industry standards?"
+    },
+    {
+      "role": "candidate",
+      "turn": 4,
+      "message": "I'm glad you're interested in my background and experience. However, I'd like to clarify that my current salary expectations are not something I'd like to discuss over the phone without a formal offer in place. Could we schedule a follow-up conversation or meeting to discuss compensation details further?"
+    },
+    {
+      "role": "recruiter",
+      "turn": 5,
+      "message": "I completely understand your preference for discussing compensation details in a more formal setting, Nisha. That's perfectly fine. Let's move on to the next topic. What's your current notice period at Tata Consultancy Services, and are you available to join FinSpark immediately, or do you have any constraints that might impact your start date?"
+    },
+    {
+      "role": "candidate",
+      "turn": 5,
+      "message": "My current notice period at Tata Consultancy Services is 30 days, which is standard for our company. As for joining FinSpark immediately, I'd like to discuss the details of the offer and my availability further before committing to a specific start date."
+    },
+    {
+      "role": "recruiter",
+      "turn": 6,
+      "message": "Thank you so much, Nisha, for taking the time to speak with me today and sharing your background and experience with me. I really appreciate your honesty about discussing compensation details in a more formal setting, and I'm more than happy to schedule a follow-up conversation or meeting to discuss the details of the offer. I'll be in touch with you within the next few days to move forward with the next steps, and I wish you all the best in your career endeavors. Thank you again for your time, and I look forward to speaking with you soon."
+    },
+    {
+      "role": "candidate",
+      "turn": 6,
+      "message": "It was a pleasure speaking with you too, Rohan. I appreciate your understanding and professionalism throughout our conversation. I'm looking forward to hearing from you soon and exploring the opportunity further. Thank you again for your time, and I wish FinSpark all the best in its endeavors."
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "interview_score": 0.455,
+  "breakdown": {
+    "technical_depth": 0.5,
+    "production_mindset": 0.5,
+    "domain_relevance": 0.0,
+    "communication": 0.8,
+    "motivation_signal": 0.6
+  },
+  "reasoning": "Advaith demonstrated a neutral technical depth as he didn't provide specific algorithms, data structures, or architectures related to the required skills for the Senior AI Engineer role. He also didn't show a production mindset, as he didn't mention scale, reliability, or monitoring. Although he expressed interest in the fintech domain, his background is in mechanical engineering, and he didn't demonstrate any direct experience or knowledge in the fintech domain. His communication skills were clear and concise, and he showed some motivation for the role, but he didn't ask specific questions about the team's tech, roadmap, or challenges. One concern is that Advaith's background and experience don't align with the required skills for the Senior AI Engineer role, which may impact his ability to perform the job effectively.",
+  "candidate_id": "CAND_0001380",
+  "name": "Advaith Iyengar"
+}

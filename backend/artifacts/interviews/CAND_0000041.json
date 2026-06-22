@@ -1,0 +1,67 @@
+{
+  "candidate_id": "CAND_0000041",
+  "name": "Anjali Khanna",
+  "turns": 6,
+  "transcript": [
+    {
+      "role": "recruiter",
+      "turn": 1,
+      "message": "Hello, thank you for taking the time to speak with me today. My name is Rohan, and I'm a recruiter at FinSpark, a fintech company that's passionate about using AI to drive innovation in the financial industry. Can you start by telling me a bit about your current role and what you've been working on lately?"
+    },
+    {
+      "role": "candidate",
+      "turn": 1,
+      "message": "Hello Rohan, nice to speak with you. I'm currently working as an Operations Manager at Hooli, where I've been overseeing the development and deployment of various software systems. Recently, I've been focused on implementing Airflow workflows and optimizing our cloud infrastructure on GCP to improve overall efficiency and scalability."
+    },
+    {
+      "role": "recruiter",
+      "turn": 2,
+      "message": "That's fascinating work, and it's great to hear about the impact you're making at Hooli. I'm curious to know what sparked your interest in exploring new opportunities, and specifically, what drew you to this Senior AI Engineer role at FinSpark that involves working with embeddings-based retrieval systems and other AI technologies?"
+    },
+    {
+      "role": "candidate",
+      "turn": 2,
+      "message": "I've been with Hooli for a while now, and while I've enjoyed my time there, I'm looking for a new challenge that allows me to grow professionally and technically. The Senior AI Engineer role at FinSpark caught my attention because of the company's innovative approach to applying AI in the financial industry, and I'm interested in exploring how my skills in areas like SQL, Go, and Kubernetes can be applied to a new domain. I'd like to learn more about the role and how it contributes to FinSpark's overall mission."
+    },
+    {
+      "role": "recruiter",
+      "turn": 3,
+      "message": "It's great that you're looking to expand your skill set and explore a new domain, and I'm excited to share more about the role with you. Before we dive deeper, I'd like to discuss the practical aspects of this opportunity - what are your current compensation expectations for a role like this, and how do you think your current experience and skills align with your desired salary range?"
+    },
+    {
+      "role": "candidate",
+      "turn": 3,
+      "message": "My current compensation expectation is \u20b90 per annum, but I'm open to discussing the details of the role and the overall package FinSpark has to offer. I believe my 13.7 years of experience and skills in areas like Airflow, SQL, and Kubernetes can bring significant value to the company, and I'm looking for a compensation package that reflects that."
+    },
+    {
+      "role": "recruiter",
+      "turn": 4,
+      "message": "I appreciate your openness about your compensation expectations, and we can certainly discuss the details of the package as we move forward. Assuming you were to join FinSpark, what's your current notice period at Hooli, and when would you be available to start if offered the Senior AI Engineer role?"
+    },
+    {
+      "role": "candidate",
+      "turn": 4,
+      "message": "My notice period at Hooli is 90 days, so if I were to be offered the role, I'd be available to start approximately three months from the date of acceptance. I'd like to ensure a smooth transition of my responsibilities at Hooli, and this notice period would allow me to do so while also giving me time to prepare for the new role at FinSpark."
+    },
+    {
+      "role": "recruiter",
+      "turn": 5,
+      "message": "Now that we've discussed the logistics, I'd love to give you the opportunity to ask any questions you may have about the role or the team you'd be working with - what would you like to know about the Senior AI Engineer position or FinSpark's AI engineering team that we haven't covered yet?"
+    },
+    {
+      "role": "candidate",
+      "turn": 5,
+      "message": "I do have a few questions about the role and the team. Could you tell me more about the day-to-day responsibilities of the Senior AI Engineer position and how it contributes to the company's overall mission? Additionally, I'd like to know more about the team's dynamics and what a typical project workflow looks like, including how cross-functional teams collaborate to drive AI innovation in the financial industry."
+    },
+    {
+      "role": "recruiter",
+      "turn": 6,
+      "message": "It was an absolute pleasure speaking with you, and I appreciate the time you took to share your background, interests, and questions about the Senior AI Engineer role at FinSpark. I'll be reviewing our conversation and will be in touch within the next few days to discuss the next steps. Once again, thank you for your time, and I wish you all the best - I'm looking forward to the possibility of welcoming you to our team soon."
+    },
+    {
+      "role": "candidate",
+      "turn": 6,
+      "message": "It was a pleasure speaking with you too, Rohan. I appreciate the time you took to discuss the Senior AI Engineer role at FinSpark and answer my questions. I'm looking forward to hearing from you soon and learning more about the next steps. Thank you again for your time, and I wish you and the FinSpark team all the best."
+    }
+  ]
+}

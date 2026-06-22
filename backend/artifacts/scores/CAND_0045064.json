@@ -1,0 +1,13 @@
+{
+  "interview_score": 0.445,
+  "breakdown": {
+    "technical_depth": 0.4,
+    "production_mindset": 0.5,
+    "domain_relevance": 0.3,
+    "communication": 0.6,
+    "motivation_signal": 0.5
+  },
+  "reasoning": "Dhruv demonstrated some technical skills, but lacked depth in specific AI-related technologies required for the role. He mentioned Pinecone and Hugging Face Transformers, but didn't elaborate on their application. He showed a production mindset by discussing the importance of a smooth transition at his current role. However, his domain relevance was limited to a general interest in fintech, without specific knowledge or experience. His communication was clear, but sometimes vague. He showed genuine interest in the role, asking questions about the team and company mission.",
+  "candidate_id": "CAND_0045064",
+  "name": "Dhruv Dalal"
+}

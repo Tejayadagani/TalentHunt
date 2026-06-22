@@ -1,0 +1,67 @@
+{
+  "candidate_id": "CAND_0000032",
+  "name": "Pranav Agarwal",
+  "turns": 6,
+  "transcript": [
+    {
+      "role": "recruiter",
+      "turn": 1,
+      "message": "Hello, thank you for taking the time to speak with me today. My name is Rohan, and I'm a recruiter at FinSpark, a fintech company that's passionate about leveraging AI to drive innovation in the financial industry. Can you start by telling me a bit about your current role and what you've been working on lately?"
+    },
+    {
+      "role": "candidate",
+      "turn": 1,
+      "message": "Hello Rohan, nice to speak with you. I'm currently working as a .NET Developer at Cognizant, where I've been involved in various projects, including developing REST APIs and working with data pipelines using Hadoop and Spark. Recently, I've been focusing on integrating speech recognition capabilities into one of our applications, which has been an interesting challenge. I'm looking forward to exploring new opportunities and learning more about FinSpark's work in the fintech space."
+    },
+    {
+      "role": "recruiter",
+      "turn": 2,
+      "message": "That sounds like a fascinating project, especially with the integration of speech recognition. I'm curious to know, what sparked your interest in exploring opportunities outside of your current role, and what specifically drew you to this Senior AI Engineer position at FinSpark?"
+    },
+    {
+      "role": "candidate",
+      "turn": 2,
+      "message": "I've been with Cognizant for a while now, and while I've enjoyed my time there, I feel like I've plateaued to some extent. I'm looking for a new challenge that will allow me to grow both technically and professionally. The Senior AI Engineer position at FinSpark caught my attention because of the company's focus on AI and innovation in the financial industry, which aligns with my interests and skills, particularly in areas like embeddings and OpenCV."
+    },
+    {
+      "role": "recruiter",
+      "turn": 3,
+      "message": "It's great to hear that you're looking for a new challenge and that our company's focus on AI and fintech resonates with you. Can you tell me a bit more about your technical background in AI and machine learning, and how you think your skills align with the requirements of this Senior AI Engineer role?"
+    },
+    {
+      "role": "candidate",
+      "turn": 3,
+      "message": "I have a strong foundation in programming languages like Python, and I've worked with various AI and machine learning concepts, including embeddings and computer vision using OpenCV. My experience with speech recognition has also given me a good understanding of natural language processing techniques. I believe my technical background, combined with my experience in developing data pipelines and working with big data technologies like Hadoop and Spark, makes me a good fit for the Senior AI Engineer role at FinSpark."
+    },
+    {
+      "role": "recruiter",
+      "turn": 4,
+      "message": "It sounds like you have a solid technical foundation in AI and machine learning, and your experience with data pipelines and big data technologies could be valuable assets in this role. What are your expectations in terms of compensation for a Senior AI Engineer position, and how does that align with your current salary and expectations?"
+    },
+    {
+      "role": "candidate",
+      "turn": 4,
+      "message": "My current salary expectation is \u20b90L per annum, but I'm open to discussing the details of the compensation package further. I'd like to understand more about the overall benefits and perks that FinSpark offers to its employees, as well as the company's approach to career growth and professional development. Could you provide more insight into what I can expect in terms of compensation and benefits as a Senior AI Engineer at FinSpark?"
+    },
+    {
+      "role": "recruiter",
+      "turn": 5,
+      "message": "I'd be happy to discuss the compensation and benefits package in more detail, but first, I'd like to touch base on your availability to join a new role, assuming everything aligns with your expectations. What is your current notice period at Cognizant, and when would you be available to start a new position if offered?"
+    },
+    {
+      "role": "candidate",
+      "turn": 5,
+      "message": "My current notice period at Cognizant is 150 days, which is a fairly standard notice period for my role. If I were to be offered a position at FinSpark, I would be available to start after completing my notice period, which would be approximately 5 months from the date of resignation. I'd like to discuss the onboarding process and any potential arrangements that could be made to ensure a smooth transition."
+    },
+    {
+      "role": "recruiter",
+      "turn": 6,
+      "message": "It was an absolute pleasure speaking with you and learning more about your background and interests. I appreciate the time you took to share your thoughts and experiences with me today. I'll be in touch within the next few days to discuss the next steps and provide an update on the status of your application. In the meantime, I wish you all the best and thank you again for considering the Senior AI Engineer role at FinSpark - I'm looking forward to being in touch soon."
+    },
+    {
+      "role": "candidate",
+      "turn": 6,
+      "message": "It was a pleasure speaking with you too, Rohan. I appreciate the time you took to discuss the Senior AI Engineer role and FinSpark's work in the fintech space. I'm looking forward to hearing from you soon and learning about the next steps in the process. Thank you again for the opportunity, and I wish you a great day."
+    }
+  ]
+}

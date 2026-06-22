@@ -54,18 +54,14 @@ AGENT_CONFIGS = {
         "openrouter": [
             os.getenv("OPENROUTER_MODEL", "meta-llama/llama-3.3-70b-instruct:free"),
             "nousresearch/hermes-3-llama-3.1-405b:free",
-            "mistralai/mistral-7b-instruct:free",
-            "google/gemma-3-27b-it:free",
             "meta-llama/llama-3.2-3b-instruct:free"
         ]
     },
-    1: { # JD Parser (fast & simple extraction)
-        "groq": ["llama-3.1-8b-instant", "llama-3.3-70b-versatile"],
+    1: { # JD Parser (70B for best structured extraction — runs once)
+        "groq": ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"],
         "openrouter": [
-            "meta-llama/llama-3.2-3b-instruct:free",
-            "mistralai/mistral-7b-instruct:free",
             "meta-llama/llama-3.3-70b-instruct:free",
-            "google/gemma-3-27b-it:free",
+            "meta-llama/llama-3.2-3b-instruct:free",
             "nousresearch/hermes-3-llama-3.1-405b:free"
         ]
     },
@@ -73,39 +69,31 @@ AGENT_CONFIGS = {
         "groq": ["llama-3.1-8b-instant", "llama-3.3-70b-versatile"],
         "openrouter": [
             "meta-llama/llama-3.2-3b-instruct:free",
-            "google/gemma-3-27b-it:free",
             "meta-llama/llama-3.3-70b-instruct:free",
-            "mistralai/mistral-7b-instruct:free",
             "nousresearch/hermes-3-llama-3.1-405b:free"
         ]
     },
     3: { # Recruiter AI (requires high nuance, HR persona)
-        "groq": ["llama-3.3-70b-versatile"],
-        "openrouter": [
-            "nousresearch/hermes-3-llama-3.1-405b:free",
-            "meta-llama/llama-3.3-70b-instruct:free",
-            "google/gemma-3-27b-it:free",
-            "mistralai/mistral-7b-instruct:free",
-            "meta-llama/llama-3.2-3b-instruct:free"
-        ]
-    },
-    4: { # Candidate AI (different persona from recruiter to prevent sameness)
-        "groq": ["llama-3.3-70b-versatile"],
-        "openrouter": [
-            "meta-llama/llama-3.3-70b-instruct:free",
-            "nousresearch/hermes-3-llama-3.1-405b:free",
-            "mistralai/mistral-7b-instruct:free",
-            "google/gemma-3-27b-it:free",
-            "meta-llama/llama-3.2-3b-instruct:free"
-        ]
-    },
-    5: { # Interest Scorer (requires high logical reasoning)
         "groq": ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"],
         "openrouter": [
             "nousresearch/hermes-3-llama-3.1-405b:free",
             "meta-llama/llama-3.3-70b-instruct:free",
-            "google/gemma-3-27b-it:free",
-            "mistralai/mistral-7b-instruct:free",
+            "meta-llama/llama-3.2-3b-instruct:free"
+        ]
+    },
+    4: { # Candidate AI (different persona from recruiter to prevent sameness)
+        "groq": ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"],
+        "openrouter": [
+            "meta-llama/llama-3.3-70b-instruct:free",
+            "nousresearch/hermes-3-llama-3.1-405b:free",
+            "meta-llama/llama-3.2-3b-instruct:free"
+        ]
+    },
+    5: { # Interest Scorer (8b-instant: fast + cheap for structured eval, temp=0.1)
+        "groq": ["llama-3.1-8b-instant", "llama-3.3-70b-versatile"],
+        "openrouter": [
+            "nousresearch/hermes-3-llama-3.1-405b:free",
+            "meta-llama/llama-3.3-70b-instruct:free",
             "meta-llama/llama-3.2-3b-instruct:free"
         ]
     }
@@ -114,6 +102,15 @@ AGENT_CONFIGS = {
 # Track fallback state independently per agent to prevent cascaded failures
 # Format: { agent_id: {"provider": "groq", "groq_idx": 0, "openrouter_idx": 0} }
 _AGENT_STATES = {}
+
+# Optional callback invoked when a model swap occurs (used by SSE stream).
+# Signature: (agent_id: int, from_model: str, to_model: str, reason: str) -> None
+_model_swap_callback = None
+
+def set_model_swap_callback(fn):
+    """Register a callable that will be invoked on every model fallback swap."""
+    global _model_swap_callback
+    _model_swap_callback = fn
 
 # Models that don't support a dedicated 'system' role — for these we merge
 # the system prompt into the user message to avoid 400 INVALID_ARGUMENT errors.
@@ -187,27 +184,41 @@ async def call_llm(system_prompt: str, user_prompt: str, agent_id: int = 0) -> s
 
             # ── Groq tier switches (only on rate-limit) ───────────────────────
             if is_rate_limit and state["provider"] == "groq":
+                from_model = config['groq'][state['groq_idx']]
                 if state["groq_idx"] < len(config["groq"]) - 1:
-                    log.warning(f"[Agent {agent_id}] Groq {config['groq'][state['groq_idx']]} limit hit. Switching to next Groq.")
                     state["groq_idx"] += 1
+                    to_model = config['groq'][state['groq_idx']]
+                    log.warning(f"[Agent {agent_id}] Groq {from_model} limit hit. Switching to {to_model}.")
+                    if _model_swap_callback:
+                        _model_swap_callback(agent_id, f"groq/{from_model}", f"groq/{to_model}", "429")
                     continue
                 else:
-                    log.warning(f"[Agent {agent_id}] Groq exhausted. Switching to OpenRouter.")
-                    state["provider"] = "openrouter"
-                    continue
+                    if os.environ.get("OPENROUTER_API_KEY"):
+                        to_model = config["openrouter"][0]
+                        log.warning(f"[Agent {agent_id}] Groq exhausted. Switching to OpenRouter/{to_model}.")
+                        if _model_swap_callback:
+                            _model_swap_callback(agent_id, f"groq/{from_model}", f"openrouter/{to_model}", "429")
+                        state["provider"] = "openrouter"
+                        continue
+                    else:
+                        log.warning(f"[Agent {agent_id}] Groq exhausted and OPENROUTER_API_KEY not configured. Retrying Groq.")
+                        state["groq_idx"] = 0
 
             # ── OpenRouter model rotation (429 OR 404 — OUTSIDE rate-limit block)
             if state["provider"] == "openrouter" and (is_rate_limit or is_unavailable):
+                from_model = config["openrouter"][state["openrouter_idx"]]
                 if state["openrouter_idx"] < len(config["openrouter"]) - 1:
                     state["openrouter_idx"] += 1
-                    next_model = config["openrouter"][state["openrouter_idx"]]
-                    log.warning(f"[Agent {agent_id}] OpenRouter error ({exc.__class__.__name__}). Rotating to: {next_model}")
+                    to_model = config["openrouter"][state["openrouter_idx"]]
+                    log.warning(f"[Agent {agent_id}] OpenRouter error ({exc.__class__.__name__}). Rotating to: {to_model}")
+                    if _model_swap_callback:
+                        _model_swap_callback(agent_id, f"openrouter/{from_model}", f"openrouter/{to_model}", str(exc.__class__.__name__))
                     continue
                 else:
                     # All OpenRouter models exhausted — loop back to Groq!
-                    # We do NOT 'continue' here, so that it hits the backoff sleep below
-                    # before trying Groq again. This prevents rapid infinite looping.
                     log.warning(f"[Agent {agent_id}] All models exhausted. Looping back to Groq.")
+                    if _model_swap_callback:
+                        _model_swap_callback(agent_id, f"openrouter/{from_model}", f"groq/{config['groq'][0]}", "exhausted")
                     state["provider"] = "groq"
                     state["groq_idx"] = 0
                     state["openrouter_idx"] = 0
@@ -253,6 +264,42 @@ def parse_json_response(text: str) -> dict:
     # Also strip stray backticks or trailing commas before the closing brace
     cleaned = cleaned.rstrip("`").strip()
     return json.loads(cleaned)
+
+
+def heal_json(text: str) -> dict:
+    """
+    Attempt to repair a truncated or malformed JSON string from an LLM.
+
+    Strategy:
+      1. Strip markdown fences.
+      2. Try to parse as-is.
+      3. Close open strings, arrays, and objects iteratively.
+      4. Raises json.JSONDecodeError if all healing attempts fail.
+    """
+    cleaned = re.sub(r"```(?:json)?\s*", "", text).strip().rstrip("`").strip()
+
+    # Attempt 1: parse as-is
+    try:
+        return json.loads(cleaned)
+    except json.JSONDecodeError:
+        pass
+
+    # Attempt 2: close open structures
+    # Count open braces / brackets
+    healed = cleaned
+    # Remove trailing comma before closing
+    healed = re.sub(r",\s*$", "", healed)
+    # Close unterminated string
+    quote_count = healed.count('"') - healed.count('\\"')
+    if quote_count % 2 != 0:
+        healed += '"'
+    # Close open objects/arrays
+    open_braces = healed.count('{') - healed.count('}')
+    open_brackets = healed.count('[') - healed.count(']')
+    healed += ']' * max(0, open_brackets)
+    healed += '}' * max(0, open_braces)
+
+    return json.loads(healed)  # raises JSONDecodeError if still broken
 
 
 # ── Private: OpenRouter ───────────────────────────────────────────────────────
@@ -321,31 +368,40 @@ def _is_rate_limit_error(exc: Exception) -> bool:
 
 def _is_model_unavailable(exc: Exception) -> bool:
     """
-    Return True if OpenRouter returned 404 'No endpoints found' — meaning
-    this specific free model is currently offline/unavailable upstream.
+    Return True if OpenRouter/Groq returned 404/400 (model unavailable/retired/paid).
     Should trigger rotation to the next model in the list.
     """
     exc_str = str(exc).lower()
-    return ("404" in exc_str and "no endpoints found" in exc_str) or ("400" in exc_str)
+    return "404" in exc_str or "400" in exc_str
 
 # ── Smoke-test (run directly: python -m app.llm_client) ──────────────────────
 if __name__ == "__main__":
-    import sys
+    import sys, asyncio
 
-    print(f"\nRunning smoke test with provider: {PROVIDER.upper()}")
+    print("\nRunning LLM client smoke test …")
     print("-" * 50)
 
-    try:
-        result = call_llm(
+    async def _smoke():
+        result = await call_llm(
             system_prompt="You are a helpful assistant. Reply in plain text only.",
-            user_prompt='Say exactly: {"status": "ok", "provider": "<provider>"} '
-                        f'but replace <provider> with {PROVIDER}. Return only JSON.',
+            user_prompt='Return only valid JSON: {"status": "ok", "engine": "groq_or_openrouter"}',
         )
         print(f"Raw response:\n{result}\n")
-
         parsed = parse_json_response(result)
         print(f"Parsed JSON: {parsed}")
+
+        # Test JSON healing
+        broken = '{"key": "value with missing close'
+        try:
+            healed = heal_json(broken)
+            print(f"Healed JSON: {healed}")
+        except Exception:
+            print("Heal test: expected failure on severely broken JSON — OK")
+
         print("\n✓ Smoke test passed!")
+
+    try:
+        asyncio.run(_smoke())
     except Exception as e:
         print(f"\n✗ Smoke test failed: {e}")
         sys.exit(1)

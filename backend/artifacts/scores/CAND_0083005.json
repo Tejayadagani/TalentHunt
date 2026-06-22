@@ -1,0 +1,13 @@
+{
+  "interview_score": 0.545,
+  "breakdown": {
+    "technical_depth": 0.5,
+    "production_mindset": 0.5,
+    "domain_relevance": 0.5,
+    "communication": 0.8,
+    "motivation_signal": 0.5
+  },
+  "reasoning": "Yash demonstrated some technical depth by mentioning recommendation systems and semantic search, but his answers were not specific to the required skills for the role. He showed a production mindset by mentioning working in a production environment, but it was not clear if he had hands-on experience. His domain relevance was neutral as he didn't mention any fintech-specific experience or knowledge. His communication was clear and concise, but he didn't ask any specific questions about the team's tech or roadmap. His motivation signal was neutral as he didn't ask any questions about the role or the company.",
+  "candidate_id": "CAND_0083005",
+  "name": "Yash Bhatia"
+}

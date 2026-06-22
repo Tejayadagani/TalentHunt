@@ -1,0 +1,36 @@
+{
+  "title": "Senior AI Engineer",
+  "required_skills": [
+    "embeddings-based retrieval systems",
+    "vector databases",
+    "hybrid search infrastructure",
+    "Python",
+    "evaluation frameworks for ranking systems",
+    "NDCG",
+    "MRR",
+    "MAP",
+    "offline-to-online correlation",
+    "A/B test interpretation"
+  ],
+  "nice_to_have_skills": [
+    "LLM fine-tuning experience",
+    "learning-to-rank models",
+    "HR-tech",
+    "recruiting tech",
+    "marketplace products",
+    "distributed systems",
+    "large-scale inference optimization",
+    "open-source contributions in the AI/ML space"
+  ],
+  "seniority": "senior",
+  "domain": "fintech",
+  "location": "Pune/Noida, India",
+  "remote_ok": false,
+  "salary_range": null,
+  "must_haves": [
+    "production experience with embeddings-based retrieval systems",
+    "production experience with vector databases or hybrid search infrastructure",
+    "strong Python",
+    "hands-on experience designing evaluation frameworks for ranking systems"
+  ]
+}

@@ -19,11 +19,14 @@ plus the following additions:
 """
 
 import logging
+import asyncio
 import time
 
 from app.llm_client import call_llm
 from app.vector_store import query_candidates
 from app.agents.jd_parser import jd_summary
+from app.agents.honeypot import detect_honeypot
+from app.agents.disqualifier import classify_candidate
 
 log = logging.getLogger(__name__)
 
@@ -71,100 +74,92 @@ async def find_candidates(parsed_jd: dict, top_k: int = 10) -> list[dict]:
     # ── Step 3: Score each candidate deterministically ───────────────────────
     scored: list[dict] = []
     for candidate in raw_candidates:
+        # Honeypot detection (safe: returns False if no career_history)
+        is_honeypot, hp_reason = detect_honeypot(candidate)
+        candidate["honeypot"] = is_honeypot
+        candidate["honeypot_reason"] = hp_reason
+
+        # Disqualifier classification
+        flag, multiplier = classify_candidate(candidate)
+        candidate["flag"]        = flag
+        candidate["multiplier"]  = multiplier
+
         semantic_score = candidate["semantic_similarity"]   # already 0–100
         score_result   = compute_match_score(parsed_jd, candidate, semantic_score)
+        raw_match = score_result["match_score"]
+        # Apply disqualifier multiplier to match score
+        score_result["match_score"] = round(raw_match * multiplier, 1)
         candidate.update(score_result)
         scored.append(candidate)
 
-    # ── Step 4: Sort and trim to top_k ───────────────────────────────────────
+    # ── Step 4: Sort and trim to top_k (exclude honeypots from shortlist) ───────
+    # Honeypots score 0.0 so naturally fall to the bottom
     scored.sort(key=lambda c: c["match_score"], reverse=True)
     top_candidates = scored[:top_k]
 
     log.info(
         f"[Agent 2] Top {len(top_candidates)} candidates by match_score: "
-        + ", ".join(f"{c['name']}={c['match_score']}" for c in top_candidates)
+        + ", ".join(f"{c['name']}={c['match_score']} [{c.get('flag','ok')}]" for c in top_candidates)
     )
 
-    # ── Step 5: LLM match reason (one sentence per candidate) ────────────────
-    import asyncio
+    # ── Step 5: Parallel LLM match reasons ─────────────────────────────────
+    # Fire all match-reason calls concurrently — each is independent and short.
     jd_sum = jd_summary(parsed_jd)
-    for i, candidate in enumerate(top_candidates):
-        log.info(
-            f"[Agent 2] Getting match reason for candidate "
-            f"{i + 1}/{len(top_candidates)}: {candidate['name']}"
-        )
-        candidate["match_reason"] = await _get_match_reason(jd_sum, candidate)
-        if i < len(top_candidates) - 1:
-            await asyncio.sleep(_LLM_INTER_CALL_SLEEP)   # rate-limit guard
+    reasons = await asyncio.gather(
+        *[_get_match_reason(jd_sum, c) for c in top_candidates],
+        return_exceptions=True,
+    )
+    for candidate, reason in zip(top_candidates, reasons):
+        candidate["match_reason"] = reason if isinstance(reason, str) else "Match reason unavailable."
 
     log.info("[Agent 2] Talent scouting complete.")
     return top_candidates
 
 
 # ── Public: scoring formula (exported for use in pipeline.py) ─────────────────
-def compute_match_score(jd: dict, candidate: dict, semantic_score: float) -> dict:
+def compute_match_score(jd: dict, candidate: dict, semantic_score_100: float) -> dict:
     """
-    Compute a structured Match Score using the exact formula from the spec.
-
-    Match Score = skill_overlap × 0.40
-               + seniority_fit × 0.20
-               + semantic_similarity × 0.30
-               + location_fit × 0.10
-
-    All sub-scores are 0–100; result is 0–100.
-
-    Returns:
-        {
-          "match_score":      float,
-          "match_breakdown": {
-              "skill_overlap":      float,
-              "seniority_fit":      float,
-              "semantic_similarity": float,
-              "location_fit":       int (100 | 85 | 50 | 10)
-          }
-        }
+    Compute a structured Match Score using the exact formula from the precompute pipeline.
     """
-    # ── Skill overlap (×0.40) ────────────────────────────────────────────────
-    required         = {s.lower() for s in jd.get("required_skills", [])}
-    candidate_skills = {s.lower() for s in candidate.get("skills", [])}
-    skill_overlap    = (
-        len(required & candidate_skills) / max(len(required), 1)
-    ) * 100
-
-    # ── Seniority fit (×0.20) ────────────────────────────────────────────────
-    jd_seniority   = (jd.get("seniority") or "mid").lower()
-    cand_seniority = (candidate.get("seniority") or "mid").lower()
-
-    jd_level   = SENIORITY_LADDER.index(jd_seniority)   if jd_seniority   in SENIORITY_LADDER else 2
-    cand_level = SENIORITY_LADDER.index(cand_seniority) if cand_seniority in SENIORITY_LADDER else 2
-    seniority_fit = max(0, 100 - abs(jd_level - cand_level) * 35)
-
-    # ── Location fit (×0.10) ─────────────────────────────────────────────────
-    jd_loc   = (jd.get("location")        or "").lower().strip()
-    cand_loc = (candidate.get("location") or "").lower().strip()
-
-    if jd_loc and jd_loc == cand_loc:
-        location_fit = 100
-    elif jd.get("remote_ok") and candidate.get("remote_ok"):
-        location_fit = 85
-    else:
-        location_fit = 10
-
-    # ── Combined match score ──────────────────────────────────────────────────
-    match_score = (
-        skill_overlap  * 0.40 +
-        seniority_fit  * 0.20 +
-        semantic_score * 0.30 +
-        location_fit   * 0.10
+    from precompute.utils import compute_skill_score, compute_career_score, compute_behavioral_score
+    from config import PRE_SCORE_WEIGHTS
+    from app.agents.disqualifier import classify_candidate
+    
+    req_skills = jd.get("required_skills", [])
+    nice_skills = jd.get("nice_to_have_skills", [])
+    jd_seniority = (jd.get("seniority") or "mid").lower()
+    
+    # 1. Normalize semantic score to 0-1
+    semantic = max(0.0, min(1.0, semantic_score_100 / 100.0))
+    
+    # 2. Get advanced math sub-scores (0.0 to 1.0)
+    skill    = compute_skill_score(candidate, req_skills, nice_skills)
+    career   = compute_career_score(candidate, jd_seniority)
+    behavior = compute_behavioral_score(candidate)
+    
+    # 3. Base Hackathon Score
+    base_score = (
+        PRE_SCORE_WEIGHTS["semantic"]   * semantic +
+        PRE_SCORE_WEIGHTS["career"]     * career +
+        PRE_SCORE_WEIGHTS["skill"]      * skill +
+        PRE_SCORE_WEIGHTS["behavioral"] * behavior
     )
+    
+    # 4. Multipliers
+    flag, disqualifier_mult = classify_candidate(candidate)
+    stuffing_mult = 1.0
+    if skill > 0.75 and semantic < 0.60:
+        stuffing_mult = 0.50
+        
+    final_score_100 = round((base_score * disqualifier_mult * stuffing_mult) * 100, 1)
 
     return {
-        "match_score": round(match_score, 1),
+        "match_score": final_score_100,
         "match_breakdown": {
-            "skill_overlap":       round(skill_overlap, 1),
-            "seniority_fit":       round(seniority_fit, 1),
-            "semantic_similarity": round(semantic_score, 1),
-            "location_fit":        location_fit,
+            "semantic_similarity": round(semantic * 100, 1),
+            "skill_overlap":       round(skill * 100, 1),
+            "seniority_fit":       round(career * 100, 1),
+            "behavioral_fit":      round(behavior * 100, 1),
         },
     }
 

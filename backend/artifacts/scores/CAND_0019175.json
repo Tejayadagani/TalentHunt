@@ -1,0 +1,13 @@
+{
+  "interview_score": 0.57,
+  "breakdown": {
+    "technical_depth": 0.6,
+    "production_mindset": 0.5,
+    "domain_relevance": 0.4,
+    "communication": 0.7,
+    "motivation_signal": 0.8
+  },
+  "reasoning": "Om demonstrated some technical depth in his experience with Hugging Face Transformers and fine-tuning language models. However, he didn't delve deeper into specific algorithms, data structures, or architectures. He showed a production mindset by mentioning the importance of integrating AI components with the rest of the system, but didn't discuss scale, reliability, or monitoring. His domain relevance is limited as he mentioned working on HR-related tasks and didn't name any fintech companies or products. His communication was clear and concise, and he showed genuine interest in the role by asking specific questions about the team's projects and challenges. He also demonstrated a motivation signal by asking about the day-to-day responsibilities of the Senior AI Engineer role and expressing enthusiasm for the opportunity.",
+  "candidate_id": "CAND_0019175",
+  "name": "Om Nair"
+}

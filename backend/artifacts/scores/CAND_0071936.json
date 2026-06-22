@@ -1,0 +1,13 @@
+{
+  "interview_score": 0.54,
+  "breakdown": {
+    "technical_depth": 0.6,
+    "production_mindset": 0.5,
+    "domain_relevance": 0.4,
+    "communication": 0.7,
+    "motivation_signal": 0.5
+  },
+  "reasoning": "Jay demonstrated a solid foundation in software development and data analysis, but his technical depth was limited to general concepts and technologies. He didn't delve into specific algorithms, data structures, or architectures relevant to AI engineering in the fintech domain. His production mindset was neutral, as he didn't mention scale, reliability, or monitoring. Jay's domain relevance was moderate, as he mentioned fintech but didn't provide specific examples or experiences. His communication was clear and concise, but he didn't ask specific questions about the team's tech or challenges. Jay's motivation signal was neutral, as he didn't ask questions about the role or team, but he did express interest in the opportunity.",
+  "candidate_id": "CAND_0071936",
+  "name": "Jay Iyengar"
+}
