@@ -424,10 +424,10 @@ export default function LandingPage() {
             <span className="text-white font-bold text-[16px]">SkillSync AI</span>
           </div>
           <p className="text-[13px] text-[#555] text-center">
-            Built for Catalyst by Deccan AI · Powered by Groq Llama 3.3 70B & ChromaDB
+            Built for recruiters
           </p>
           <div className="flex items-center gap-4">
-            <a href="https://github.com/Charan512/TalentHunt" target="_blank" rel="noopener noreferrer" className="text-[13px] text-[#555] hover:text-white transition-colors">GitHub ↗</a>
+            <a href="https://github.com/Tejayadagani/TalentHunt" target="_blank" rel="noopener noreferrer" className="text-[13px] text-[#555] hover:text-white transition-colors">GitHub ↗</a>
           </div>
         </div>
       </footer>
