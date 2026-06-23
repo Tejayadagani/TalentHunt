@@ -337,12 +337,27 @@ def compute_career_score(candidate: dict, jd_seniority: str) -> float:
 
     # 1. YOE fit (0.25)
     yoe = float(candidate.get("years_of_experience") or 0.0)
-    if 5.0 <= yoe <= 9.0:
-        points += 0.25
-    elif (3.0 <= yoe < 5.0) or (9.0 < yoe <= 12.0):
-        points += 0.15
-    elif yoe > 12.0:
-        points += 0.05
+    jd_seniority = jd_seniority.lower()
+    
+    if jd_seniority == "intern":
+        if yoe < 1.0: points += 0.25
+        elif yoe < 2.0: points += 0.15
+    elif jd_seniority == "junior":
+        if 1.0 <= yoe <= 3.0: points += 0.25
+        elif yoe < 1.0 or (3.0 < yoe <= 5.0): points += 0.15
+    elif jd_seniority == "mid":
+        if 3.0 <= yoe <= 6.0: points += 0.25
+        elif (1.0 <= yoe < 3.0) or (6.0 < yoe <= 8.0): points += 0.15
+    elif jd_seniority == "lead":
+        if 8.0 <= yoe <= 12.0: points += 0.25
+        elif (5.0 <= yoe < 8.0) or (12.0 < yoe <= 15.0): points += 0.15
+    elif jd_seniority == "principal":
+        if yoe >= 12.0: points += 0.25
+        elif 9.0 <= yoe < 12.0: points += 0.15
+    else: # "senior" or default
+        if 5.0 <= yoe <= 9.0: points += 0.25
+        elif (3.0 <= yoe < 5.0) or (9.0 < yoe <= 12.0): points += 0.15
+        elif yoe > 12.0: points += 0.05
 
     # 2. Title match (0.30)
     title = (candidate.get("current_title") or "").lower().strip()
