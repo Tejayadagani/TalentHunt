@@ -13,7 +13,7 @@ bash run.sh
 ```
 
 ### 🪄 Complete Setup Commands
-If you want to test this from scratch, simply run these commands. *(Make sure to replace `<YOUR_DATASET_URL_HERE>` with the actual download link to the 100K candidate database)*.
+If you want to test this from scratch, simply run these commands. The dataset will be automatically downloaded directly from the GitHub releases page.
 
 **For Mac / Linux:**
 ```bash
@@ -21,7 +21,7 @@ git clone https://github.com/Tejayadagani/TalentHunt.git
 cd TalentHunt
 python3 -m venv venv
 source venv/bin/activate
-curl -L -o candidates.jsonl.gz "<YOUR_DATASET_URL_HERE>"
+curl -L -o candidates.jsonl "https://github.com/Tejayadagani/TalentHunt/releases/download/v1.0.0/candidates.jsonl"
 bash run.sh
 ```
 
@@ -31,7 +31,7 @@ git clone https://github.com/Tejayadagani/TalentHunt.git
 cd TalentHunt
 python -m venv venv
 call venv\Scripts\activate.bat
-curl -L -o candidates.jsonl.gz "<YOUR_DATASET_URL_HERE>"
+curl -L -o candidates.jsonl "https://github.com/Tejayadagani/TalentHunt/releases/download/v1.0.0/candidates.jsonl"
 bash run.sh
 ```
 
