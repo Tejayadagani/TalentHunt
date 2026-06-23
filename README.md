@@ -151,9 +151,7 @@ Python, FastAPI, ChromaDB, sentence-transformers (`all-MiniLM-L6-v2`), Groq (Lla
 
 ## Team
 
-* [Ask me to fill in] - [Role]
-* [Ask me to fill in] - [Role]
+* Yadagani DharmaTeja
+* Penta Prabhu Nandan
 
-## License
 
-MIT License.
