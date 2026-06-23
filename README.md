@@ -6,14 +6,13 @@ Note: the hackathon allows a maximum of 3 submissions total, with the last valid
 
 ## 🚀 One-Command Reproduction
 
-Run `gunzip -k candidates.jsonl.gz` before running the ranking script, as our evaluation pipeline expects the unpacked `.jsonl` file. The validator script is fully compatible with both `.jsonl` and `.jsonl.gz` formats.
+The absolute easiest way to run the entire pipeline, extract the database, generate the top 100 rankings, and mathematically validate the results is to use our bundled script:
 
 ```bash
-pip install -r requirements.txt
-gunzip -k candidates.jsonl.gz
-python rank.py --candidates ./candidates.jsonl --out ./submission.csv
-python backend/scripts/validate_submission.py submission.csv
+bash run.sh
 ```
+
+*(Alternatively, you can run the commands manually: `pip install -r requirements.txt`, `gunzip -k candidates.jsonl.gz`, `python rank.py --candidates ./candidates.jsonl --out ./submission.csv`, and `python backend/scripts/validate_submission.py submission.csv`)*
 
 ## ⚔️ The Adversarial Reality
 
