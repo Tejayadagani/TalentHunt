@@ -12,17 +12,25 @@ If you already have the repository and the `candidates.jsonl.gz` dataset in your
 bash run.sh
 ```
 
-### 🪄 Magic One-Liner for Testers/Friends
-If you want to send this to a friend to test from scratch, they can paste this single magic command into their terminal. It will automatically download the code, set up the environment, and **safely pause** to ask them to drop the database file into the folder before executing the run script!
+### 🪄 Complete Setup Commands
+If you want to test this from scratch, simply run these commands. *(Make sure to drop the `candidates.jsonl.gz` dataset into the folder before running the final step).*
 
 **For Mac / Linux:**
 ```bash
-git clone https://github.com/Tejayadagani/TalentHunt.git && cd TalentHunt && python3 -m venv venv && source venv/bin/activate && echo -e "\n⚠️  PAUSING: Please drag 'candidates.jsonl.gz' into the TalentHunt folder right now!" && read -p "Press [Enter] when you have moved the file..." && bash run.sh
+git clone https://github.com/Tejayadagani/TalentHunt.git
+cd TalentHunt
+python3 -m venv venv
+source venv/bin/activate
+bash run.sh
 ```
 
 **For Windows:**
 ```cmd
-git clone https://github.com/Tejayadagani/TalentHunt.git && cd TalentHunt && python -m venv venv && call venv\Scripts\activate.bat && echo ⚠️ PAUSING: Please drag 'candidates.jsonl.gz' into the TalentHunt folder right now! && pause && bash run.sh
+git clone https://github.com/Tejayadagani/TalentHunt.git
+cd TalentHunt
+python -m venv venv
+call venv\Scripts\activate.bat
+bash run.sh
 ```
 
 ## ⚔️ The Adversarial Reality
