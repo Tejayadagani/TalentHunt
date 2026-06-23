@@ -321,10 +321,11 @@ async def _call_openrouter(system_prompt: str, user_prompt: str, model: str) -> 
 
     response = await client.chat.completions.create(
         model=model,
-        messages=messages,
+        messages=messages, # type: ignore
         temperature=0.3,
     )
-    return response.choices[0].message.content.strip()
+    content = response.choices[0].message.content
+    return content.strip() if content else ""
 
 
 # ── Private: Groq ─────────────────────────────────────────────────────────────
@@ -337,11 +338,12 @@ async def _call_groq(system_prompt: str, user_prompt: str, model: str) -> str:
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user",   "content": user_prompt},
-        ],
+        ], # type: ignore
         max_tokens=2048,  # Increased to prevent truncation of JSON/explanations
         temperature=0.1,  # Lower temperature for more stable JSON
     )
-    return response.choices[0].message.content.strip()
+    content = response.choices[0].message.content
+    return content.strip() if content else ""
 
 
 # ── Private: rate-limit detection ─────────────────────────────────────────────
