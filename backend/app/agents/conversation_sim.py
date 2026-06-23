@@ -324,7 +324,7 @@ if __name__ == "__main__":
         "interest_level": 4,
     }
 
-    print("=== TalentRadar — Agent 3+4: Conversation Simulator demo ===\n")
+    print("=== SkillSync AI — Agent 3+4: Conversation Simulator demo ===\n")
     print(f"JD: {SAMPLE_JD['title']} | {SAMPLE_JD['domain']}")
     print(f"Candidate: {SAMPLE_CANDIDATE['name']} (interest={SAMPLE_CANDIDATE['interest_level']}/5)\n")
     print("─" * 70)

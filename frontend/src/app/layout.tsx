@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
 export const metadata: Metadata = {
-  title: "TalentRadar",
+  title: "SkillSync AI",
   description: "AI-powered talent scouting agent",
 };
 

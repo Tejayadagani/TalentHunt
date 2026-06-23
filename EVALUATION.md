@@ -1,6 +1,6 @@
 # 📊 Empirical Evaluation & Ranking Proof
 
-This document provides the empirical data, testing methodology, and verified results proving the quality of TalentRadar's deterministic ranking engine.
+This document provides the empirical data, testing methodology, and verified results proving the quality of SkillSync AI's deterministic ranking engine.
 
 ## 1. The "Rank-Flip" Correction (Why Weights Matter)
 
@@ -63,4 +63,4 @@ We beat this constraint through architecture isolation:
 1. **Offline Pre-computation:** Embedding all 100,000 candidates via `sentence-transformers (all-MiniLM-L6-v2)` takes ~22 minutes on CPU. We perform this strictly offline as a one-time ingestion cost.
 2. **Live Execution:** The actual timed ranking step (Semantic Retrieval of Top 1,000 → Deterministic Math Scoring → Sorting → Outputting `submission.csv`) completes in **15.3 seconds**. 
 
-**Result:** TalentRadar leaves over 4 minutes and 44 seconds of spare time on the table while making zero external API calls.
+**Result:** SkillSync AI leaves over 4 minutes and 44 seconds of spare time on the table while making zero external API calls.

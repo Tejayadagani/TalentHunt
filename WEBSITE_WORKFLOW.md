@@ -11,7 +11,7 @@ graph TD
     Profile -->|Clicks 'Simulate Interview'| API[FastAPI Backend]
 
     %% Backend Services
-    subgraph TalentRadar Backend
+    subgraph SkillSync AI Backend
         API -->|Fetch Profile| DB[(ChromaDB / JSON Cache)]
         API -->|Initiate Chat| Orchestrator[Multi-Agent Orchestrator]
         

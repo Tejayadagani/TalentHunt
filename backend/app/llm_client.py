@@ -1,5 +1,5 @@
 """
-llm_client.py — Unified LLM wrapper for TalentRadar.
+llm_client.py — Unified LLM wrapper for SkillSync AI.
 
 Supports three-tier fallback:
   - Groq 70B (Primary)
@@ -146,7 +146,7 @@ def _get_openrouter_client():
             base_url=OPENROUTER_BASE_URL,
             default_headers={
                 "HTTP-Referer": "https://talenthunt.vercel.app",
-                "X-Title": "TalentRadar"
+                "X-Title": "SkillSync AI"
             },
             max_retries=0
         )

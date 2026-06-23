@@ -1,5 +1,5 @@
 """
-config.py — TalentRadar Central Configuration.
+config.py — SkillSync AI Central Configuration.
 
 All weights, thresholds, model names, consulting firm lists,
 disqualifier title lists, and scoring constants live here.

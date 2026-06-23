@@ -26,7 +26,7 @@ export interface CandidateResult {
   missing_skills?: string[];
 }
 
-const SAVED_KEY = "talentradar_saved_candidates";
+const SAVED_KEY = "skillsync_saved_candidates";
 
 function ScoreBar({ value, color }: { value: number; color: string }) {
   return (

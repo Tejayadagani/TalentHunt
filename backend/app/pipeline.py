@@ -1,5 +1,5 @@
 """
-pipeline.py — TalentRadar Pipeline Orchestrator.
+pipeline.py — SkillSync AI Pipeline Orchestrator.
 
 Chains all 5 agents in sequence:
   Agent 1  → parse_jd()              : JD text → structured JSON
@@ -130,7 +130,7 @@ async def run_pipeline(
     conversation_turns: int = 6,
 ) -> dict:
     """
-    Run the full TalentRadar pipeline asynchronously and in parallel.
+    Run the full SkillSync AI pipeline asynchronously and in parallel.
     """
     pipeline_start = time.time()
     errors: list[str] = []
@@ -373,7 +373,7 @@ if __name__ == "__main__":
     Must have: experience with financial APIs, strong SQL skills.
     """
 
-    print("=== TalentRadar — Full Pipeline demo (top_k=2 for speed) ===\n")
+    print("=== SkillSync AI — Full Pipeline demo (top_k=2 for speed) ===\n")
 
     try:
         result = asyncio.run(run_pipeline(SAMPLE_JD, top_k=2, conversation_turns=4))

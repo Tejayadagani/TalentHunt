@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-rank.py — TalentRadar Hackathon Submission Script.
+rank.py — SkillSync AI Hackathon Submission Script.
 
 Loads precomputed_scores.pkl and generates submission.csv.
 Zero network calls. Zero GPU. Runs in < 5 minutes on CPU.
@@ -64,7 +64,7 @@ _WRONG_DOMAIN_TITLES = {
 # Main entry point
 # ─────────────────────────────────────────────────────────────────────────────
 def main():
-    parser = argparse.ArgumentParser(description="TalentRadar — Generate submission.csv")
+    parser = argparse.ArgumentParser(description="SkillSync AI — Generate submission.csv")
     parser.add_argument("--candidates", required=True,
                         help="Path to candidates.jsonl or candidates.json(.gz)")
     parser.add_argument("--out",        required=True,

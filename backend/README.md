@@ -1,4 +1,4 @@
-# TalentRadar — Backend
+# SkillSync AI — Backend
 
 ## Setup
 

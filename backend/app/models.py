@@ -1,5 +1,5 @@
 """
-models.py — Pydantic request/response schemas for the TalentRadar API.
+models.py — Pydantic request/response schemas for the SkillSync AI API.
 
 All models used by FastAPI endpoints live here so they can be imported
 by both main.py (for route declarations) and any test scripts.

@@ -22,7 +22,7 @@ interface ScoutResponseData {
   [key: string]: unknown;
 }
 
-const STORAGE_KEY = "talentradar_saved_scouts";
+const STORAGE_KEY = "skillsync_saved_scouts";
 
 function loadSavedScouts(): SavedScout[] {
   try {
@@ -158,7 +158,7 @@ export default function ScoutPage() {
     });
     
     // Save to localStorage so the /interviews page can pick it up
-    localStorage.setItem("talentradar_pending_interviews", JSON.stringify({
+    localStorage.setItem("skillsync_pending_interviews", JSON.stringify({
       candidates: selectedCandidates,
       parsed_jd: results.parsed_jd,
       weights: results.weights || { match: 0.6, interest: 0.4 },
@@ -213,7 +213,7 @@ export default function ScoutPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `submission_${results.job_title?.replace(/\s+/g, "_") || "talentradar"}.csv`;
+    a.download = `submission_${results.job_title?.replace(/\s+/g, "_") || "skillsync"}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -250,7 +250,7 @@ export default function ScoutPage() {
             <div className="w-7 h-7 rounded bg-[#2D7D3E] flex items-center justify-center shadow-lg shadow-[#2D7D3E]/20">
               <Search className="w-3.5 h-3.5 text-white" />
             </div>
-            <span className="text-[17px] font-bold text-white">TalentRadar</span>
+            <span className="text-[17px] font-bold text-white">SkillSync AI</span>
           </div>
         </div>
 

@@ -1,5 +1,5 @@
 """
-sandbox/app.py — TalentRadar · Redrob Hackathon Sandbox
+sandbox/app.py — SkillSync AI · Redrob Hackathon Sandbox
 ========================================================
 
 Satisfies submission_spec.md §10.5 requirements:
@@ -445,7 +445,7 @@ _COLS = ["Rank","Candidate ID","Name","Title","YOE","Skills","Score","Flag","Rea
 
 def build_ui():
     with gr.Blocks(
-        title="TalentRadar — Redrob Hackathon Sandbox",
+        title="SkillSync AI — Redrob Hackathon Sandbox",
         theme=gr.themes.Soft(primary_hue="green", secondary_hue="slate"),
         css="""
         .header { text-align:center; padding: 1rem; }
@@ -457,7 +457,7 @@ def build_ui():
         gr.Markdown("""
 <div class="header">
 
-# 🛰️ TalentRadar — Intelligent Candidate Ranking
+# 🛰️ SkillSync AI — Intelligent Candidate Ranking
 ### Redrob Hackathon · Submission Sandbox (§10.5 Compliant)
 
 **5-Agent AI Pipeline** | CPU-only | No external API calls during ranking | ≤5 min
@@ -573,7 +573,7 @@ the scoring system works on a small sample — as required by spec §10.5.
             # Tab 3 — Architecture
             with gr.Tab("🏗️ Architecture"):
                 gr.Markdown("""
-## TalentRadar System Architecture
+## SkillSync AI System Architecture
 
 ### Phase 1 — Pre-Computation (offline, LLM-assisted)
 ```
@@ -646,7 +646,7 @@ Fallback: OpenRouter → meta-llama/llama-3.3-70b-instruct
         # ── Footer ────────────────────────────────────────────────────────────
         gr.Markdown("""
 ---
-**TalentRadar** · Built for Redrob Hackathon · Python 3.12 · FastAPI · ChromaDB · sentence-transformers · Next.js
+**SkillSync AI** · Built for Redrob Hackathon · Python 3.12 · FastAPI · ChromaDB · sentence-transformers · Next.js
 """)
 
     return demo

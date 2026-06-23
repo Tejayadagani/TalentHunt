@@ -36,7 +36,7 @@ export default function InterviewsPage() {
   // Load state from local storage on mount
   useEffect(() => {
     try {
-      const raw = localStorage.getItem("talentradar_pending_interviews");
+      const raw = localStorage.getItem("skillsync_pending_interviews");
       if (raw) {
         const data = JSON.parse(raw);
         setCandidates(data.candidates || []);

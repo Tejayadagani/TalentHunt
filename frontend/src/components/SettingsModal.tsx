@@ -67,7 +67,7 @@ export function SettingsModal({
               Architecture Overview
             </h2>
             <p className="text-sm text-muted-foreground mt-0.5">
-              TalentRadar&apos;s 5-Agent AI Pipeline
+              SkillSync AI&apos;s 5-Agent AI Pipeline
             </p>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-[#333] rounded-full transition-colors">

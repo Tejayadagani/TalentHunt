@@ -1,1 +1,1 @@
-# TalentRadar — Agents sub-package placeholder
+# SkillSync AI — Agents sub-package placeholder

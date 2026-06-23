@@ -1,4 +1,4 @@
-# TalentRadar 🛰️
+# SkillSync AI 🛰️
 
 An autonomous AI recruitment engine that ranks 100,000 candidates by simulating real screening conversations.
 
@@ -17,7 +17,7 @@ python backend/scripts/validate_submission.py submission.csv
 
 ## ⚔️ The Adversarial Reality
 
-TalentRadar treats the 100K-candidate pool as adversarial by default. Rather than scoring resumes against the JD's literal keywords, we built nine independent disqualifier checks — three of them (pure-research-only, recent-LangChain-wrapper-only, stopped-coding-18mo+) map directly to disqualifiers the JD states explicitly but that naive keyword matching would never catch. Our semantic layer is deliberately weighted equal to, not above, our skill layer — because over-weighting semantic similarity is itself the trap: a fluent, keyword-light 'Tier 5' profile and a fluent, keyword-stuffed 'wrong domain' profile can produce nearly identical embeddings. The system has to reason about who someone is, not just how they wrote about it.
+SkillSync AI treats the 100K-candidate pool as adversarial by default. Rather than scoring resumes against the JD's literal keywords, we built nine independent disqualifier checks — three of them (pure-research-only, recent-LangChain-wrapper-only, stopped-coding-18mo+) map directly to disqualifiers the JD states explicitly but that naive keyword matching would never catch. Our semantic layer is deliberately weighted equal to, not above, our skill layer — because over-weighting semantic similarity is itself the trap: a fluent, keyword-light 'Tier 5' profile and a fluent, keyword-stuffed 'wrong domain' profile can produce nearly identical embeddings. The system has to reason about who someone is, not just how they wrote about it.
 
 Instead, our pipeline forces the system to reason about *who someone is, not just how they wrote about it*. We built a deterministic engine that balances semantic meaning with rigorous, programmatic disqualifier checks—verifying actual career progression, isolating pure-academic backgrounds, and penalizing keyword stuffers. This ensures the final ranking reflects verifiable technical depth, not just linguistic fluency.
 

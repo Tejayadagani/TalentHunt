@@ -229,7 +229,7 @@ if __name__ == "__main__":
         "must_haves": ["5+ years experience"],
     }
 
-    print("=== TalentRadar — Agent 2: Talent Scout demo ===\n")
+    print("=== SkillSync AI — Agent 2: Talent Scout demo ===\n")
     print(f"JD: {SAMPLE_JD['title']} | {SAMPLE_JD['domain']} | {SAMPLE_JD['location']}")
     print(f"Required skills: {SAMPLE_JD['required_skills']}\n")
 

@@ -1,6 +1,6 @@
-# TalentRadar: Sample Inputs & Outputs
+# SkillSync AI: Sample Inputs & Outputs
 
-This document showcases standard workflows in the TalentRadar application, from raw Job Description input to the final live-sorted candidate shortlist.
+This document showcases standard workflows in the SkillSync AI application, from raw Job Description input to the final live-sorted candidate shortlist.
 
 ---
 

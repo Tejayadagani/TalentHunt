@@ -219,7 +219,7 @@ if __name__ == "__main__":
     Must have: experience with financial APIs, strong SQL skills.
     """
 
-    print("=== TalentRadar — Agent 1: JD Parser demo ===\n")
+    print("=== SkillSync AI — Agent 1: JD Parser demo ===\n")
     print("Input JD:")
     print(SAMPLE_JD.strip())
     print("\nParsing …\n")

@@ -30,7 +30,7 @@ if not CANDIDATES_FILE.exists():
 
 def main() -> None:
     print("=" * 60)
-    print("  TalentRadar — Candidate Embedding Script (Batch Mode)")
+    print("  SkillSync AI — Candidate Embedding Script (Batch Mode)")
     print("=" * 60)
 
     # ── Get (or create) the ChromaDB collection ──────────────────

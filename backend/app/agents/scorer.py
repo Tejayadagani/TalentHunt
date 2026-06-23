@@ -314,7 +314,7 @@ if __name__ == "__main__":
         "salary_range": {"min": 2000000, "max": 3500000, "currency": "INR"},
     }
 
-    print("=== TalentRadar — Agent 5: Technical Scorer demo ===\n")
+    print("=== SkillSync AI — Agent 5: Technical Scorer demo ===\n")
 
     try:
         result = asyncio.run(score_conversation(

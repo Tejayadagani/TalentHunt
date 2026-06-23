@@ -5,7 +5,7 @@ import os
 os.makedirs("artifacts", exist_ok=True)
 
 # Data
-labels = ['Hackathon CPU Limit\n(5 Minutes)', 'TalentRadar Live Execution\n(15.3 Seconds)']
+labels = ['Hackathon CPU Limit\n(5 Minutes)', 'SkillSync AI Live Execution\n(15.3 Seconds)']
 times = [300, 15.3]
 colors = ['#ef5350', '#2e7d32']
 

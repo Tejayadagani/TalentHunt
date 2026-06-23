@@ -136,7 +136,7 @@ const STEPS: { n: string; title: string; desc: string; Icon: React.ElementType }
   {
     n: "02",
     title: "We scout and screen candidates",
-    desc: "TalentRadar searches the talent pool by semantic similarity, then simulates a real screening conversation with each top match.",
+    desc: "SkillSync AI searches the talent pool by semantic similarity, then simulates a real screening conversation with each top match.",
     Icon: Radar,
   },
   {
@@ -151,7 +151,7 @@ const STEPS: { n: string; title: string; desc: string; Icon: React.ElementType }
 const WHY = [
   {
     title: "Skill match + genuine interest",
-    desc: "Most tools match keywords. TalentRadar also measures whether a candidate will actually accept the offer — before you pick up the phone.",
+    desc: "Most tools match keywords. SkillSync AI also measures whether a candidate will actually accept the offer — before you pick up the phone.",
   },
   {
     title: "Fully transparent scoring",
@@ -187,11 +187,11 @@ export default function LandingPage() {
       <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-[#E0E0E0] px-6 h-16 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <RadarLogo size={30} color="#2D7D3E" />
-          <span className="text-[19px] font-bold text-[#1A1A1A] tracking-tight">TalentRadar</span>
+          <span className="text-[19px] font-bold text-[#1A1A1A] tracking-tight">SkillSync AI</span>
         </div>
         <nav className="hidden md:flex items-center gap-6">
           <a href="#how-it-works" className="text-[14px] text-[#4A4A4A] hover:text-[#2D7D3E] transition-colors">How it works</a>
-          <a href="#why" className="text-[14px] text-[#4A4A4A] hover:text-[#2D7D3E] transition-colors">Why TalentRadar</a>
+          <a href="#why" className="text-[14px] text-[#4A4A4A] hover:text-[#2D7D3E] transition-colors">Why SkillSync AI</a>
           <a href="#preview" className="text-[14px] text-[#4A4A4A] hover:text-[#2D7D3E] transition-colors">See output</a>
         </nav>
         <Link href="/scout" className="bg-[#2D7D3E] hover:bg-[#1F5A2B] text-white text-[14px] font-semibold px-5 py-2.5 rounded-lg transition-colors">
@@ -220,7 +220,7 @@ export default function LandingPage() {
             <span className="text-white/80">not days.</span>
           </h1>
           <p className="text-[18px] text-[#D4E8D8] leading-relaxed max-w-xl mx-auto mb-10">
-            TalentRadar uses five AI agents to scout candidates, simulate screening conversations, and hand you a transparent ranked shortlist — before your first coffee is cold.
+            SkillSync AI uses five AI agents to scout candidates, simulate screening conversations, and hand you a transparent ranked shortlist — before your first coffee is cold.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
@@ -421,7 +421,7 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2.5">
             <RadarLogo size={26} color="#4A9D5F" />
-            <span className="text-white font-bold text-[16px]">TalentRadar</span>
+            <span className="text-white font-bold text-[16px]">SkillSync AI</span>
           </div>
           <p className="text-[13px] text-[#555] text-center">
             Built for Catalyst by Deccan AI · Powered by Groq Llama 3.3 70B & ChromaDB
