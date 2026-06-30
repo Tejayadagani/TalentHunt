@@ -25,17 +25,9 @@ curl -L -o candidates.jsonl "https://github.com/Tejayadagani/TalentHunt/releases
 bash run.sh
 ```
 
-**For Windows (use Git Bash — NOT Command Prompt):**
-
-> ⚠️ You must use **Git Bash** (installed with [Git for Windows](https://git-scm.com/download/win)). Regular CMD will not work.
-
-```bash
-git clone https://github.com/Tejayadagani/TalentHunt.git
-cd TalentHunt
-python -m venv venv
-source venv/Scripts/activate
-curl -L -o candidates.jsonl "https://github.com/Tejayadagani/TalentHunt/releases/download/v1.0.0/candidates.jsonl"
-bash run.sh
+**For Windows (Command Prompt — no Git Bash needed):**
+```cmd
+git clone https://github.com/Tejayadagani/TalentHunt.git && cd TalentHunt && curl -L -o candidates.jsonl "https://github.com/Tejayadagani/TalentHunt/releases/download/v1.0.0/candidates.jsonl" && run.bat
 ```
 
 ## ⚔️ The Adversarial Reality
