@@ -1,0 +1,4 @@
+# Minimal dependencies for the offline ranking pipeline (rank.py)
+# rank.py uses only Python standard library modules:
+# argparse, csv, gzip, json, logging, pickle, sys, time, pathlib, datetime
+# No external packages required!

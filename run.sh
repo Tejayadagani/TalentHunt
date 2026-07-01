@@ -5,10 +5,9 @@ set -e
 
 echo "🚀 Starting SkillSync AI offline ranking pipeline..."
 
-echo "📦 1. Installing dependencies..."
-export PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1
-pip install -q -r requirements.txt
-echo "✅ Dependencies installed."
+echo "📦 1. Checking Python environment..."
+python --version 2>/dev/null || python3 --version
+echo "✅ Python ready. (rank.py uses only standard library — no pip install needed!)"
 
 echo "📂 2. Extracting candidate database..."
 if [ -f "candidates.jsonl.gz" ]; then
