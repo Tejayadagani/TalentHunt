@@ -19,13 +19,11 @@ If you want to test this from scratch, simply run these commands. The dataset wi
 ```bash
 git clone https://github.com/Tejayadagani/TalentHunt.git
 cd TalentHunt
-python3 -m venv venv
-source venv/bin/activate
 curl -L -o candidates.jsonl.gz "https://github.com/Tejayadagani/TalentHunt/releases/download/v1.0.0/candidates.jsonl.gz"
 bash run.sh
 ```
 
-**For Windows (Command Prompt — no Git Bash needed):**
+**For Windows (Command Prompt):**
 ```cmd
 git clone https://github.com/Tejayadagani/TalentHunt.git && cd TalentHunt && curl -L -o candidates.jsonl.gz "https://github.com/Tejayadagani/TalentHunt/releases/download/v1.0.0/candidates.jsonl.gz" && run.bat
 ```
