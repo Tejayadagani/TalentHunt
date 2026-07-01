@@ -3,8 +3,11 @@ import sys
 from pathlib import Path
 
 def validate():
-    csv_path = Path(__file__).resolve().parent.parent / "submission.csv"
-    
+    if len(sys.argv) > 1:
+        csv_path = Path(sys.argv[1]).resolve()
+    else:
+        csv_path = Path(__file__).resolve().parent.parent / "submission.csv"
+
     if not csv_path.exists():
         print(f"❌ FAIL: {csv_path} does not exist.")
         sys.exit(1)
