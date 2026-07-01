@@ -17,10 +17,7 @@ If you want to test this from scratch, simply run these commands. The dataset wi
 
 **For Mac / Linux:**
 ```bash
-git clone https://github.com/Tejayadagani/TalentHunt.git
-cd TalentHunt
-curl -L -o candidates.jsonl.gz "https://github.com/Tejayadagani/TalentHunt/releases/download/v1.0.0/candidates.jsonl.gz"
-bash run.sh
+git clone https://github.com/Tejayadagani/TalentHunt.git && cd TalentHunt && curl -L -o candidates.jsonl.gz "https://github.com/Tejayadagani/TalentHunt/releases/download/v1.0.0/candidates.jsonl.gz" && bash run.sh
 ```
 
 **For Windows (Command Prompt):**
