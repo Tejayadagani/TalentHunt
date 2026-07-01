@@ -21,13 +21,13 @@ git clone https://github.com/Tejayadagani/TalentHunt.git
 cd TalentHunt
 python3 -m venv venv
 source venv/bin/activate
-curl -L -o candidates.jsonl "https://github.com/Tejayadagani/TalentHunt/releases/download/v1.0.0/candidates.jsonl"
+curl -L -o candidates.jsonl.gz "https://github.com/Tejayadagani/TalentHunt/releases/download/v1.0.0/candidates.jsonl.gz"
 bash run.sh
 ```
 
 **For Windows (Command Prompt — no Git Bash needed):**
 ```cmd
-git clone https://github.com/Tejayadagani/TalentHunt.git && cd TalentHunt && curl -L -o candidates.jsonl "https://github.com/Tejayadagani/TalentHunt/releases/download/v1.0.0/candidates.jsonl" && run.bat
+git clone https://github.com/Tejayadagani/TalentHunt.git && cd TalentHunt && curl -L -o candidates.jsonl.gz "https://github.com/Tejayadagani/TalentHunt/releases/download/v1.0.0/candidates.jsonl.gz" && run.bat
 ```
 
 ## ⚔️ The Adversarial Reality
